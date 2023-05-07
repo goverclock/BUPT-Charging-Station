@@ -1,8 +1,8 @@
 package main
 
-import "fmt"
+import "buptcs/server"
 
 func main() {
-
-	fmt.Println("FUNNY")
+	s := server.New()
+	s.Run(":8080")
 }

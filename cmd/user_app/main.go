@@ -23,14 +23,14 @@ func main() {
 	//login计划布局：文本框（表示欢迎以及登录错误信息）、（文本框）账号（输入框）、（文本框）密码（输入框）、登录按钮，退出按钮。
 
 	//欢迎/显示错误的文本框
-	HelloLabel := widget.NewLabel("Welcome to the charging app")
+	infoLabel := widget.NewLabel("Welcome to the charging app")
 
 	//账号密码输入文本框：
 	username := widget.NewEntry()
 	password := widget.NewPasswordEntry()
 
 	//创造登录与输出按钮
-	LoginButton := widget.NewButton("Login", func() {
+	loginButton := widget.NewButton("Login", func() {
 		//调用函数login（）（未实现）
 		if login(username.Text, password.Text) {
 			//打开功能界面,关闭登陆界面
@@ -38,7 +38,17 @@ func main() {
 			loginWindow.Close()
 		} else {
 			//显示登录错误文本
-			HelloLabel.SetText("Login failed")
+			infoLabel.SetText("Login failed")
+		}
+	})
+
+	// register button
+	regButton := widget.NewButton("Register", func() {
+		if register(username.Text, password.Text) {
+			infoLabel.SetText("Registered successfully")
+		} else {
+			//显示登录错误文本
+			infoLabel.SetText("Register failed")
 		}
 	})
 
@@ -49,13 +59,14 @@ func main() {
 
 	//创建登录界面布局
 	loginForm := container.NewVBox(
-		HelloLabel,
+		infoLabel,
 		widget.NewLabel("Username:"),
 		username,
 		widget.NewLabel("Password:"),
 		password,
 		container.NewHBox(
-			LoginButton,
+			loginButton,
+			regButton,
 			CancalButton,
 		),
 	)
@@ -94,6 +105,10 @@ func main() {
 func login(username string, passwd string) bool {
 	// TODO: 实现登录逻辑
 	return cli.RequestLogin(username, passwd)	
+}
+
+func register(username string, passwd string) bool {
+	return cli.RequestRegister(username, passwd)	
 }
 
 func StartCharging() {
