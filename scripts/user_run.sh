@@ -1,0 +1,1 @@
+go run ../cmd/user_app/main.go
