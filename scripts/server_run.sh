@@ -1,1 +1,0 @@
-go run ../cmd/server_app/main.go
