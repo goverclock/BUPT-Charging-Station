@@ -1,7 +1,6 @@
 package data
 
 import (
-	"log"
 	"time"
 )
 
@@ -93,7 +92,7 @@ func (user *User) CreatePost(conv Thread, body string) (post Post, err error) {
 func Threads() (threads []Thread, err error) {
 	rows, err := Db.Query("SELECT id, uuid, topic, user_id, created_at FROM threads ORDER BY created_at DESC")
 	if err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
 		return
 	}
 	for rows.Next() {
