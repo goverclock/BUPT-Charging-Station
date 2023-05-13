@@ -117,35 +117,110 @@ body {
  * 我的修改
 
 */
+#div-present{
+  position: relative;
+  background-color:#1a2530;
+  width: 845px;
+  height: 550px;
+  left: 200px;
+  bottom: 550px;
+  
+}
+#div1{
+   background-color: #859394;
+   width: 1045px;
+   height: 550px;
+   
+}
+#div-buttons{
+  position: relative;
+  background-color:#707c7d;
+  height: 550px;
+  width: 200px;
+}
+#my_nav{
+  position: relative;
+  
+  width: 1045px;
+
+}
 #start_charge{
   position: relative;
-  left: 85px;
+  left: 30px;
+  top:100px;
 }
 #quarry{
   position: relative;
-  left: 85px;
+  left: 30px;
+  top:100px;
 }
 #modify_quarry{
   position: relative;
-  left: 85px;
+  left: 30px;
+  top:100px;
 }
 #quarry_id{
   position: relative;
-  left: 85px;
+  left: 30px;
+  top:100px;
 }
 #wait_cars{
   position: relative;
-  left: 85px;
+  left: 30px;
+  top:100px;
 }
 #end_charge{
   position: relative;
-  left: 85px;
-}
-#exit{
-  position: relative;
-  left: 85px;
+  left: 30px;
+  top:100px;
 }
 
+.myselect{
+  position: relative;
+  left: 120px;
+  top: 100px;
+}
+#startbutton{
+  position: relative;
+  left: 140px;
+  top: 120px;
+}
+#mylab{
+  font-size: large;
+}
+#exit-btn{
+  position: relative;
+  bottom: 40px;
+  left:679px;
+  background-color: red;
+}
+#div-quarry{
+  width: 700px;
+  height: 400px;
+  position: relative;
+  left: 80px;
+  top:75px;
+
+  background-color: #1f5b83;
+}
+#start_x{
+  position: relative;
+  bottom:77px;
+  left:295px;
+  background-color: red;
+}
+
+dialog{
+  width: 400px;
+  height: 400px;
+  position: relative;
+  top:100px;
+  background-color: #1f5b83;
+  font-size: larger;
+  
+}
+
+/*添加到此为止*/
 
 hr {
   margin: 1rem 0;
