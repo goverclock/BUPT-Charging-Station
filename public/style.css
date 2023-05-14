@@ -118,6 +118,13 @@ body {
 
 */
 
+#charge_select{
+  position: relative;
+  background-color:#1675b4;
+  top: -43px;
+  left:150px;
+
+}
 #div-present{
   position: relative;
   background-color:#1a2530;
@@ -184,7 +191,7 @@ body {
 #startbutton{
   position: relative;
   left: 140px;
-  top: 120px;
+  
 }
 #mylab{
   font-size: large;
@@ -206,8 +213,14 @@ body {
 }
 #start_x{
   position: relative;
-  bottom:77px;
+  bottom:173px;
   left:295px;
+  background-color: red;
+}
+#modify_x{
+  position: relative;
+  top:-19px;
+  left:80px;
   background-color: red;
 }
 
