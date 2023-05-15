@@ -1,9 +1,20 @@
+//To do 
+//1 充电详单查询首先需要订单文件id,用于区分不同订单,建议采用日期,用户便于查找指定订单
+//在用户登陆后将订单文件id发到客户端,然后用户根据订单id查找订单,服务器再将详细内容发送至客户端.
+//2 排队号码查询,服务器需将排队号码发送至客户端
+//3 排队车辆查询,服务器需将前车的等待数发送至客户端.
+
+
+
+//状态变量
+let value=0;//用于控制显示区只显示一个子窗口
+let car_position=1;// 1表示处于等待区,2表示处于充电区,0代表处于充电站外.
+
 //安全退出的代码
 const btn_login_out=document.querySelector("#nav-btn2");
 const form_login_out=document.querySelector("#form_login_out");
 btn_login_out.addEventListener("click",()=>{
     form_login_out.submit();
-    
 });
 
 
@@ -55,6 +66,7 @@ start_charge.addEventListener("click",()=>{
     form_charge.method="POST";
     start_x.textContent="x";
     start_x.id="start_x";
+    start_x.className="btn btn-primary";
    
     submit.className="btn btn-primary";
     submit.textContent="确认";
@@ -114,6 +126,7 @@ quarry.addEventListener("click",()=>{
     submit.textContent="确认";
     submit.className="btn btn-secondary";
     exit_btn.textContent='x';
+    exit_btn.className="btn btn-secondary";
     exit_btn.id="exit-btn";
 
     value=1;
@@ -176,6 +189,7 @@ modify_quarry.addEventListener("click",()=>{
         form_modify.method="POST";
         start_x.textContent="x";
         start_x.id="start_x";
+        start_x.className="btn btn-secondary";
    
         submit.className="btn btn-primary";
         submit.textContent="确认";
@@ -211,6 +225,72 @@ modify_quarry.addEventListener("click",()=>{
     start_x.addEventListener("click",()=>{
         value=0;
         diag_modify.remove();
+
+    });
+
+
+});
+
+//结束充电的代码
+const end_charge=document.querySelector("#end_charge");
+end_charge.addEventListener("click",()=>{
+    if(value!==0){
+        return;
+    }
+    let diag_end=document.createElement("dialog");
+    let form_end=document.createElement("form");
+    let submit=document.createElement("button");
+    let end_x1=document.createElement("button");
+    let end_x2=document.createElement("button");
+
+    form_end.action="end_charge_action";
+    form_end.method="POST";
+    end_x1.textContent="x";
+    end_x1.id="end-x";
+    end_x2.textContent="x";
+    end_x2.id="end-x2";
+    end_x1.className="btn btn-primary";
+    end_x2.className="btn btn-primary";
+    submit.textContent="确认";
+    submit.className="btn btn-primary";
+    submit.id="end_btn";
+    submit.name="exit_charge";
+   
+    div_operation.appendChild(diag_end);
+
+    if(car_position===1){//等待区
+        diag_end.textContent="您当前正处于等待区,可以直接修改充电请求,确定要结束充电吗?";
+        diag_end.appendChild(form_end);
+        form_end.appendChild(submit);
+        diag_end.appendChild(end_x2);
+        diag_end.show();
+
+    }
+    else if(car_position===2){//充电区
+        diag_end.textContent="您当前正在充电,确定要结束充电吗?";
+        diag_end.appendChild(form_end);
+        form_end.appendChild(submit);
+        diag_end.appendChild(end_x1);
+        diag_end.show();
+
+    }
+    else{
+        diag_end.textContent="确定取消充电吗?";
+        diag_end.appendChild(form_end);
+        form_end.appendChild(submit);
+        diag_end.appendChild(end_x1);
+        diag_end.show();
+
+    }
+    submit.addEventListener("click",()=>{
+        form_end.submit();
+        value=0;
+        diag_end.remove();
+
+    });
+    end_x1.addEventListener("click",()=>{
+        diag_end.remove();
+        value=0;
 
     });
 
