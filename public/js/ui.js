@@ -3,6 +3,7 @@ const btn_login_out=document.querySelector("#nav-btn2");
 const form_login_out=document.querySelector("#form_login_out");
 btn_login_out.addEventListener("click",()=>{
     form_login_out.submit();
+    
 });
 
 
