@@ -15,7 +15,10 @@ func main() {
 
 	mux.HandleFunc("/", index)
 	mux.HandleFunc("/login", login)
+	mux.HandleFunc("/authenticate", authenticate)
 	mux.HandleFunc("/ui", ui)
+
+	mux.HandleFunc("/errpage", errpage)
 
 	server := &http.Server{
 		Addr:           config.Address,
