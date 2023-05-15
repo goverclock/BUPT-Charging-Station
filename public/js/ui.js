@@ -1,3 +1,11 @@
+//安全退出的代码
+const btn_login_out=document.querySelector("#nav-btn2");
+const form_login_out=document.querySelector("#form_login_out");
+btn_login_out.addEventListener("click",()=>{
+    form_login_out.submit();
+});
+
+
 //start_charge代码
 const start_charge=document.querySelector("#start_charge");
 const div_operation=document.querySelector("#div-present");

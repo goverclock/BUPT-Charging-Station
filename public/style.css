@@ -117,6 +117,12 @@ body {
  * 我的修改
 
 */
+#nav-btn2{
+  background-color:red;
+}
+#nav-btn1{
+  background-color:#194969;
+}
 
 #charge_select{
   position: relative;
