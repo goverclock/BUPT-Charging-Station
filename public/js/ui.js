@@ -293,6 +293,11 @@ end_charge.addEventListener("click",()=>{
         value=0;
 
     });
+    end_x2.addEventListener("click",()=>{
+        diag_end.remove();
+        value=0;
+
+    });
 
 
 });
