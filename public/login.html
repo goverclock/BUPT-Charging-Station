@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=9">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>自助充电系统</title>
-    <link href="/static/style.css" rel="stylesheet">
-    
-    
-  </head>
-  <body>
-        <form action="login" method="post" >
-            <h3 >
-                欢迎
-                <small class="text-muted">登录充电系统</small>
-              </h3>
-            
-              <div class="form-group" >
-                    <label class="form-label mt-4" for="exampleInputEmail1">用户名</label>
-                    <input type="email" name="use_name" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="输入邮箱地址">
-              </div>
-            
-              <div class="form-group" >
-                <label for="exampleInputPassword1" for="password" class="form-label mt-4">密码</label>
-                <input type="password" name="user_password" class="form-control" placeholder="输入密码" id="password">
-                <br>
-                </div>
-                &ensp;&ensp;<button id="sign up" type="submit"  name="sign_up" class="btn btn-primary">
-                    sign up
-                </button>
-                  <tr> &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</tr>
-                  <button id="sign in" type="submit" name="sign_in" class="btn btn-secondary">
-                    sign in
-                  </button>
-            </form>
-    
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=9">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>自助充电系统</title>
+  <link href="/static/style.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+  <form action="authenticate" method="post">
+    <h3>
+      欢迎
+      <small class="text-muted">登录充电系统</small>
+    </h3>
+    <div class="form-group">
+      <label class="form-label mt-4" for="exampleInputEmail1">用户名</label>
+      <input type="email" name="user_name" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+        placeholder="输入邮箱地址">
+    </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1" for="password" class="form-label mt-4">密码</label>
+      <input type="password" name="user_password" class="form-control" placeholder="输入密码" id="password">
+      <br>
+    </div>
+
+    &ensp;&ensp;<button id="sign in" type="submit" name="sign_in" class="btn btn-primary">
+      登录
+    </button>
+    <tr> &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</tr>
+    <button id="sign up" type="submit" name="sign_up" class="btn btn-secondary">
+      注册
+    </button>
+  </form>
+
+</body>
+
 </html>
