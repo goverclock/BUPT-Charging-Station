@@ -140,6 +140,16 @@ body {
   bottom: 550px;
   
 }
+#div-background{
+  position: relative;
+  background-color:#14a085;
+  width: 845px;
+  height: 550px;
+  left: 200px;
+  bottom: 550px;
+  top:-550px;
+  
+}
 #div1{
    background-color: #859394;
    width: 1045px;
@@ -163,27 +173,27 @@ body {
   left: 30px;
   top:100px;
 }
-#quarry{
+#queue_ind{
   position: relative;
   left: 30px;
   top:100px;
 }
-#modify_quarry{
+#modify_queue_ind{
   position: relative;
   left: 30px;
   top:100px;
 }
-#quarry_id{
+#queue_ind_id{
   position: relative;
   left: 30px;
   top:100px;
 }
-#wait_cars{
+#pending_cars{
   position: relative;
   left: 30px;
   top:100px;
 }
-#end_charge{
+#stop_charge{
   position: relative;
   left: 30px;
   top:100px;
@@ -205,10 +215,10 @@ body {
 #exit-btn{
   position: relative;
   bottom: 40px;
-  left:665px;
+  left:680px;
   background-color: red;
 }
-#div-quarry{
+#div-queue_ind{
   width: 700px;
   height: 400px;
   position: relative;
@@ -220,7 +230,7 @@ body {
 #start_x{
   position: relative;
   bottom:173px;
-  left:288px;
+  left:295px;
   background-color: red;
 }
 #end_btn{
