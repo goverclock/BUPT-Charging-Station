@@ -37,9 +37,9 @@ func authenticate(writer http.ResponseWriter, request *http.Request) {
 			Email:    request.PostFormValue("user_name"),
 			Password: request.PostFormValue("user_password"),
 		}
-		log.Println(user)
+		// log.Println(user)
 		if err := user.Create(); err != nil {
-			log.Println(err, "Cannot create user")
+			// log.Println(err, "Cannot create user")
 		}
 		http.Redirect(writer, request, "/login", http.StatusFound)
 		return

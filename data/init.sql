@@ -34,3 +34,10 @@ create table cars (
   stage     varchar(64) not null,
   qid       varchar(64)
 );
+
+-- 2 Fast, 3 Slow
+INSERT INTO stations (mode) VALUES ('Fast');
+INSERT INTO stations (mode) VALUES ('Fast');
+INSERT INTO stations (mode) VALUES ('Slow');
+INSERT INTO stations (mode) VALUES ('Slow');
+INSERT INTO stations (mode) VALUES ('Slow');

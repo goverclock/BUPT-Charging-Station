@@ -13,3 +13,9 @@ func CarById(id int) (c Car, err error) {
 	err = Db.QueryRow("SELECT id, ownedby, stage, qid FROM cars WHERE id = $1", id).Scan(&c.Id, &c.OwnedBy, &c.Stage, &c.QId)
 	return
 }
+
+func CarByUser(user *User) (c Car, err error) {
+	c = Car{}
+	err = Db.QueryRow("SELECT id, ownedby, stage, qid FROM cars WHERE ownedby = $1", user.Uuid).Scan(&c.Id, &c.OwnedBy, &c.Stage, &c.QId)
+	return
+}
