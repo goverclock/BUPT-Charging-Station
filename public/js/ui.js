@@ -17,13 +17,17 @@ btn_login_out.addEventListener("click", () => {
     form_login_out.submit();
 });
 
-
 //start_charge代码
 const start_charge = document.querySelector("#start_charge");
 const div_operation = document.querySelector("#div-present");
+const div1=document.querySelector("#div1");
+const div_background=document.querySelector("#div-background");
 const body = document.querySelector("body");
+div_operation.remove();
 
 start_charge.addEventListener("click", () => {
+    div_background.remove();
+    div1.appendChild(div_operation);
     if (value !== 0) {
         return;
     }
@@ -80,11 +84,15 @@ start_charge.addEventListener("click", () => {
     submit.addEventListener("click", () => {
         form_charge.submit();
         value = 0;
+        div_operation.remove();
+        div1.appendChild(div_background);
         diag.remove();
 
     })
     start_x.addEventListener("click", () => {
         value = 0;
+        div_operation.remove();
+        div1.appendChild(div_background);
         diag.remove();
 
     });
@@ -94,6 +102,8 @@ start_charge.addEventListener("click", () => {
 // queue_ind的代码
 const queue_ind = document.querySelector("#queue_ind");
 queue_ind.addEventListener("click", () => {
+    div_background.remove();
+    div1.appendChild(div_operation);
     if (value !== 0) {
         return;
     }
@@ -131,15 +141,21 @@ queue_ind.addEventListener("click", () => {
         value = 0;
         form_queue_ind.submit();
         div_queue_ind.remove();
+        div_operation.remove();
+        div1.appendChild(div_background);
     });
     exit_btn.addEventListener("click", () => {
         value = 0;
         div_queue_ind.remove();
+        div_operation.remove();
+        div1.appendChild(div_background);
     });
 });
 //modify_queue_ind代码
 const modify_queue_ind = document.querySelector("#modify_queue_ind");
 modify_queue_ind.addEventListener("click", () => {
+    div_background.remove();
+    div1.appendChild(div_operation);
     if (value !== 0) {
         return;
     }
@@ -212,11 +228,15 @@ modify_queue_ind.addEventListener("click", () => {
     submit.addEventListener("click", () => {
         form_modify.submit();
         value = 0;
+        div_operation.remove();
+        div1.appendChild(div_background);
         diag_modify.remove();
 
     })
     start_x.addEventListener("click", () => {
         value = 0;
+        div_operation.remove();
+        div1.appendChild(div_background);
         diag_modify.remove();
 
     });
@@ -227,6 +247,8 @@ modify_queue_ind.addEventListener("click", () => {
 //结束充电的代码
 const end_charge=document.querySelector("#end_charge");
 end_charge.addEventListener("click",()=>{
+    div_background.remove();
+    div1.appendChild(div_operation);
     if(value!==0){
         return;
     }
