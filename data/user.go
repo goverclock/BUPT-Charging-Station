@@ -57,6 +57,13 @@ func UserByEmail(email string) (user User, err error) {
 	return
 }
 
+func UserBySession(sess *Session) (user User, err error) {
+	user = User{}
+	err = Db.QueryRow("SELECT id, uuid, email, created_at FROM users WHERE id = $1", sess.UserId).
+		Scan(&user.Id, &user.Uuid, &user.Email, &user.CreatedAt)
+	return
+}
+
 // Create a new session for an existing user
 func (user *User) CreateSession() (session Session, err error) {
 	statement := "insert into sessions (uuid, email, user_id, created_at) values ($1, $2, $3, $4) returning id, uuid, email, user_id, created_at"

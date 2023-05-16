@@ -23,6 +23,7 @@ func login(writer http.ResponseWriter, request *http.Request) {
 	t.Execute(writer, nil)
 }
 
+// including both login and register
 func authenticate(writer http.ResponseWriter, request *http.Request) {
 	request.ParseForm()
 	user_email := request.PostFormValue("user_name")
@@ -36,9 +37,9 @@ func authenticate(writer http.ResponseWriter, request *http.Request) {
 			Email:    request.PostFormValue("user_name"),
 			Password: request.PostFormValue("user_password"),
 		}
-		log.Println(user)
+		// log.Println(user)
 		if err := user.Create(); err != nil {
-			log.Println(err, "Cannot create user")
+			// log.Println(err, "Cannot create user")
 		}
 		http.Redirect(writer, request, "/login", http.StatusFound)
 		return
@@ -66,11 +67,33 @@ func authenticate(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+func logout(writer http.ResponseWriter, request *http.Request) {
+	cookie, err := request.Cookie("_cookie")
+	if err != http.ErrNoCookie {
+		// log.Println(err, "Failed to get cookie")	// just a WARNING
+		session := data.Session{Uuid: cookie.Value}
+		session.DeleteByUUID()
+	}
+	http.Redirect(writer, request, "/", http.StatusFound)
+}
+
 // charging page
 func ui(writer http.ResponseWriter, request *http.Request) {
+	// check if user has logged in
+	_, err := session(writer, request)
+	if err != nil { // user hasn't logged in
+		http.Redirect(writer, request, "/login", http.StatusFound)
+		return
+	}
+	
 	file := "public/ui.html"
 	t := template.Must(template.ParseFiles(file))
 	t.Execute(writer, nil)
+}
+
+func operation(writer http.ResponseWriter, request *http.Request) {
+	request.ParseForm()
+	log.Println(request.Form)
 }
 
 // TODO: a page to show an error message

@@ -163,27 +163,27 @@ body {
   left: 30px;
   top:100px;
 }
-#quarry{
+#queue_ind{
   position: relative;
   left: 30px;
   top:100px;
 }
-#modify_quarry{
+#modify_queue_ind{
   position: relative;
   left: 30px;
   top:100px;
 }
-#quarry_id{
+#queue_ind_id{
   position: relative;
   left: 30px;
   top:100px;
 }
-#wait_cars{
+#pending_cars{
   position: relative;
   left: 30px;
   top:100px;
 }
-#end_charge{
+#stop_charge{
   position: relative;
   left: 30px;
   top:100px;
@@ -208,7 +208,7 @@ body {
   left:665px;
   background-color: red;
 }
-#div-quarry{
+#div-queue_ind{
   width: 700px;
   height: 400px;
   position: relative;

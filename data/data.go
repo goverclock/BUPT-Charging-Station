@@ -25,6 +25,7 @@ func Encrypt(plaintext string) (cryptext string) {
 	cryptext = fmt.Sprintf("%x", sha1.Sum([]byte(plaintext)))
 	return
 }
+
 // create a random UUID with from RFC 4122
 // adapted from http://github.com/nu7hatch/gouuid
 func createUUID() (uuid string) {
@@ -40,5 +41,18 @@ func createUUID() (uuid string) {
 	// time_hi_and_version field to the 4-bit version number.
 	u[6] = (u[6] & 0xF) | (0x4 << 4)
 	uuid = fmt.Sprintf("%x-%x-%x-%x-%x", u[0:4], u[4:6], u[6:8], u[8:10], u[10:])
+	return
+}
+
+// delete session from database
+func (session *Session) DeleteByUUID() (err error) {
+	statement := "delete from sessions where uuid = $1"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(session.Uuid)
 	return
 }
