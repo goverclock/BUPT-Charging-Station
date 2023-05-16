@@ -205,7 +205,7 @@ body {
 #exit-btn{
   position: relative;
   bottom: 40px;
-  left:679px;
+  left:665px;
   background-color: red;
 }
 #div-queue_ind{
@@ -220,7 +220,25 @@ body {
 #start_x{
   position: relative;
   bottom:173px;
-  left:295px;
+  left:288px;
+  background-color: red;
+}
+#end_btn{
+  position: relative;
+  left:140px;
+  top :50px;
+
+}
+#end-x{
+  position: relative;
+  left:345px;
+  top:-86px;
+  background-color: red;
+}
+#end-x2{
+  position: relative;
+  left:345px;
+  top:-115px;
   background-color: red;
 }
 #modify_x{
