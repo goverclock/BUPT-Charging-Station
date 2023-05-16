@@ -81,7 +81,33 @@ start_charge.addEventListener("click",()=>{
     value=1;
 
     submit.addEventListener("click",()=>{
-        form_charge.submit();
+        var data = {
+            key1: 'value1',
+            key2: 'value2'
+          };
+          
+          fetch("/operation/start_charge", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+            .then(function(response) {
+              if (response.ok) {
+                // 请求成功处理响应数据
+                return response.text();
+              } else {
+                // 请求失败处理错误信息
+                throw new Error('请求出错。状态码：' + response.status);
+              }
+            })
+            .then(function(data) {
+              console.log(data);
+            })
+            .catch(function(error) {
+              console.error('请求出错：', error);
+            });
         value=0;
         diag.remove();
 
