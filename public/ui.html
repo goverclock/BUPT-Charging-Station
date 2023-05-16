@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=9">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>自助充电系统</title>
+  <title>智能充电系统</title>
   <link href="/static/style.css" rel="stylesheet">
 
 
@@ -50,32 +50,26 @@
   </nav>
   <div>
     <form action="operation" method="post">
-
       <div id="div1">
         <div id="div-buttons">
           <p><button type="button" id="start_charge" name="start_charge" class="btn btn-primary"
               value="0">&ensp;&ensp;开始充电&ensp;&ensp;</button></p>
-          <p><button type="button" id="quarry" name="quarry " class="btn btn-secondary" value="0">充电详单查询</button></p>
-          <p><button type="button" id="modify_quarry" name="modify_quarry" class="btn btn-primary"
+          <p><button type="button" id="queue_ind" name="queue_ind " class="btn btn-secondary" value="0">充电详单查询</button></p>
+          <p><button type="button" id="modify_queue_ind" name="modify_queue_ind" class="btn btn-primary"
               value="0">修改充电请求</button></p>
-          <p><button type="submit" id="quarry_id" name="quarry_id" class="btn btn-secondary" value="0">排队号码查询</button>
+          <p><button type="submit" id="queue_ind_id" name="queue_ind_id" class="btn btn-secondary" value="0">排队号码查询</button>
           </p>
-          <p><button type="submit" id="wait_cars" name="wait_cars" class="btn btn-primary" value="0">排队车辆查询</button></p>
-          <p><button type="submit" id="end_charge" name="end_charge" class="btn btn-secondary"
+          <p><button type="submit" id="pending_cars" name="pending_cars" class="btn btn-primary" value="0">排队车辆查询</button></p>
+          <p><button type="submit" id="stop_charge" name="stop_charge" class="btn btn-secondary"
               value="0">&ensp;&ensp;结束充电&ensp;&ensp;</button></p>
         </div>
         <div id="div-present">
-
-
         </div>
-
       </div>
-
     </form>
-
   </div>
-
 </body>
+
 <script src="js/ui.js" defer></script>
 
 </html>
