@@ -25,6 +25,7 @@ func Encrypt(plaintext string) (cryptext string) {
 	cryptext = fmt.Sprintf("%x", sha1.Sum([]byte(plaintext)))
 	return
 }
+
 // create a random UUID with from RFC 4122
 // adapted from http://github.com/nu7hatch/gouuid
 func createUUID() (uuid string) {

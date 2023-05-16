@@ -18,6 +18,7 @@ func main() {
 	mux.HandleFunc("/authenticate", authenticate)
 	mux.HandleFunc("/logout", logout)
 	mux.HandleFunc("/ui", ui)
+	mux.HandleFunc("/operation", operation)
 
 	mux.HandleFunc("/errpage", errpage)
 

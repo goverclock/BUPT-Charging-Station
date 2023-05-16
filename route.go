@@ -91,6 +91,11 @@ func ui(writer http.ResponseWriter, request *http.Request) {
 	t.Execute(writer, nil)
 }
 
+func operation(writer http.ResponseWriter, request *http.Request) {
+	request.ParseForm()
+	log.Println(request.Form)
+}
+
 // TODO: a page to show an error message
 func errpage(writer http.ResponseWriter, request *http.Request) {
 	// file := "public/ui.html"
