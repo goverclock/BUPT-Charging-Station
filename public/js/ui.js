@@ -22,8 +22,6 @@ btn_login_out.addEventListener("click", () => {
 const start_charge = document.querySelector("#start_charge");
 const div_operation = document.querySelector("#div-present");
 const body = document.querySelector("body");
-let value = 0;
-let car_position = 1;// 1表示处于等待区,2表示处于充电区,0代表处于充电站外.
 
 start_charge.addEventListener("click", () => {
     if (value !== 0) {
