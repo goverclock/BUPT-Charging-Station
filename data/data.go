@@ -42,3 +42,16 @@ func createUUID() (uuid string) {
 	uuid = fmt.Sprintf("%x-%x-%x-%x-%x", u[0:4], u[4:6], u[6:8], u[8:10], u[10:])
 	return
 }
+
+// delete session from database
+func (session *Session) DeleteByUUID() (err error) {
+	statement := "delete from sessions where uuid = $1"
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(session.Uuid)
+	return
+}
