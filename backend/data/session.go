@@ -11,7 +11,6 @@ type Session struct {
 }
 
 // check if session is valid in the database
-// TODO: legacy
 func (session *Session) Check() (valid bool, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, user_id, created_at FROM sessions WHERE uuid = $1", session.Uuid).
 		Scan(&session.Id, &session.Uuid, &session.Name, &session.UserId, &session.CreatedAt)
@@ -25,15 +24,13 @@ func (session *Session) Check() (valid bool, err error) {
 	return
 }
 
-// TODO: legacy
 func UserBySession(sess *Session) (user User, err error) {
 	user = User{}
-	err = Db.QueryRow("SELECT id, uuid, name, password, balance, batteryCapacity, created_at FROM users WHERE id = $1", sess.Uuid).
-		Scan(&user.Id, &user.Name, &user.Password, &user.Balance, &user.BatteryCapacity)
+	err = Db.QueryRow("SELECT * FROM users WHERE id = $1", sess.Uuid).
+		Scan(&user.Id, &user.Uuid, &user.Name, &user.Password, &user.Balance, &user.BatteryCapacity)
 	return
 }
 
-// TOOD: legacy
 // Create a new session for an existing user
 func (user *User) CreateSession() (session Session, err error) {
 	statement := "insert into sessions (uuid, name, user_id, created_at) values ($1, $2, $3, $4) returning id, uuid, name, user_id, created_at"
