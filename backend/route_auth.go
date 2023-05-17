@@ -46,12 +46,60 @@ func user_login(ctx *gin.Context) {
 	} else if user.Password != data.Encrypt(request.Password) {
 		response.Code = "500"
 		response.Msg = "wrong password"
-	} else if user.Password == data.Encrypt(request.Password){
+	} else if user.Password == data.Encrypt(request.Password) {
 		response.Code = "200"
 		response.Msg = "success"
-	} 
+	}
 	response.Data.Balance = user.Balance
 	response.Data.Balance = user.BatteryCapacity
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func register_user(ctx *gin.Context) {
+	var request struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	ctx.BindJSON(&request)
+	log.Println(request)
+
+	var response struct {
+		Code string `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+			Username        string  `json:"username"`
+			Password        string  `json:"password"`
+			Balance         float64 `json:"balance"`
+			BatteryCapacity float64 `json:"batteryCapacity"`
+		} `json:"data"`
+	}
+
+	user, err := data.UserByName(request.Username)
+	if request.Username == "" || request.Password == "" {
+		response.Code = "400"
+		response.Msg = "need user name or password"
+	} else if err == nil {
+		// user with same name already exists, can't register
+		response.Code = "600"
+		response.Msg = "username is taken"
+	} else {
+		response.Code = "200"
+		response.Msg = "register succeeds"
+		user.Name = request.Username
+		user.Password = request.Password
+		user.Balance = 0
+		user.BatteryCapacity = 0
+		err = user.Create()
+		if err != nil {
+			log.Fatal(err, "fail to create user")
+		}
+
+		response.Data.Username = user.Name
+		response.Data.Password = user.Password
+		response.Data.Balance = user.Balance
+		response.Data.BatteryCapacity = user.BatteryCapacity
+	}
 
 	ctx.JSON(http.StatusOK, response)
 }
