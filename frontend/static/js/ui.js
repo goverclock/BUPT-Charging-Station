@@ -310,7 +310,7 @@ modify_queue_ind.addEventListener("click", () => {
 });
 
 //结束充电的代码
-const end_charge=document.querySelector("#end_charge");
+const end_charge=document.querySelector("#stop_charge");
 end_charge.addEventListener("click",()=>{
     div_background.remove();
     div1.appendChild(div_operation);
