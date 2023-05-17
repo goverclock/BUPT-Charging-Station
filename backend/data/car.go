@@ -7,3 +7,5 @@ type Car struct {
 	Stage   string // Waiting, Queueing, Charging
 	QId     string // F1, F2, T1, T2...
 }
+
+var Cars []Car

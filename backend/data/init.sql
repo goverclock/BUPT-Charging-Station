@@ -1,7 +1,5 @@
 drop table sessions;
 drop table users;
-drop table stations;
-drop table cars;
 
 create table users (
   id         serial primary key,
@@ -18,32 +16,17 @@ create table sessions (
   user_id    integer references users(id)
 );
 
-create table stations (
-  id        serial primary key,
-  mode      varchar(64) not null,
-  usedby    varchar(64),
-  slot1     varchar(64),
-  slot2     varchar(64)
-  -- ok        boolean  -- is the station functional?
-);
+-- create table cars (
+--   id        serial primary key,
+--   ownedby   varchar(64) not null,
+--   stage     varchar(64) not null,
+--   qid       varchar(64)
+-- );
 
-create table cars (
-  id        serial primary key,
-  ownedby   varchar(64) not null,
-  stage     varchar(64) not null,
-  qid       varchar(64)
-);
+-- -- examples
 
--- 2 Fast, 3 Slow
-INSERT INTO stations (mode) VALUES ('Fast');
-INSERT INTO stations (mode) VALUES ('Fast');
-INSERT INTO stations (mode) VALUES ('Slow');
-INSERT INTO stations (mode) VALUES ('Slow');
-INSERT INTO stations (mode) VALUES ('Slow');
+-- -- user must be created with Create, because data is Encrypted
+-- -- INSERT INTO users (name, password, balance, batteryCapacity) VALUES ('an', 'ap', 100, 233);
 
--- examples
-
--- user must be created with Create, because data is Encrypted
--- INSERT INTO users (name, password, balance, batteryCapacity) VALUES ('an', 'ap', 100, 233);
-
+-- INSERT INTO cars (ownedby, stage, qid) VALUES ('g', 'Waiting', 'F1');
 

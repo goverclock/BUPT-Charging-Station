@@ -48,7 +48,7 @@ func user_login(ctx *gin.Context) {
 		response.Msg = "wrong password"
 	} else if user.Password == data.Encrypt(request.Password) {
 		response.Code = "200"
-		response.Msg = "success"
+		response.Msg = "login succeeded"
 	}
 	response.Data.Balance = user.Balance
 	response.Data.Balance = user.BatteryCapacity
