@@ -7,6 +7,10 @@ import (
 	"net/http"
 )
 
+func userlogin(writer http.ResponseWriter, request *http.Request) {
+
+}
+
 func index(writer http.ResponseWriter, request *http.Request) {
 	_, err := session(writer, request)
 	if err == nil { // user has logged in
@@ -85,7 +89,7 @@ func ui(writer http.ResponseWriter, request *http.Request) {
 		http.Redirect(writer, request, "/login", http.StatusFound)
 		return
 	}
-	
+
 	file := "public/ui.html"
 	t := template.Must(template.ParseFiles(file))
 	t.Execute(writer, nil)
