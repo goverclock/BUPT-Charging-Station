@@ -5,12 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=9">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>自助充电系统</title>
-    <link href="style.css" rel="stylesheet">
+    <link href="static/style.css" rel="stylesheet">
+    <script src="static/js/sign.js" defer></script>
     
     
   </head>
   <body>
-        <form action="login" method="post" >
+        
             <h3 >
                 欢迎
                 <small class="text-muted">登录充电系统</small>
@@ -26,14 +27,16 @@
                 <input type="password" name="user_password" class="form-control" placeholder="输入密码" id="password">
                 <br>
                 </div>
-                &ensp;&ensp;<button id="sign up" type="submit"  name="sign_up" class="btn btn-primary">
+                &ensp;&ensp;
+                <button id="signup" type="type"  name="sign_up" class="btn btn-primary">
                     sign up
                 </button>
                   <tr> &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</tr>
-                  <button id="sign in" type="submit" name="sign_in" class="btn btn-secondary">
-                    sign in
+                  <button   id="sign in" type="type" name="sign_in" class="btn btn-secondary">
+                    <a href="ui.html">sign in</a>
                   </button>
-            </form>
+           
     
   </body>
+  
 </html>

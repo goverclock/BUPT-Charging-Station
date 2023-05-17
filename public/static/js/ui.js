@@ -5,6 +5,56 @@
 //3 排队车辆查询,服务器需将前车的等待数发送至客户端.
 
 
+//向服务器发送数据
+function send_data(part_url,object){
+    server_addr="http://localhost:8080";
+    url=server_addr+part_url;
+    fetch(url , {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(object)
+      })
+        .then(response => response.json())
+        .then(log_info => {
+          console.log(log_info);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+}
+
+
+
+//从服务器取数据
+function send_data(part_url,object){
+    server_addr="http://localhost:8080";
+    url=server_addr+part_url;
+    json_object=fetch(url)
+// fetch() 返回一个 promise。当我们从服务器收到响应时，
+// 会使用该响应调用 promise 的 `then()` 处理器。
+     .then((response) => {
+  // 如果请求没有成功，我们的处理器会抛出错误。
+     if (!response.ok) {
+        throw new Error(`HTTP 错误：${response.status}`);
+     }
+  // 否则（如果请求成功），我们的处理器通过调用
+  // response.text() 以获取文本形式的响应，
+  // 并立即返回 `response.text()` 返回的 promise。
+        return response.text();
+     })
+// 若成功调用 response.text()，会使用返回的文本来调用 `then()` 处理器，
+// 然后我们将其拷贝到 `poemDisplay` 框中。
+     .then((text) => poemDisplay.textContent = text)
+// 捕获可能出现的任何错误，
+// 并在 `poemDisplay` 框中显示一条消息。
+      .catch((error) => poemDisplay.textContent = `数据获取失败:${error}`);
+      object=JSON.parse(json_object);
+      return object;
+}
+
+
 
 //状态变量
 let value=0;//用于控制显示区只显示一个子窗口
@@ -82,7 +132,7 @@ start_charge.addEventListener("click", () => {
     value = 1;
 
     submit.addEventListener("click", () => {
-        form_charge.submit();
+        
         value = 0;
         div_operation.remove();
         div1.appendChild(div_background);
@@ -139,7 +189,6 @@ queue_ind.addEventListener("click", () => {
 
     submit.addEventListener("click", () => {
         value = 0;
-        form_queue_ind.submit();
         div_queue_ind.remove();
         div_operation.remove();
         div1.appendChild(div_background);
@@ -226,7 +275,7 @@ modify_queue_ind.addEventListener("click", () => {
 
     }
     submit.addEventListener("click", () => {
-        form_modify.submit();
+        
         value = 0;
         div_operation.remove();
         div1.appendChild(div_background);
@@ -298,7 +347,7 @@ end_charge.addEventListener("click",()=>{
 
     }
     submit.addEventListener("click",()=>{
-        form_end.submit();
+
         value=0;
         diag_end.remove();
 
