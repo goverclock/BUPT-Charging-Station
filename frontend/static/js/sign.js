@@ -31,7 +31,7 @@ function send_data(part_url,object){
 
 
 //从服务器取数据
-function send_data(part_url,object){
+function receive_data(part_url,object){
     server_addr="http://localhost:8080";
     url=server_addr+part_url;
     json_object=fetch(url)
