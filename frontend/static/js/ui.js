@@ -28,7 +28,7 @@ function send_data(part_url,object){
 
 
 //从服务器取数据
-function send_data(part_url,object){
+function receive_data(part_url,object){
     server_addr="http://localhost:8080";
     url=server_addr+part_url;
     json_object=fetch(url)
@@ -68,6 +68,11 @@ btn_login_out.addEventListener("click", () => {
 });
 
 //start_charge代码
+let start_charge_url="/charge/submit";
+let charge_date={
+    chargeMode:"",
+    chargeAmount:""
+}
 const start_charge = document.querySelector("#start_charge");
 const div_operation = document.querySelector("#div-present");
 const div1=document.querySelector("#div1");
@@ -103,8 +108,8 @@ start_charge.addEventListener("click", () => {
     p1.appendChild(lab);
     start_input.type = "number";
     start_input.name = "elec_num";
-    opt1.textContent = "快充模式";
-    opt2.textContent = "慢充模式";
+    opt1.textContent = "快充";
+    opt2.textContent = "慢充";
     diag.textContent = "请设置你的充电方案:";
     diag.appendChild(form_charge);
     form_charge.appendChild(p);
@@ -132,8 +137,10 @@ start_charge.addEventListener("click", () => {
     value = 1;
 
     submit.addEventListener("click", () => {
-        
         value = 0;
+        charge_date.chargeMode=select.value;
+        charge_date.chargeAmount=start_input.value;
+        send_data(start_charge_url,charge_date);
         div_operation.remove();
         div1.appendChild(div_background);
         diag.remove();
@@ -201,6 +208,13 @@ queue_ind.addEventListener("click", () => {
     });
 });
 //modify_queue_ind代码
+const modify_queue_ind_url="/charge/cancelCharge";
+let modify_date={
+    modifyMode:"",
+    modifyAmount:""
+}
+
+
 const modify_queue_ind = document.querySelector("#modify_queue_ind");
 modify_queue_ind.addEventListener("click", () => {
     div_background.remove();
@@ -275,8 +289,10 @@ modify_queue_ind.addEventListener("click", () => {
 
     }
     submit.addEventListener("click", () => {
-        
         value = 0;
+        modify_date.modifyMode=options.value;
+        modify_date.modifyAmount=elc_num.value;
+        send_data(modify_queue_ind_url,modify_date);
         div_operation.remove();
         div1.appendChild(div_background);
         diag_modify.remove();

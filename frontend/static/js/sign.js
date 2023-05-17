@@ -1,11 +1,25 @@
 const btn1=document.querySelector("#signup");
+const btn2=document.querySelector("#signin");
+const user_name=document.querySelector("#username");
+const pwd=document.querySelector("#password");
+
 login_url="/user/login"
-let usr1={
-    username:"1233",
-    password:"4567"}
+let usr={
+    username:"",
+    password:""}
 btn1.addEventListener("click",()=>{
-    send_data(login_url,usr1);
+    usr.username=user_name.value;
+    usr.password=pwd.value;
+    send_data(login_url,usr);
+    window.location.href="ui.html";
     
+});
+
+btn2.addEventListener("click",()=>{
+    usr.username=user_name.value;
+    usr.password=pwd.value;
+    send_data(login_url,usr);
+
 });
 
 //向服务器发送数据
