@@ -1,9 +1,6 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -17,17 +14,7 @@ func main() {
 		AllowHeaders: []string{"Origin", "Content-Type", "Content-Length"},
 	}))
 
-	server.POST("/user/login", func(ctx *gin.Context) {
-		var js struct {
-			Username string	`json:"username"`
-			Password string	`json:"password"`
-		}
-		ctx.BindJSON(&js)
-		log.Println(js)
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "OK",
-		})
-	})
+	server.POST("/user/login", user_login)
 
 	server.Run(":8080")
 }
