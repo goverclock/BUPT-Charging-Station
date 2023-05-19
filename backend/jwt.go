@@ -8,7 +8,7 @@ import (
 var JwtKey = []byte("my-secret-key")
 
 type Claims struct {
-	UserId string `json:"user_id"`
+	UserName string `json:"user_name"`
 	jwt.StandardClaims
 }
 
@@ -47,6 +47,6 @@ func authMiddleware(c *gin.Context) {
     }
 
     // 将用户 ID 保存到上下文中
-    c.Set("user_id", claims.UserId)
+    c.Set("user_name", claims.UserName)
     c.Next()
 }

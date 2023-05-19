@@ -57,7 +57,7 @@ func user_login(ctx *gin.Context) {
 
 	// JWT
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
-		UserId: request.Username,
+		UserName: request.Username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
