@@ -24,13 +24,13 @@ func charge_submit(ctx *gin.Context) {
 	// get user
 	user_name, _ := ctx.Get("user_name")		// ctx.Set in JWT
 	user, err := data.UserByName(user_name.(string))
-	log.Println(user)
+	// log.Println(user)
 	if err != nil {
 		log.Fatal("UserByName")
 	}
 
 	car := data.Car{
-		Id:      1,
+		// Id:      1,
 		OwnedBy: user.Name,
 		// Stage: ,
 	}
