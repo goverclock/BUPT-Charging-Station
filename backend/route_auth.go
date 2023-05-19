@@ -4,7 +4,9 @@ import (
 	"buptcs/data"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
@@ -48,11 +50,24 @@ func user_login(ctx *gin.Context) {
 		response.Msg = "wrong password"
 	} else if user.Password == data.Encrypt(request.Password) {
 		response.Code = "200"
-		response.Msg = "success"
+		response.Msg = "login succeeded"
 	}
 	response.Data.Balance = user.Balance
 	response.Data.Balance = user.BatteryCapacity
 
+	// JWT
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+		UserName: request.Username,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
+	})
+    tokenString, err := token.SignedString(JwtKey)
+    if err != nil {
+        ctx.JSON(500, gin.H{"message": "Internal server error"})
+        return
+    }
+	ctx.Header("Authorization", tokenString)
 	ctx.JSON(http.StatusOK, response)
 }
 
