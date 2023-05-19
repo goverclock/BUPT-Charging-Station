@@ -2,6 +2,9 @@ const btn1=document.querySelector("#signup");
 const btn2=document.querySelector("#signin");
 const user_name=document.querySelector("#username");
 const pwd=document.querySelector("#password");
+const body=document.querySelector("body");
+const para=document.createElement("p");
+body.appendChild(para);
 
 login_url="/user/login"
 let usr={
@@ -10,15 +13,41 @@ let usr={
 btn1.addEventListener("click",()=>{
     usr.username=user_name.value;
     usr.password=pwd.value;
-    send_data(login_url,usr);
-    window.location.href="ui.html";
+    const response=send_data(login_url,usr);
+    response.then(response=>response.json())
+    .then(data=>{
+      console.log(data);
+      if(data.code===200){
+        window.location.href="login.html";
+        para.textContent="注册成功请登录";
+        
+      }
+      else{
+        para.textContent="注册失败用户名已存在";
+      }
+      
+    })
+    
+    
     
 });
 
 btn2.addEventListener("click",()=>{
     usr.username=user_name.value;
     usr.password=pwd.value;
-    send_data(login_url,usr);
+    const response=send_data(login_url,usr);
+    response.then(response=>response.json())
+    .then(data=>{
+      console.log(data);
+      if(data.code===200){
+        window.location.href="ui.html";
+      }
+      else{
+        //window.location.href="login.html";
+        para.textContent="登录失败,用户名或密码错误";
+      }
+      
+    })
 
 });
 
@@ -26,20 +55,14 @@ btn2.addEventListener("click",()=>{
 function send_data(part_url,object){
     server_addr="http://localhost:8080";
     url=server_addr+part_url;
-    fetch(url , {
+    const res=fetch(url , {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(object)
-      })
-        .then(response => response.json())
-        .then(log_info => {
-          console.log(log_info);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      });
+      return res;
 }
 
 
