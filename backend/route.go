@@ -12,12 +12,12 @@ func userlogin(writer http.ResponseWriter, request *http.Request) {
 }
 
 func index(writer http.ResponseWriter, request *http.Request) {
-	_, err := session(writer, request)
-	if err == nil { // user has logged in
-		http.Redirect(writer, request, "/ui", http.StatusFound)
-	} else {
-		http.Redirect(writer, request, "/login", http.StatusFound)
-	}
+	// _, err := session(writer, request)
+	// if err == nil { // user has logged in
+	// 	http.Redirect(writer, request, "/ui", http.StatusFound)
+	// } else {
+	// 	http.Redirect(writer, request, "/login", http.StatusFound)
+	// }
 }
 
 // show the login page
@@ -54,13 +54,13 @@ func authenticate(writer http.ResponseWriter, request *http.Request) {
 		log.Println(err, "can't find user %v", user_name)
 	}
 	if user.Password == data.Encrypt(user_passwd) {
-		sess, err := user.CreateSession()
+		// sess, err := user.CreateSession()
 		if err != nil {
 			log.Println(err, "can't create session")
 		}
 		cookie := http.Cookie{
 			Name:     "_cookie",
-			Value:    sess.Uuid,
+			// Value:    sess.Uuid,
 			HttpOnly: true,
 		}
 		http.SetCookie(writer, &cookie)
@@ -71,29 +71,29 @@ func authenticate(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func logout(writer http.ResponseWriter, request *http.Request) {
-	cookie, err := request.Cookie("_cookie")
-	if err != http.ErrNoCookie {
-		// log.Println(err, "Failed to get cookie")	// just a WARNING
-		session := data.Session{Uuid: cookie.Value}
-		session.DeleteByUUID()
-	}
-	http.Redirect(writer, request, "/", http.StatusFound)
-}
+// func logout(writer http.ResponseWriter, request *http.Request) {
+// 	cookie, err := request.Cookie("_cookie")
+// 	if err != http.ErrNoCookie {
+// 		// log.Println(err, "Failed to get cookie")	// just a WARNING
+// 		session := data.Session{Uuid: cookie.Value}
+// 		session.DeleteByUUID()
+// 	}
+// 	http.Redirect(writer, request, "/", http.StatusFound)
+// }
 
 // charging page
-func ui(writer http.ResponseWriter, request *http.Request) {
-	// check if user has logged in
-	_, err := session(writer, request)
-	if err != nil { // user hasn't logged in
-		http.Redirect(writer, request, "/login", http.StatusFound)
-		return
-	}
+// func ui(writer http.ResponseWriter, request *http.Request) {
+// 	// check if user has logged in
+// 	_, err := session(writer, request)
+// 	if err != nil { // user hasn't logged in
+// 		http.Redirect(writer, request, "/login", http.StatusFound)
+// 		return
+// 	}
 
-	file := "public/ui.html"
-	t := template.Must(template.ParseFiles(file))
-	t.Execute(writer, nil)
-}
+// 	file := "public/ui.html"
+// 	t := template.Must(template.ParseFiles(file))
+// 	t.Execute(writer, nil)
+// }
 
 func operation(writer http.ResponseWriter, request *http.Request) {
 	request.ParseForm()

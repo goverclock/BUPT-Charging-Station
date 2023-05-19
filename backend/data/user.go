@@ -30,7 +30,7 @@ func (user *User) Create() (err error) {
 // get a single user given the name
 func UserByName(name string) (user User, err error) {
 	user = User{}
-	err = Db.QueryRow("SELECT id, uuid, name, password, balance, batteryCapacity FROM users WHERE name = $1", name).
+	err = Db.QueryRow("SELECT * FROM users WHERE name = $1", name).
 		Scan(&user.Id, &user.Name, &user.Uuid, &user.Password, &user.Balance, &user.BatteryCapacity)
 	return
 }

@@ -9,4 +9,4 @@ type Station struct {
 	Slot2  string
 }
 
-var Stations []Station
+
