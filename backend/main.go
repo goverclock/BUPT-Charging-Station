@@ -13,11 +13,10 @@ func main() {
 		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Content-Length"},
 	}))
-	server.Use(authMiddleware)		// JWT
 
 	server.POST("/user/login", user_login)
 	server.POST("/register/user", register_user)
-	server.POST("/charge/submit", charge_submit)
+	server.POST("/charge/submit", authMiddleware, charge_submit)
 
 	server.Run(":8080")
 }
