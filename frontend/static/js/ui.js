@@ -4,54 +4,31 @@
 //2 排队号码查询,服务器需将排队号码发送至客户端
 //3 排队车辆查询,服务器需将前车的等待数发送至客户端.
 
+let user_id=localStorage.getItem('user_id');//获取本地存储的用户id
 
 //向服务器发送数据
 function send_data(part_url,object){
     server_addr="http://localhost:8080";
     url=server_addr+part_url;
-    fetch(url , {
+    const res=fetch(url , {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(object)
-      })
-        .then(response => response.json())
-        .then(log_info => {
-          console.log(log_info);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      });
+      return res;
 }
 
 
 
 //从服务器取数据
-function receive_data(part_url,object){
+function receive_data(part_url){
     server_addr="http://localhost:8080";
     url=server_addr+part_url;
-    json_object=fetch(url)
-// fetch() 返回一个 promise。当我们从服务器收到响应时，
-// 会使用该响应调用 promise 的 `then()` 处理器。
-     .then((response) => {
-  // 如果请求没有成功，我们的处理器会抛出错误。
-     if (!response.ok) {
-        throw new Error(`HTTP 错误：${response.status}`);
-     }
-  // 否则（如果请求成功），我们的处理器通过调用
-  // response.text() 以获取文本形式的响应，
-  // 并立即返回 `response.text()` 返回的 promise。
-        return response.text();
-     })
-// 若成功调用 response.text()，会使用返回的文本来调用 `then()` 处理器，
-// 然后我们将其拷贝到 `poemDisplay` 框中。
-     .then((text) => poemDisplay.textContent = text)
-// 捕获可能出现的任何错误，
-// 并在 `poemDisplay` 框中显示一条消息。
-      .catch((error) => poemDisplay.textContent = `数据获取失败:${error}`);
-      object=JSON.parse(json_object);
-      return object;
+    const response=fetch(url);
+    
+    return response;
 }
 
 
@@ -157,7 +134,16 @@ start_charge.addEventListener("click", () => {
 });
 
 // queue_ind的代码
+const queue_ind_url="/charge/details";
 const queue_ind = document.querySelector("#queue_ind");
+
+let div_queue_ind = document.createElement("div");
+let form_queue_ind = document.createElement("form");
+let queue_ind_select = document.createElement("select");
+    
+let submit = document.createElement("button");
+let exit_btn = document.createElement("button");
+
 queue_ind.addEventListener("click", () => {
     div_background.remove();
     div1.appendChild(div_operation);
@@ -165,24 +151,29 @@ queue_ind.addEventListener("click", () => {
         return;
     }
     //从服务器获取数据
-    //fetch()根据数据个数创建select
+    const response=receive_data(queue_ind_url);
+    response.then(response=>response.json())
+    .then(all_data=>{
+        if(all_data.code===200){
+            let data=all_data.data;
+            for(i=0;i<data.length;i++){
+                //该用for语句创建option
+                let opt=document.createElement("option");
+                opt.textContent=data[i].order_id;
+                select.appendChild(opt);
+            }
 
-    let div_queue_ind = document.createElement("div");
-    let form_queue_ind = document.createElement("form");
-    let queue_ind_select = document.createElement("select");
-    //该用for语句创建option
-    let opt1 = document.createElement("option");
-    let opt2 = document.createElement("option");
-    let submit = document.createElement("button");
-    let exit_btn = document.createElement("button");
+        }
+        else{
+
+        }
+    });
 
     div_operation.appendChild(div_queue_ind);
     div_queue_ind.appendChild(form_queue_ind);
     div_queue_ind.id = "div-queue_ind";
     form_queue_ind.appendChild(queue_ind_select);
     form_queue_ind.appendChild(submit);
-    queue_ind_select.appendChild(opt1);
-    queue_ind_select.appendChild(opt2);
     div_queue_ind.appendChild(exit_btn);
 
     form_queue_ind.action = "queue_ind";
@@ -205,7 +196,19 @@ queue_ind.addEventListener("click", () => {
         div_queue_ind.remove();
         div_operation.remove();
         div1.appendChild(div_background);
+        response.then(response=>response.json())
+         .then(all_data=>{
+         if(all_data.code===200){
+            let data=all_data.data[select.value];
+            const p=document.createElement("p");
+            p.textContent=data;
+            div_background.appendChild(p);
+        }
+        else{
+
+        }
     });
+});
 });
 //modify_queue_ind代码
 const modify_queue_ind_url="/charge/cancelCharge";
@@ -297,7 +300,7 @@ modify_queue_ind.addEventListener("click", () => {
         div1.appendChild(div_background);
         diag_modify.remove();
 
-    })
+    });
     start_x.addEventListener("click", () => {
         value = 0;
         div_operation.remove();
