@@ -15,6 +15,7 @@ func main() {
 	}))
 
 	server.POST("/user/login", user_login)
+	server.POST("/register/user", register_user)
 
 	server.Run(":8080")
 }
