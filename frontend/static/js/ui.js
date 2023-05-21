@@ -5,6 +5,11 @@
 //3 排队车辆查询,服务器需将前车的等待数发送至客户端.
 
 let user_id=localStorage.getItem('user_id');//获取本地存储的用户id
+user_id="123";
+const user_id_text=document.querySelector("#user_id");
+const money=document.querySelector("#money");
+
+user_id_text.textContent=user_id;
 
 //向服务器发送数据
 function send_data(part_url,object){
@@ -43,21 +48,128 @@ const form_login_out = document.querySelector("#form_login_out");
 btn_login_out.addEventListener("click", () => {
     form_login_out.submit();
 });
+//money_charge 余额充值代码
+const money_charge_url="/recharge";
+let money_charge_data={
+    recharge_amount:"",
+    username:""
+}
+const money_charge=document.querySelector("#money_charge");
+money_charge.addEventListener("click",()=>{
+    div_background.remove();
+    div1.appendChild(div_operation);
+    if (value !== 0) {
+        return;
+    }
+    value=1;
 
-//start_charge代码
-let start_charge_url="/charge/submit";
+    let diag=document.createElement("dialog");
+    let start_x=document.createElement("button");
+    let input=document.createElement("input");
+    let lab=document.createElement("label");
+    let p=document.createElement("p");
+    let submit=document.createElement("button");
+
+    submit.textContent="确认";
+    submit.className="btn btn-primary";
+    submit.id="recharge-submit";
+    start_x.id="recharge-x";
+    start_x.textContent="x";
+    lab.textContent="请输入充值金额: ";
+    input.type="number";
+    input.min=1;
+    input.max=1000000;
+    p.appendChild(lab);
+    p.appendChild(input);
+    diag.appendChild(p);
+    diag.appendChild(submit);
+    diag.appendChild(start_x);
+    div_operation.appendChild(diag);
+    diag.show();
+
+    submit.addEventListener("click",()=>{
+        money_charge_data.recharge_amount=input.value;
+        money_charge_data.username=user_id;
+        const response=send_data(money_charge_url,money_charge_data);
+        response.then(response=>response.json())
+        .then(all_data=>{
+        if(all_data.code==="200"){
+         diag.textContent="充值成功";
+         money.textContent=money.value+ money_charge_data.recharge_amount;
+       }
+       else{
+        diag.textContent="充值失败,请重试";
+       }
+    });
+
+    });
+    start_x.addEventListener("click",()=>{
+        value = 0;
+        div_operation.remove();
+        div1.appendChild(div_background);
+        diag.remove();
+    });
+
+
+});
+
+
+//start_charge 开始充电代码
+const start_charge_url="/charge/startCharge";
+let start_charge_data={
+    username:""
+}
+const start_charge=document.querySelector("#start_charge");
+start_charge.addEventListener("click",()=>{
+    div_background.remove();
+    div1.appendChild(div_operation);
+    if (value !== 0) {
+        return;
+    }
+    value=1;
+    let diag=document.createElement("dialog");
+    let start_x=document.createElement("button");
+    start_x.id="start_x";
+    start_x.textContent="x";
+    diag.textContent="等待服务器响应...";
+    diag.appendChild(start_x);
+    div_operation.appendChild(diag);
+    diag.show();
+    const response=send_data(start_charge_url,start_charge_data);
+    response.then(response=>response.json())
+    .then(all_data=>{
+    if(all_data.code==="200"){
+        diag.textContent="已开始充电";
+    }
+    else{
+        diag.textContent="服务器忙,请重试";
+    }
+    });
+    start_x.addEventListener("click",()=>{
+        value = 0;
+        div_operation.remove();
+        div1.appendChild(div_background);
+        diag.remove();
+    });
+
+});
+
+
+//charge_submit代码
+const charge_submit_url="/charge/submit";
 let charge_date={
     chargeMode:"",
-    chargeAmount:""
+    chargeAmount:"",
+    username:""
 }
-const start_charge = document.querySelector("#start_charge");
+const charge_submit = document.querySelector("#charge_submit");
 const div_operation = document.querySelector("#div-present");
 const div1=document.querySelector("#div1");
 const div_background=document.querySelector("#div-background");
 const body = document.querySelector("body");
 div_operation.remove();
 
-start_charge.addEventListener("click", () => {
+charge_submit.addEventListener("click", () => {
     div_background.remove();
     div1.appendChild(div_operation);
     if (value !== 0) {
@@ -115,9 +227,15 @@ start_charge.addEventListener("click", () => {
 
     submit.addEventListener("click", () => {
         value = 0;
-        charge_date.chargeMode=select.value;
+        if(select.value==="快充"){
+            charge_date.chargeMode=1;
+        }
+        else{
+            charge_date.chargeMode=0;
+        }
         charge_date.chargeAmount=start_input.value;
-        send_data(start_charge_url,charge_date);
+        charge_date.username=user_id;
+        send_data(charge_submit_url,charge_date);
         div_operation.remove();
         div1.appendChild(div_background);
         diag.remove();
@@ -154,7 +272,7 @@ queue_ind.addEventListener("click", () => {
     const response=receive_data(queue_ind_url);
     response.then(response=>response.json())
     .then(all_data=>{
-        if(all_data.code===200){
+        if(all_data.code==="200"){
             let data=all_data.data;
             for(i=0;i<data.length;i++){
                 //该用for语句创建option
@@ -196,9 +314,9 @@ queue_ind.addEventListener("click", () => {
         div_queue_ind.remove();
         div_operation.remove();
         div1.appendChild(div_background);
-        response.then(response=>response.json())
+         response.then(response=>response.json())
          .then(all_data=>{
-         if(all_data.code===200){
+         if(all_data.code==="200"){
             let data=all_data.data[select.value];
             const p=document.createElement("p");
             p.textContent=data;
@@ -211,13 +329,12 @@ queue_ind.addEventListener("click", () => {
 });
 });
 //modify_queue_ind代码
-const modify_queue_ind_url="/charge/cancelCharge";
+const modify_queue_ind_url="/charge/changeSubmit";
 let modify_date={
     modifyMode:"",
-    modifyAmount:""
+    modifyAmount:"",
+    username:""
 }
-
-
 const modify_queue_ind = document.querySelector("#modify_queue_ind");
 modify_queue_ind.addEventListener("click", () => {
     div_background.remove();
@@ -250,8 +367,8 @@ modify_queue_ind.addEventListener("click", () => {
         p1.appendChild(lab);
         elc_num.type = "number";
         elc_num.name = "modify_elecnum";
-        opt_fast.textContent = "快充模式";
-        opt_normal.textContent = "慢充模式";
+        opt_fast.textContent = "快充";
+        opt_normal.textContent = "慢充";
         diag_modify.textContent = "请修改你的充电方案:";
         diag_modify.appendChild(form_modify);
         form_modify.appendChild(p);
@@ -293,8 +410,14 @@ modify_queue_ind.addEventListener("click", () => {
     }
     submit.addEventListener("click", () => {
         value = 0;
-        modify_date.modifyMode=options.value;
+        if(options.value==="快充"){
+            modify_date.modifyMode=1;
+        }
+        else{
+            modify_date.modifyMode=0;
+        }
         modify_date.modifyAmount=elc_num.value;
+        modify_date.username=user_id;
         send_data(modify_queue_ind_url,modify_date);
         div_operation.remove();
         div1.appendChild(div_background);
@@ -312,7 +435,128 @@ modify_queue_ind.addEventListener("click", () => {
 
 });
 
+//queue_ind_id代码
+const queue_ind_id_url="/charge/getChargingMsg";
+let quque_ind_id_data={
+    username:""
+}
+const queue_ind_id=document.querySelector("#queue_ind_id");
+queue_ind_id.addEventListener("click",()=>{
+    div_background.remove();
+    div1.appendChild(div_operation);
+    if(value!==0){
+        return;
+    }
+    value=1;
+    let div_queue_ind_id=document.createElement("div");
+    let exit_btn=document.createElement("button");
+    let p1=document.createElement("p");
+    let p2=document.createElement("p");
+    let p3=document.createElement("p");
+    let p4=document.createElement("p");
+    let p5=document.createElement("p");
+    div_operation.appendChild(div_queue_ind_id);
+    div_queue_ind_id.appendChild(p1);
+    div_queue_ind_id.appendChild(p2);
+    div_queue_ind_id.appendChild(p3);
+    div_queue_ind_id.appendChild(p4);
+    div_queue_ind_id.appendChild(p5);
+    div_queue_ind_id.appendChild(exit_btn);
+    exit_btn.textContent = 'x';
+    exit_btn.id = "exit-btn";
+    const response=send_data(queue_ind_id_url,quque_ind_id_data);
+    response.then(response=>response.json())
+         .then(all_data=>{
+         if(all_data.code==="200"){
+            p1.textContent="排队号码: "+quque_ind_id_data.data["queue_number"];
+            p2.textContent="正在等待的前车数量: "+quque_ind_id_data.data["waiting_count"];
+            if(quque_ind_id_data.data["charge_mode"]===1){
+                p3.textContent="充电模式: 快充";
+            }
+            else{
+                p3.textContent="充电模式: 慢充";
+            }
+            p4.textContent="本次请求充电量: "+quque_ind_id_data.data["charge_amount"];
+            if(quque_ind_id_data.data["charge_state"]===0){
+                p5.textContent="充电状态: 未提交充电申请";
+            }
+            else if(quque_ind_id_data.data["charge_state"]===1){
+                p5.textContent="充电状态: 在等待区队列";
+            }
+            else if(quque_ind_id_data.data["charge_state"]===2){
+                p5.textContent="充电状态: 在充电区队列";
+            }
+            else{
+                p5.textContent="充电状态: 正在充电";
+            }
+
+        }
+    });
+    exit_btn.addEventListener("click",()=>{
+        value = 0;
+        div_operation.remove();
+        div1.appendChild(div_background);
+        div_queue_ind_id.remove();
+    })
+
+
+});
+//取消充电的代码;
+const cancel_charge_url="/charge/cancelCharge";
+let cancel_charge_data={
+    username:""
+}
+const cancel_charge=document.querySelector("#cancel_charge");
+cancel_charge.addEventListener("click",()=>{
+    div_background.remove();
+    div1.appendChild(div_operation);
+    if(value!==0){
+        return;
+    }
+    value=1;
+    let diag_cancel=document.createElement("dialog");
+    let submit=document.createElement("button");
+    let end_x1=document.createElement("button");
+    end_x1.textContent="x";
+    end_x1.id="cancel-x";
+    submit.textContent="确认";
+    submit.className="btn btn-primary";
+    submit.id="cancel_btn";
+    submit.name="cancel_charge";
+
+    div_operation.appendChild(diag_cancel);
+    diag_cancel.textContent="确认要取消充电吗?";
+    diag_cancel.appendChild(submit);
+    diag_cancel.appendChild(end_x1);
+    diag_cancel.show();
+    submit.addEventListener("click",()=>{
+    const  response=send_data(cancel_charge_url,cancel_charge_data);
+        response.then(response=>response.json())
+         .then(all_data=>{
+         if(all_data.code==="200"){
+            diag_cancel.textContent="已取消充电";
+            submit.remove();
+         }
+         else{
+            diag_cancel.textContent="服务器繁忙,请重新操作";
+         }
+        });
+
+    });
+    end_x1.addEventListener("click",()=>{
+        value=0;
+        div_operation.remove();
+        div1.appendChild(div_background);
+        diag_cancel.remove();
+    });
+
+});
+
 //结束充电的代码
+const end_charge_url="/charge/endCharge";
+let end_charge_data={
+    user_name:""
+}
 const end_charge=document.querySelector("#stop_charge");
 end_charge.addEventListener("click",()=>{
     div_background.remove();
@@ -320,6 +564,7 @@ end_charge.addEventListener("click",()=>{
     if(value!==0){
         return;
     }
+    value=1;
     let diag_end=document.createElement("dialog");
     let form_end=document.createElement("form");
     let submit=document.createElement("button");
@@ -343,6 +588,7 @@ end_charge.addEventListener("click",()=>{
 
     if(car_position===1){//等待区
         diag_end.textContent="您当前正处于等待区,可以直接修改充电请求,确定要结束充电吗?";
+        send_data(end_charge_url,end_charge_data);
         diag_end.appendChild(form_end);
         form_end.appendChild(submit);
         diag_end.appendChild(end_x2);
@@ -351,6 +597,7 @@ end_charge.addEventListener("click",()=>{
     }
     else if(car_position===2){//充电区
         diag_end.textContent="您当前正在充电,确定要结束充电吗?";
+        send_data(end_charge_url,end_charge_data);
         diag_end.appendChild(form_end);
         form_end.appendChild(submit);
         diag_end.appendChild(end_x1);
@@ -358,7 +605,8 @@ end_charge.addEventListener("click",()=>{
 
     }
     else{
-        diag_end.textContent="确定取消充电吗?";
+        diag_end.textContent="确定结束充电吗?";
+        send_data(end_charge_url,end_charge_data);
         diag_end.appendChild(form_end);
         form_end.appendChild(submit);
         diag_end.appendChild(end_x1);
@@ -366,18 +614,23 @@ end_charge.addEventListener("click",()=>{
 
     }
     submit.addEventListener("click",()=>{
-
         value=0;
+        div_operation.remove();
+        div1.appendChild(div_background);
         diag_end.remove();
 
     });
     end_x1.addEventListener("click",()=>{
         diag_end.remove();
+        div_operation.remove();
+        div1.appendChild(div_background);
         value=0;
 
     });
     end_x2.addEventListener("click",()=>{
         diag_end.remove();
+        div_operation.remove();
+        div1.appendChild(div_background);
         value=0;
 
     });

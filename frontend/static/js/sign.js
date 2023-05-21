@@ -5,20 +5,22 @@ const pwd=document.querySelector("#password");
 const body=document.querySelector("body");
 const para=document.createElement("p");
 body.appendChild(para);
+let  server_addr="http://localhost:8080";
 
 login_url="/user/login"
+register_url="/register/user";
 let usr={
     username:"",
     password:""}
 btn1.addEventListener("click",()=>{
     usr.username=user_name.value;
     usr.password=pwd.value;
-    const response=send_data(login_url,usr);
+    const response=send_data(register_url,usr);
     response.then(response=>response.json())
     .then(data=>{
       console.log(data);
-      if(data.code===200){
-        window.location.href="login.html";
+      if(data.code==="200"){
+        
         para.textContent="注册成功请登录";
         
       }
@@ -39,7 +41,7 @@ btn2.addEventListener("click",()=>{
     response.then(response=>response.json())
     .then(data=>{
       console.log(data);
-      if(data.code===200){
+      if(data.code==="200"){
         localStorage.setItem('user_id',data.user_id);
         window.location.href="ui.html";
       }
@@ -53,9 +55,9 @@ btn2.addEventListener("click",()=>{
 
 //向服务器发送数据
 function send_data(part_url,object){
-    server_addr="http://localhost:8080";
+   
     url=server_addr+part_url;
-    const res=fetch(url , {
+    const res=fetch(url ,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -69,7 +71,7 @@ function send_data(part_url,object){
 
 //从服务器取数据
 function receive_data(part_url){
-    server_addr="http://localhost:8080";
+   
     url=server_addr+part_url;
     const response=fetch(url);
 
