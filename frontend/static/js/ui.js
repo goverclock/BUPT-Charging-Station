@@ -49,7 +49,7 @@ btn_login_out.addEventListener("click", () => {
     form_login_out.submit();
 });
 //money_charge 余额充值代码
-const money_charge_url="/recharge";
+const money_charge_url="/user/recharge";
 let money_charge_data={
     recharge_amount:"",
     username:""
