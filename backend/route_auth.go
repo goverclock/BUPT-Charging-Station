@@ -80,7 +80,7 @@ func register_user(ctx *gin.Context) {
 	log.Println(request)
 
 	var response struct {
-		Code string `json:"code"`
+		Code int `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
 			Username        string  `json:"username"`
@@ -92,14 +92,14 @@ func register_user(ctx *gin.Context) {
 
 	user, err := data.UserByName(request.Username)
 	if request.Username == "" || request.Password == "" {
-		response.Code = "400"
+		response.Code = CodeKeyError
 		response.Msg = "need user name or password"
 	} else if err == nil {
 		// user with same name already exists, can't register
-		response.Code = "600"
+		response.Code = CodeForbidden
 		response.Msg = "username is taken"
 	} else {
-		response.Code = "200"
+		response.Code = CodeSucceed
 		response.Msg = "register succeeds"
 		user.Name = request.Username
 		user.Password = request.Password
