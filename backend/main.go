@@ -14,7 +14,8 @@ func main() {
 		AllowHeaders: []string{"Origin", "Content-Type", "Content-Length"},
 	}))
 
-	server.POST("/user/login", user_login)
+	server.POST("/login/user", login_user)
+	server.POST("/login/admin", login_admin)
 	server.POST("/register/user", register_user)
 	server.POST("/charge/submit", authMiddleware, charge_submit)
 	server.GET("/charge/getChargingMsg", authMiddleware, charge_getChargingMsg)
