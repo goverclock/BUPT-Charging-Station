@@ -168,35 +168,46 @@ body {
   width: 1045px;
 
 }
+#charge_submit{
+  position: relative;
+  left: 30px;
+  top:20px;
+}
 #start_charge{
   position: relative;
   left: 30px;
-  top:100px;
+  top:20px;
 }
 #queue_ind{
   position: relative;
   left: 30px;
-  top:100px;
+  top:20px;
+}
+#money_charge{
+  position: relative;
+  left: 30px;
+  top:20px;
+
 }
 #modify_queue_ind{
   position: relative;
   left: 30px;
-  top:100px;
+  top:20px;
 }
 #queue_ind_id{
   position: relative;
   left: 30px;
-  top:100px;
+  top:20px;
 }
-#pending_cars{
+#cancel_charge{
   position: relative;
   left: 30px;
-  top:100px;
+  top:20px;
 }
 #stop_charge{
   position: relative;
   left: 30px;
-  top:100px;
+  top:20px;
 }
 
 .myselect{
@@ -217,6 +228,17 @@ body {
   bottom: 40px;
   left:680px;
   background-color: red;
+}
+#recharge-x{
+  position: relative;
+  background-color: red;
+  top:-70px;
+  left:295px;
+}
+#recharge-submit{
+  position: relative;
+  left: 140px;
+  top:50px;
 }
 #div-queue_ind{
   width: 700px;
@@ -256,6 +278,19 @@ body {
   top:-19px;
   left:80px;
   background-color: red;
+}
+#cancel-x{
+  position: relative;
+  top:-20px;
+  left:133px;
+  background-color: red;
+
+}
+#cancel_btn{
+  position: relative;
+  top:100px;
+  left:-20px;
+
 }
 
 dialog{
