@@ -19,7 +19,7 @@ func user_login(ctx *gin.Context) {
 	log.Println(request)
 
 	var response struct {
-		Code string `json:"code"`
+		Code int `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
 			Username        string  `json:"username"`
@@ -40,16 +40,16 @@ func user_login(ctx *gin.Context) {
 	response.Data.Password = request.Password
 	user, err := data.UserByName(request.Username)
 	if request.Username == "" || request.Password == "" {
-		response.Code = "400"
+		response.Code = CodeKeyError
 		response.Msg = "need user name or password"
 	} else if err != nil {
-		response.Code = "500"
+		response.Code = CodeForbidden
 		response.Msg = "no such user"
 	} else if user.Password != data.Encrypt(request.Password) {
-		response.Code = "500"
+		response.Code = CodeForbidden
 		response.Msg = "wrong password"
 	} else if user.Password == data.Encrypt(request.Password) {
-		response.Code = "200"
+		response.Code = CodeSucceed
 		response.Msg = "login succeeded"
 	}
 	response.Data.Balance = user.Balance
@@ -103,9 +103,10 @@ func register_user(ctx *gin.Context) {
 		response.Msg = "register succeeds"
 		user.Name = request.Username
 		user.Password = request.Password
+		user.IsAdmin = false
 		user.Balance = 0
 		user.BatteryCapacity = 0
-		err = user.Create()
+		err = user.Create(false)	// save user register information
 		if err != nil {
 			log.Fatal(err, "fail to create user")
 		}

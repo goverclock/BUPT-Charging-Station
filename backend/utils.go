@@ -1,5 +1,11 @@
 package main
 
+const (
+	CodeSucceed   int = 200
+	CodeKeyError  int = 400
+	CodeForbidden int = 403
+)
+
 type Configuration struct {
 	Address      string
 	ReadTimeout  int64

@@ -2,9 +2,9 @@ package data
 
 // 2 Fast, 3 Slow
 type Station struct {
-	Id     int
-	Mode   int    // 1 - Fast, 0 - Slow
-	Queue  []string	// QIds
+	Id    int
+	Mode  int   // 1 - Fast, 0 - Slow
+	Queue []Car // the 1st Car can start charge
 }
 
 func (st *Station) Available() bool {
@@ -12,8 +12,8 @@ func (st *Station) Available() bool {
 }
 
 func (st *Station) Join(c *Car) {
-	st.Queue = append(st.Queue, c.QId)	
-	if st.Queue[0] == c.QId {
+	st.Queue = append(st.Queue, *c)
+	if st.Queue[0] == *c {
 		c.Stage = "Charging"
 	}
 	// log.Println("car JOINED", c)

@@ -7,4 +7,5 @@ type Car struct {
 	Stage   string // Waiting, Queueing, Charging
 	QId     string // F1, F2, T1, T2...
 	ChargeMode int // 1 - Fast, 0 - Slow
+	ChargeAmount float64
 }

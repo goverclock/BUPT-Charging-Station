@@ -17,6 +17,7 @@ func main() {
 	server.POST("/user/login", user_login)
 	server.POST("/register/user", register_user)
 	server.POST("/charge/submit", authMiddleware, charge_submit)
+	server.GET("/charge/getChargingMsg", authMiddleware, charge_getChargingMsg)
 
 	server.Run(":8080")
 }
