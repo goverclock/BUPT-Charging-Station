@@ -7,7 +7,7 @@ const para=document.createElement("p");
 body.appendChild(para);
 let  server_addr="http://localhost:8080";
 
-login_url="/user/login"
+login_url="/login/user"
 register_url="/register/user";
 let usr={
     username:"",
@@ -19,8 +19,7 @@ btn1.addEventListener("click",()=>{
     response.then(response=>response.json())
     .then(data=>{
       console.log(data);
-      if(data.code==="200"){
-        
+      if(data.code===200){
         para.textContent="注册成功请登录";
         
       }
@@ -41,8 +40,15 @@ btn2.addEventListener("click",()=>{
     response.then(response=>response.json())
     .then(data=>{
       console.log(data);
-      if(data.code==="200"){
-        localStorage.setItem('user_id',data.user_id);
+      if(data.code===200){
+        response.then(responseObject=>{
+          console.log(responseObject.headers.get("Authorization"));
+          console.log(responseObject.headers.get("Content-Type"));
+          console.log(responseObject.headers);
+          localStorage.setItem('tokens',responseObject.headers.get("Authorization"));
+        });
+        console.log(data.data.username);
+        localStorage.setItem('user_id',data.data.username);
         window.location.href="ui.html";
       }
       else{
@@ -60,7 +66,7 @@ function send_data(part_url,object){
     const res=fetch(url ,{
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(object)
       });

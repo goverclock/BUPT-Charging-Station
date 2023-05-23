@@ -3,9 +3,13 @@
 //在用户登陆后将订单文件id发到客户端,然后用户根据订单id查找订单,服务器再将详细内容发送至客户端.
 //2 排队号码查询,服务器需将排队号码发送至客户端
 //3 排队车辆查询,服务器需将前车的等待数发送至客户端.
+console.log(localStorage.getItem('user_id'));
+console.log(localStorage.getItem('tokens'));
 
+server_addr="http://localhost:8080";
 let user_id=localStorage.getItem('user_id');//获取本地存储的用户id
-user_id="123";
+user_id=getItem('user_id');
+tokens=getItem('tokens');
 const user_id_text=document.querySelector("#user_id");
 const money=document.querySelector("#money");
 
@@ -13,12 +17,12 @@ user_id_text.textContent=user_id;
 
 //向服务器发送数据
 function send_data(part_url,object){
-    server_addr="http://localhost:8080";
     url=server_addr+part_url;
     const res=fetch(url , {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization':`${tokens}`
         },
         body: JSON.stringify(object)
       });
@@ -29,7 +33,6 @@ function send_data(part_url,object){
 
 //从服务器取数据
 function receive_data(part_url){
-    server_addr="http://localhost:8080";
     url=server_addr+part_url;
     const response=fetch(url);
     
@@ -93,7 +96,7 @@ money_charge.addEventListener("click",()=>{
         const response=send_data(money_charge_url,money_charge_data);
         response.then(response=>response.json())
         .then(all_data=>{
-        if(all_data.code==="200"){
+        if(all_data.code===200){
          diag.textContent="充值成功";
          money.textContent=money.value+ money_charge_data.recharge_amount;
        }
@@ -138,7 +141,7 @@ start_charge.addEventListener("click",()=>{
     const response=send_data(start_charge_url,start_charge_data);
     response.then(response=>response.json())
     .then(all_data=>{
-    if(all_data.code==="200"){
+    if(all_data.code===200){
         diag.textContent="已开始充电";
     }
     else{
@@ -272,7 +275,7 @@ queue_ind.addEventListener("click", () => {
     const response=receive_data(queue_ind_url);
     response.then(response=>response.json())
     .then(all_data=>{
-        if(all_data.code==="200"){
+        if(all_data.code===200){
             let data=all_data.data;
             for(i=0;i<data.length;i++){
                 //该用for语句创建option
@@ -316,7 +319,7 @@ queue_ind.addEventListener("click", () => {
         div1.appendChild(div_background);
          response.then(response=>response.json())
          .then(all_data=>{
-         if(all_data.code==="200"){
+         if(all_data.code===200){
             let data=all_data.data[select.value];
             const p=document.createElement("p");
             p.textContent=data;
@@ -467,7 +470,7 @@ queue_ind_id.addEventListener("click",()=>{
     const response=send_data(queue_ind_id_url,quque_ind_id_data);
     response.then(response=>response.json())
          .then(all_data=>{
-         if(all_data.code==="200"){
+         if(all_data.code===200){
             p1.textContent="排队号码: "+quque_ind_id_data.data["queue_number"];
             p2.textContent="正在等待的前车数量: "+quque_ind_id_data.data["waiting_count"];
             if(quque_ind_id_data.data["charge_mode"]===1){
@@ -533,7 +536,7 @@ cancel_charge.addEventListener("click",()=>{
     const  response=send_data(cancel_charge_url,cancel_charge_data);
         response.then(response=>response.json())
          .then(all_data=>{
-         if(all_data.code==="200"){
+         if(all_data.code===200){
             diag_cancel.textContent="已取消充电";
             submit.remove();
          }
