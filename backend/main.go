@@ -9,9 +9,10 @@ func main() {
 	server := gin.Default()
 
 	server.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders: []string{"Origin", "Content-Type", "Content-Length"},
+		AllowOrigins:  []string{"*"},
+		AllowMethods:  []string{"*"},
+		AllowHeaders:  []string{"*"},
+		ExposeHeaders: []string{"*"},
 	}))
 
 	server.POST("/login/user", login_user)

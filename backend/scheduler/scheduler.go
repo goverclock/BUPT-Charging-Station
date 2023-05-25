@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -139,6 +140,11 @@ func ticker() {
 // Sta4(F): 
 // 
 func show_info() {
+	v := os.Getenv("V")
+	if v != "" {
+		return
+	}
+	
 	for {
 		time.Sleep(1 * time.Second)
 		

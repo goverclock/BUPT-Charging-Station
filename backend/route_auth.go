@@ -54,13 +54,12 @@ func login_user(ctx *gin.Context) {
         return
     }
 
-	ctx.Header("Access-Control-Allow-Headers", "Authorization")
-	ctx.Header("Access-Control-Expose-Headers", "Authorization")
 	ctx.Header("Authorization", tokenString)
 
 	ctx.JSON(http.StatusOK, response)
 }
 
+// TODO
 func login_admin(ctx *gin.Context) {
 	var request struct {
 		Username string `json:"username"`
