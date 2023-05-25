@@ -1,5 +1,7 @@
 package data
 
+import "log"
+
 // 2 Fast, 3 Slow
 type Station struct {
 	Id    int
@@ -16,5 +18,5 @@ func (st *Station) Join(c *Car) {
 	if st.Queue[0] == *c {
 		c.Stage = "Charging"
 	}
-	// log.Println("car JOINED", c)
+	log.Println(st.Id, "car JOINED", c)
 }

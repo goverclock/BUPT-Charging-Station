@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"testing"
 
@@ -11,8 +13,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var authToken string
+
 // almost same as main.go
 func init() {
+	return
 	server := gin.Default()
 
 	server.Use(cors.New(cors.Config{
@@ -43,16 +48,36 @@ func init() {
 	// server.POST("/system/getsettings")
 	// server.POST("/system/setsettings")
 
-	go server.Run(":8080")
+	go server.Run(":8080")	// only difference
 }
 
-func TestLoginUser(t *testing.T) {
+// no Authorization header
+func send(method string, route string, request interface{}) []byte {
+	route = "http://localhost:8080" + route
+	req_body, _ := json.Marshal(request)
+	req, err := http.NewRequest(method, route, bytes.NewBuffer(req_body))
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", authToken)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if token := resp.Header.Get("Authorization"); token != "" {
+		authToken = token
+		fmt.Println("Token is", authToken)
+	}
+	
+	body, _ := io.ReadAll(resp.Body)
+	return body
 }
-
 
 // assuming user "w", "w" exists
-func TestRegisterUser(t *testing.T) {
+func TestLoginUser(t *testing.T) {
 	var request struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -66,21 +91,37 @@ func TestRegisterUser(t *testing.T) {
 	}
 	request.Username = "w"
 	request.Password = "w"
-	req_body, _ := json.Marshal(request)
 
-	req, err := http.NewRequest("POST", "http://localhost:8080/login/user", bytes.NewBuffer(req_body))
-	if err != nil {
-		t.Fatal(err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	
-	body, _ := io.ReadAll(resp.Body)
+	body := send("POST", "/login/user", request)
 	json.Unmarshal(body, &response)
 	t.Log(response)
+	if response.Code != 200 {
+		t.Fail()
+	}
+}
+
+// func TestRegisterUser(t *testing.T) {
+// }
+
+// /charge/submit
+func TestChargeSubmit(t *testing.T) {
+	TestLoginUser(t)	// login in as user "w"
+	
+	var request struct {
+		ChargeMode   int     `json:"chargeMode"`
+		ChargeAmount float64 `json:"chargeAmount"`
+	}
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+	}
+	request.ChargeMode = 1
+	request.ChargeAmount = 2.0
+
+	body := send("POST", "/charge/submit", request)
+	json.Unmarshal(body, &response)
+	t.Log(response)
+	if response.Code != 200 {
+		t.Fail()
+	}
 }

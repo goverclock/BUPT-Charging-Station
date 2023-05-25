@@ -96,7 +96,7 @@ func ticker() {
 		// check if any car in waitingcars can move to charing station
 		for ci, c := range sched.waitingcars {
 			// check if any station is available
-			for _, st := range sched.stations {
+			for sti, st := range sched.stations {
 				if !st.Available() || st.Mode != c.ChargeMode {
 					continue
 				}
@@ -123,7 +123,7 @@ func ticker() {
 				// car moves to station
 				sched.waitingcars =
 					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
-				st.Join(&c) // join station queue
+				sched.stations[sti].Join(&c) // join station queue
 				break
 			}
 		}
@@ -155,10 +155,10 @@ func show_info() {
 			if st.Mode == 1 {
 				m = 'F'
 			}
-			fmt.Printf("Sta%d(%c):\t", st.Id, m)
-			for _, c := range st.Queue {
-				fmt.Printf("%s\t" ,c.QId)
-			}
+			fmt.Printf("Sta%d(%c):\t%d", st.Id, m, len(st.Queue))
+			// for _, c := range st.Queue {
+			// 	fmt.Printf("%s\t" ,c.QId)
+			// }
 
 			fmt.Println()
 		}
