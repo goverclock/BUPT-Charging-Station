@@ -84,10 +84,10 @@ func charge_getChargingMsg(ctx *gin.Context) {
 		response.Data.Charge_mode = car.ChargeMode
 		response.Data.Charge_amount = car.ChargeAmount
 		sta := -1
-		if car.Stage == "Waiting" {
+		if car.Stage == data.Waiting {
 			sta = 1
 		}
-		if car.Stage == "Queueing" {
+		if car.Stage == data.Queueing {
 			sta = 2
 		} else { // "Charging"
 			sta = 3

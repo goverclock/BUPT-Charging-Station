@@ -115,7 +115,7 @@ func TestChargeSubmit(t *testing.T) {
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 	}
-	request.ChargeMode = 1
+	request.ChargeMode = 0
 	request.ChargeAmount = 2.0
 
 	body := send("POST", "/charge/submit", request)
