@@ -161,9 +161,8 @@ start_charge.addEventListener("click",()=>{
 //charge_submit代码
 const charge_submit_url="/charge/submit";
 let charge_date={
-    chargeMode:"",
-    chargeAmount:"",
-    username:""
+    chargeMode:0,
+    chargeAmount:0.0,
 }
 const charge_submit = document.querySelector("#charge_submit");
 const div_operation = document.querySelector("#div-present");
@@ -236,8 +235,7 @@ charge_submit.addEventListener("click", () => {
         else{
             charge_date.chargeMode=0;
         }
-        charge_date.chargeAmount=start_input.value;
-        charge_date.username=user_id;
+        charge_date.chargeAmount=parseFloat(start_input.value);
         send_data(charge_submit_url,charge_date);
         div_operation.remove();
         div1.appendChild(div_background);
@@ -467,6 +465,7 @@ queue_ind_id.addEventListener("click",()=>{
     div_queue_ind_id.appendChild(exit_btn);
     exit_btn.textContent = 'x';
     exit_btn.id = "exit-btn";
+    quque_ind_id_data.username=user_id;
     const response=send_data(queue_ind_id_url,quque_ind_id_data);
     response.then(response=>response.json())
          .then(all_data=>{
