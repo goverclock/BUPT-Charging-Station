@@ -8,8 +8,7 @@ console.log(localStorage.getItem('tokens'));
 
 server_addr="http://localhost:8080";
 let user_id=localStorage.getItem('user_id');//获取本地存储的用户id
-user_id=getItem('user_id');
-tokens=getItem('tokens');
+let tokens=localStorage.getItem('tokens');
 const user_id_text=document.querySelector("#user_id");
 const money=document.querySelector("#money");
 
@@ -22,13 +21,14 @@ function send_data(part_url,object){
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization':`${tokens}`
+          'Authorization':`${tokens}`,
+          'Access-Control-Allow-Headers':'Authorization',
+	      'Access-Control-Expose-Headers':'Authorization'
         },
         body: JSON.stringify(object)
       });
       return res;
 }
-
 
 
 //从服务器取数据
