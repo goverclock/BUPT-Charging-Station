@@ -14,7 +14,7 @@ func (st *Station) Available() bool {
 func (st *Station) Join(c *Car) {
 	st.Queue = append(st.Queue, *c)
 	if st.Queue[0] == *c {
-		c.Stage = "Charging"
+		st.Queue[0].Stage = Charging
 	}
-	// log.Println("car JOINED", c)
+	// log.Println(st.Id, "car JOINED", c)
 }

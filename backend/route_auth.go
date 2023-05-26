@@ -54,46 +54,11 @@ func login_user(ctx *gin.Context) {
         return
     }
 
-	ctx.Header("Access-Control-Allow-Headers", "Authorization")
-	ctx.Header("Access-Control-Expose-Headers", "Authorization")
 	ctx.Header("Authorization", tokenString)
 
 	ctx.JSON(http.StatusOK, response)
 }
 
-func login_admin(ctx *gin.Context) {
-	var request struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	ctx.BindJSON(&request)
-	var response struct {
-		Code int `json:"code"`
-		Msg  string `json:"msg"`
-		Data struct {
-			Username        string  `json:"username"`
-		} `json:"data"`
-	}
-
-	response.Data.Username = request.Username
-	user, err := data.UserByName(request.Username)
-	if request.Username == "" || request.Password == "" {
-		response.Code = CodeKeyError
-		response.Msg = "need user name or password"
-	} else if err != nil {
-		response.Code = CodeForbidden
-		response.Msg = "no such user"
-	} else if user.Password != data.Encrypt(request.Password) {
-		response.Code = CodeForbidden
-		response.Msg = "wrong password"
-	} else if user.Password == data.Encrypt(request.Password) {
-		response.Code = CodeSucceed
-		response.Msg = "admin login succeeded"
-	}
-
-
-	ctx.JSON(http.StatusOK, response)
-}
 
 func register_user(ctx *gin.Context) {
 	var request struct {
