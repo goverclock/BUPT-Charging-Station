@@ -15,6 +15,8 @@ type Scheduler struct {
 	mu          sync.Mutex
 	stations    []data.Station
 	waitingcars []data.Car
+	fast_qind   int // QId of the next fast car to schdule to charging area
+	slow_qind   int
 }
 
 var sched Scheduler
@@ -28,24 +30,29 @@ func init() {
 	go show_info()
 
 	sched.stations = append(sched.stations, data.Station{
-		Id:   0,
-		Mode: 1,
+		Id:    0,
+		Mode:  1,
+		Speed: 30,
 	})
 	sched.stations = append(sched.stations, data.Station{
-		Id:   1,
-		Mode: 1,
+		Id:    1,
+		Mode:  1,
+		Speed: 30,
 	})
 	sched.stations = append(sched.stations, data.Station{
-		Id:   2,
-		Mode: 0,
+		Id:    2,
+		Mode:  0,
+		Speed: 7,
 	})
 	sched.stations = append(sched.stations, data.Station{
-		Id:   3,
-		Mode: 0,
+		Id:    3,
+		Mode:  0,
+		Speed: 7,
 	})
 	sched.stations = append(sched.stations, data.Station{
-		Id:   4,
-		Mode: 0,
+		Id:    4,
+		Mode:  0,
+		Speed: 7,
 	})
 }
 
@@ -94,24 +101,72 @@ func ticker() {
 		time.Sleep(1 * time.Second)
 		sched.mu.Lock()
 
-		// check if any car in waitingcars can move to charing station
-		for ci, c := range sched.waitingcars {
-			// check if any station is available for the car
-			for sti, st := range sched.stations {
-				if !st.Available() || st.Mode != c.ChargeMode {
-					continue
-				}
-				// available station
-				// generate QId
-				// car moves to station
-				sched.waitingcars =
-					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
-				sched.stations[sti].Join(&c) // join station queue
-				break
-			}
-		}
+		// try to schdule the next fast car
+		schduleFast()
+		// try to schedule the next slow car
+		scheduleSlow()
 
 		sched.mu.Unlock()
+	}
+}
+
+func schduleFast() {
+	for ci, c := range sched.waitingcars {
+		if c.QId == "F"+strconv.Itoa(sched.fast_qind+1) {
+			// the car exists, look for a station with min wait time for the car
+			min_wait := -1.0
+			min_wait_sti := -1
+			for sti, st := range sched.stations {
+				if !st.Available() || st.Mode != 1 {	// fast station
+					continue
+				}
+				if min_wait < 0 || st.WaitingTimeForCar(c) < min_wait {
+					min_wait = st.WaitingTimeForCar(c)
+					min_wait_sti = sti
+				}
+			}
+
+			// available station
+			// car moves to station
+			if min_wait_sti != -1 {
+				sched.waitingcars =
+					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
+				sched.stations[min_wait_sti].Join(&c) // join station queue
+				sched.fast_qind++
+			}
+
+			break
+		}
+	}
+}
+
+func scheduleSlow() {
+	for ci, c := range sched.waitingcars {
+		if c.QId == "T"+strconv.Itoa(sched.slow_qind+1) {
+			// the car exists, look for a station with min wait time for the car
+			min_wait := -1.0
+			min_wait_sti := -1
+			for sti, st := range sched.stations {
+				if !st.Available() || st.Mode != 0 {	// slow station
+					continue
+				}
+				if min_wait < 0 || st.WaitingTimeForCar(c) < min_wait {
+					min_wait = st.WaitingTimeForCar(c)
+					min_wait_sti = sti
+				}
+			}
+
+			// available station
+			// car moves to station
+			if min_wait_sti != -1 {
+				sched.waitingcars =
+					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
+				sched.stations[min_wait_sti].Join(&c) // join station queue
+				sched.slow_qind++
+			}
+
+			break
+		}
 	}
 }
 
@@ -136,15 +191,29 @@ func generateQId(mode int) string {
 		}
 		return true
 	}
-	for i := 1; ; i++ {
-		qid := "T" + strconv.Itoa(i)
-		if mode == 1 {
-			qid = "F" + strconv.Itoa(i)
+	if mode == 1 { // fast
+		for i := sched.fast_qind; ; i = (i + 1) % getMaxQId() {
+			qid := "F" + strconv.Itoa(i+1)
+			if isqidfree(qid) {
+				return qid
+			}
 		}
-		if isqidfree(qid) {
-			return qid
+	} else { // slow
+		for i := sched.slow_qind; ; i = (i + 1) % getMaxQId() {
+			qid := "T" + strconv.Itoa(i+1) // slow
+			if isqidfree(qid) {
+				return qid
+			}
 		}
 	}
+}
+
+// assume sched.mu is locked
+func getMaxQId() int {
+	if sched.mu.TryLock() {
+		log.Fatal("should have locked sched.mu in getMaxQid")
+	}
+	return data.MAX_WAITING_SLOT + data.MAX_STATION_QUEUE*len(sched.stations)
 }
 
 // for debug only
@@ -161,9 +230,11 @@ func show_info() {
 
 	for {
 		time.Sleep(1 * time.Second)
-
 		sched.mu.Lock()
-		fmt.Printf("Waiting:\t%d\t", len(sched.waitingcars))
+
+		fmt.Printf("FastInd:\t%v\n", "F"+strconv.Itoa(sched.fast_qind+1))
+		fmt.Printf("SlowInd:\t%v\n", "T"+strconv.Itoa(sched.slow_qind+1))
+		fmt.Printf("Waiting:\t")
 		for _, c := range sched.waitingcars {
 			fmt.Printf("%v\t", c.QId)
 		}

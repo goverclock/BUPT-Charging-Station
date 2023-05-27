@@ -5,7 +5,7 @@ type User struct {
 	Uuid            string
 	Name            string
 	Password        string
-	IsAdmin         bool
+	IsAdmin         bool		// unused, Id == 0 -> Admin
 	Balance         float64
 	BatteryCapacity float64
 }
