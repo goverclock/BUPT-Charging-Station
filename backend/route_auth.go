@@ -17,16 +17,16 @@ func login_user(ctx *gin.Context) {
 	}
 	ctx.BindJSON(&request)
 	var response struct {
-		Code int `json:"code"`
+		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
-			Username        string  `json:"username"`
+			Id int `json:"username"`
 		} `json:"data"`
 	}
 
 	// authenticate
-	response.Data.Username = request.Username
 	user, err := data.UserByName(request.Username)
+	response.Data.Id = user.Id
 	if request.Username == "" || request.Password == "" {
 		response.Code = CodeKeyError
 		response.Msg = "need user name or password"
@@ -48,17 +48,16 @@ func login_user(ctx *gin.Context) {
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
 	})
-    tokenString, err := token.SignedString(JwtKey)
-    if err != nil {
-        ctx.JSON(500, gin.H{"message": "Internal server error"})
-        return
-    }
+	tokenString, err := token.SignedString(JwtKey)
+	if err != nil {
+		ctx.JSON(500, gin.H{"message": "Internal server error"})
+		return
+	}
 
 	ctx.Header("Authorization", tokenString)
 
 	ctx.JSON(http.StatusOK, response)
 }
-
 
 func register_user(ctx *gin.Context) {
 	var request struct {
@@ -69,7 +68,7 @@ func register_user(ctx *gin.Context) {
 	log.Println(request)
 
 	var response struct {
-		Code int `json:"code"`
+		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
 			Username        string  `json:"username"`
@@ -95,7 +94,7 @@ func register_user(ctx *gin.Context) {
 		user.IsAdmin = false
 		user.Balance = 0
 		user.BatteryCapacity = 0
-		err = user.Create(false)	// save user register information
+		err = user.Create(false) // save user register information
 		if err != nil {
 			log.Fatal(err, "fail to create user")
 		}
