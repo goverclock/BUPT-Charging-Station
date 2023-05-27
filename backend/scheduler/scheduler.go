@@ -96,6 +96,40 @@ func CarByUser(u *data.User) (data.Car, error) {
 	return data.Car{}, errors.New("car not found, because user hasn't submit charge")
 }
 
+// 0 if car is not in waiting area
+func WaitCountByCar(c *data.Car) (int, error) {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	log.Println(c)
+
+	if c.Stage != data.Waiting {
+		return 0, nil
+	}
+	qid := c.QId
+	wc := 0
+	if c.ChargeMode == 1 {
+		for {
+			if "F"+strconv.Itoa(((sched.fast_qind+wc)%getMaxQId())+1) == qid {
+				return wc, nil
+			}
+			wc++
+			if wc > getMaxQId() {
+				return 0, errors.New("waiting_count out of range")
+			}
+		}
+	} else {
+		for {
+			if "T"+strconv.Itoa(((sched.slow_qind+wc)%getMaxQId())+1) == qid {
+				return wc, nil
+			}
+			wc++
+			if wc > getMaxQId() {
+				return 0, errors.New("waiting_count out of range")
+			}
+		}
+	}
+}
+
 func ticker() {
 	for {
 		time.Sleep(1 * time.Second)
@@ -117,7 +151,7 @@ func schduleFast() {
 			min_wait := -1.0
 			min_wait_sti := -1
 			for sti, st := range sched.stations {
-				if !st.Available() || st.Mode != 1 {	// fast station
+				if !st.Available() || st.Mode != 1 { // fast station
 					continue
 				}
 				if min_wait < 0 || st.WaitingTimeForCar(c) < min_wait {
@@ -147,7 +181,7 @@ func scheduleSlow() {
 			min_wait := -1.0
 			min_wait_sti := -1
 			for sti, st := range sched.stations {
-				if !st.Available() || st.Mode != 0 {	// slow station
+				if !st.Available() || st.Mode != 0 { // slow station
 					continue
 				}
 				if min_wait < 0 || st.WaitingTimeForCar(c) < min_wait {

@@ -5,7 +5,7 @@ type User struct {
 	Uuid            string
 	Name            string
 	Password        string
-	IsAdmin         bool		// unused, Id == 0 -> Admin
+	IsAdmin         bool // unused, Id == 0 -> Admin
 	Balance         float64
 	BatteryCapacity float64
 }
@@ -32,6 +32,6 @@ func (user *User) Create(isAdmin bool) (err error) {
 func UserByName(name string) (user User, err error) {
 	user = User{}
 	err = Db.QueryRow("SELECT * FROM users WHERE name = $1", name).
-		Scan(&user.Id, &user.Name, &user.Uuid, &user.Password, &user.IsAdmin, &user.Balance, &user.BatteryCapacity)
+		Scan(&user.Id, &user.Uuid, &user.Name, &user.Password, &user.IsAdmin, &user.Balance, &user.BatteryCapacity)
 	return
 }

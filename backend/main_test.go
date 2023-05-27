@@ -8,50 +8,11 @@ import (
 	"log"
 	"net/http"
 	"testing"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 )
 
 var authToken string
 
-// almost same as main.go
-func init() {
-	return
-	server := gin.Default()
-
-	server.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"*"},
-		AllowMethods:  []string{"*"},
-		AllowHeaders:  []string{"*"},
-		ExposeHeaders: []string{"*"},
-	}))
-
-	server.POST("/login/user", login_user)
-	server.POST("/register/user", register_user)
-	server.POST("/charge/submit", authMiddleware, charge_submit)
-	server.GET("/charge/getChargingMsg", authMiddleware, charge_getChargingMsg)
-	// server.POST("/charge/chargeSubmit")	// maybe changeSubmit
-	// server.POST("/charge/cancelCharge")
-	// server.POST("/charge/startCharge")
-	// server.POST("/charge/endCharge")
-	// server.POST("/charge/details")
-	// server.POST("/recharge")
-	// server.POST("//getbalance")
-	// server.POST("/chargeports/getreport")
-	// server.POST("/chargeports/getchargeports")
-	// server.POST("/chargeports/addchargeport")
-	// server.POST("/chargeports/delBatch")
-	// server.POST("/chargeports/turnon")
-	// server.POST("/chargeports/setfailure")
-	// server.POST("/chargeports/waitingCars")
-	// server.POST("/system/getsettings")
-	// server.POST("/system/setsettings")
-
-	go server.Run(":8080")	// only difference
-}
-
-// no Authorization header
+// Authorization header included
 func send(method string, route string, request interface{}) []byte {
 	route = "http://localhost:8080" + route
 	req_body, _ := json.Marshal(request)
@@ -119,6 +80,29 @@ func TestChargeSubmit(t *testing.T) {
 	request.ChargeAmount = 2.0
 
 	body := send("POST", "/charge/submit", request)
+	json.Unmarshal(body, &response)
+	t.Log(response)
+	if response.Code != 200 {
+		t.Fail()
+	}
+}
+
+func TestGetChargingMsg(t *testing.T) {
+	TestLoginUser(t)
+
+	var request struct {
+		Username string `json:"username"`
+	}
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+			Waiting_count int `json:"waiting_count"`
+		} `json:"data"`
+	}
+
+	request.Username = "w"
+	body := send("GET", "/charge/getChargingMsg", request)
 	json.Unmarshal(body, &response)
 	t.Log(response)
 	if response.Code != 200 {
