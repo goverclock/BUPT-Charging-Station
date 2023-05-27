@@ -131,3 +131,26 @@ func TestStartCharge(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestGetBalance(t *testing.T) {
+	TestLoginUser(t)
+
+	var request struct {
+		User_id int `json:"user_id"`
+	}
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+			Balance float64 `json:"balance"`
+		} `json:"data"`
+	}
+	
+	request.User_id = 1
+	body := send("POST", "/getbalance", request)
+	json.Unmarshal(body, &response)
+	t.Log(response)
+	if response.Code != 200 {
+		t.Fail()
+	}
+}

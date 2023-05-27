@@ -25,7 +25,7 @@ func main() {
 	// server.POST("/charge/endCharge")
 	// server.GET("/charge/details", authMiddleware, charge_details)
 	// server.POST("/recharge")
-	// server.POST("/getbalance")
+	server.POST("/getbalance", authMiddleware, getbalance)
 	// server.POST("/chargeports/getreport")
 	// server.POST("/chargeports/getchargeports")
 	// server.POST("/chargeports/addchargeport")

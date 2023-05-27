@@ -13,13 +13,15 @@ func charge_submit(ctx *gin.Context) {
 	var request struct {
 		ChargeMode   int     `json:"chargeMode"`
 		ChargeAmount float64 `json:"chargeAmount"`
-		User_id      int     `json:"User_id"`	// unused
+		User_id      int     `json:"User_id"` // unused
 	}
 	ctx.Bind(&request)
 
 	var response struct {
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
 	}
 
 	// get user
