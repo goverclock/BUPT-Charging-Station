@@ -1,5 +1,7 @@
 package data
 
+import "log"
+
 // 2 Fast, 3 Slow
 type Station struct {
 	Id    int
@@ -13,10 +15,10 @@ func (st *Station) Available() bool {
 }
 
 func (st *Station) Join(c *Car) {
-	st.Queue = append(st.Queue, *c)
-	if st.Queue[0] == *c {
-		st.Queue[0].Stage = Charging
+	if !st.Available() {
+		log.Fatal("station is not available!")
 	}
+	st.Queue = append(st.Queue, *c)
 	// log.Println(st.Id, "car JOINED", c)
 }
 

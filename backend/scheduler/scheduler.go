@@ -76,31 +76,50 @@ func JoinCar(car data.Car) bool {
 	return false
 }
 
-func CarByUser(u *data.User) (data.Car, error) {
+func CarByUser(u data.User) (*data.Car, error) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	// 1. find in waitingcars
 	for _, c := range sched.waitingcars {
 		if c.OwnedBy == u.Uuid {
-			return c, nil
+			return &c, nil
 		}
 	}
 	// 2. find in every stations
 	for _, st := range sched.stations {
 		for _, c := range st.Queue {
 			if c.OwnedBy == u.Uuid {
-				return c, nil
+				return &c, nil
 			}
 		}
 	}
-	return data.Car{}, errors.New("car not found, because user hasn't submit charge")
+	return &data.Car{}, errors.New("car not found, because user hasn't submit charge")
+}
+
+func StartChargeCar(c *data.Car) error {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	if c.Stage == data.Waiting {
+		return errors.New("car isn't queueing")
+	} else if c.Stage == data.Charging {
+		return errors.New("car is alreay charging")
+	}
+	// check if the car is in a station's 1st slot
+	for _, st := range sched.stations {
+		for ci, stc := range st.Queue {
+			if stc.QId == c.QId {
+				// start charge
+				st.Queue[ci].Stage = data.Charging
+			}
+		}
+	}
+	return nil
 }
 
 // 0 if car is not in waiting area
 func WaitCountByCar(c *data.Car) (int, error) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
-	log.Println(c)
 
 	if c.Stage != data.Waiting {
 		return 0, nil
@@ -165,7 +184,9 @@ func schduleFast() {
 			if min_wait_sti != -1 {
 				sched.waitingcars =
 					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
-				sched.stations[min_wait_sti].Join(&c) // join station queue
+					// join station queue
+				c.Stage = data.Queueing
+				sched.stations[min_wait_sti].Join(&c)
 				sched.fast_qind++
 			}
 
@@ -195,7 +216,9 @@ func scheduleSlow() {
 			if min_wait_sti != -1 {
 				sched.waitingcars =
 					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
-				sched.stations[min_wait_sti].Join(&c) // join station queue
+					// join station queue
+				c.Stage = data.Queueing
+				sched.stations[min_wait_sti].Join(&c)
 				sched.slow_qind++
 			}
 
