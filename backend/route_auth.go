@@ -20,7 +20,7 @@ func login_user(ctx *gin.Context) {
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
-			Id int `json:"username"`
+			Id int `json:"id"`
 		} `json:"data"`
 	}
 
