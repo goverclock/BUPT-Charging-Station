@@ -176,3 +176,27 @@ func TestGetBalance(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestRecharge(t *testing.T) {
+	TestLoginUser(t)
+
+	var request struct {
+		Recharge_amount float64 `json:"recharge_amount"`
+		User_id int `json:"user_id"`
+	}
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	request.Recharge_amount = 3.33
+	request.User_id = 1
+	body := send("POST", "/recharge", request)
+	json.Unmarshal(body, &response)
+	t.Log(response)
+	if response.Code != 200 {
+		t.Fail()
+	}
+}

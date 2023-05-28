@@ -30,6 +30,11 @@ func (user *User) Create(isAdmin bool) (err error) {
 	return
 }
 
+func (user *User) Update() {
+	Db.QueryRow("update users set name = $2, password = $3, isadmin = $4, balance = $5, batterycapacity = $6 WHERE id = $1",
+		user.Id, user.Name, user.Password, user.IsAdmin, user.Balance, user.BatteryCapacity)
+}
+
 // get a single user given the name
 func UserByName(name string) (user User, err error) {
 	user = User{}

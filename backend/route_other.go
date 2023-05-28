@@ -20,7 +20,7 @@ func getbalance(ctx *gin.Context) {
 			Balance float64 `json:"balance"`
 		} `json:"data"`
 	}
-	
+
 	user, err := data.UserById(request.User_id)
 	if err != nil {
 		log.Fatal(err, " no such user ", request.User_id)
@@ -28,6 +28,32 @@ func getbalance(ctx *gin.Context) {
 	response.Code = CodeSucceed
 	response.Msg = "succeed"
 	response.Data.Balance = user.Balance
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func recharge(ctx *gin.Context) {
+	var request struct {
+		Recharge_amount float64 `json:"recharge_amount"`
+		User_id         int     `json:"user_id"`
+	}
+	ctx.Bind(&request)
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	user, err := data.UserById(request.User_id)
+	if err != nil {
+		log.Fatal(err, "no such user: ", request.User_id)
+	}
+	user.Balance += request.Recharge_amount
+	log.Println(user)
+	user.Update()
+	response.Code = CodeSucceed
+	response.Msg = "recharge succeeded"
 
 	ctx.JSON(http.StatusOK, response)
 }
