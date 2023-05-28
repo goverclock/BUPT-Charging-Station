@@ -106,11 +106,9 @@ func StartChargeCar(c *data.Car) error {
 	}
 	// check if the car is in a station's 1st slot
 	for _, st := range sched.stations {
-		for ci, stc := range st.Queue {
-			if stc.QId == c.QId {
-				// start charge
-				st.Queue[ci].Stage = data.Charging
-			}
+		if len(st.Queue) > 0 && st.Queue[0].QId == c.QId {
+			// start charge
+			st.Queue[0].Stage = data.Charging
 		}
 	}
 	return nil
