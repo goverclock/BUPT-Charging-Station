@@ -82,7 +82,6 @@ func JoinCar(user data.User, car *data.Car) bool {
 		rp.Step = data.StepInline
 		rp.Queue_number = car.QId
 		rp.Inlinetime = time.Now().Unix()
-
 		return true
 	}
 
@@ -102,9 +101,11 @@ func newOngoingReport(u data.User) *data.Report {
 }
 
 // archive and remove from sched's ongoing_reports
+// assume sched.mu is locked
 func archiveOngoingReport(rp *data.Report) {
-	sched.mu.Lock()
-	defer sched.mu.Unlock()
+	if sched.mu.TryLock(){
+		log.Fatal("should have locked sched.mu in generate QId")
+	}
 	for ri, r := range sched.ongoing_reports {
 		if r.Num == rp.Num {
 			sched.ongoing_reports = append(sched.ongoing_reports[:ri], sched.ongoing_reports[ri+1:]...)
@@ -299,7 +300,7 @@ func scheduleSlow() {
 
 // assume sched.mu is locked
 func generateQId(mode int) string {
-	if sched.mu.TryLock() {
+	if sched.mu.TryLock(){
 		log.Fatal("should have locked sched.mu in generate QId")
 	}
 
