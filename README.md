@@ -1,3 +1,5 @@
 # BUPT-Charging-Station
 
-chitchat is an example.
+TODO:
+
+- [ ] JWT or user_id

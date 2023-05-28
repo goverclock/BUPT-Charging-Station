@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -43,8 +44,8 @@ type Report struct {
 	Charge_end_time       int64   `json:"charge_end_time"`
 	Terminate_flag        bool    `json:"terminate_flag"`
 	Terminate_time        int64   `json:"terminate_time"`
-	Failed_flag           bool    `json:"failed_flag"`	// chargeSubmit
-	Failed_msg            string  `json:"failed_msg"`	// chargeSubmit
+	Failed_flag           bool    `json:"failed_flag"` // chargeSubmit
+	Failed_msg            string  `json:"failed_msg"`  // chargeSubmit
 }
 
 func (r *Report) Archive() {
@@ -82,5 +83,33 @@ func generateReportNum(user_id int) int64 {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return ret
+}
+
+func (r Report) String() string {
+	ret := ""
+	ret += fmt.Sprintln("Id                   ", r.Id)
+	ret += fmt.Sprintln("Num                  ", r.Num)
+	ret += fmt.Sprintln("Charge_id            ", r.Charge_id)
+	ret += fmt.Sprintln("Charge_mode          ", r.Charge_mode)
+	ret += fmt.Sprintln("Username             ", r.Username)
+	ret += fmt.Sprintln("User_id              ", r.User_id)
+	ret += fmt.Sprintln("Request_charge_amount", r.Request_charge_amount)
+	ret += fmt.Sprintln("Real_charge_amount   ", r.Real_charge_amount)
+	ret += fmt.Sprintln("Charge_time          ", r.Charge_time)
+	ret += fmt.Sprintln("Charge_fee           ", r.Charge_fee)
+	ret += fmt.Sprintln("Service_fee          ", r.Service_fee)
+	ret += fmt.Sprintln("Tot_fee              ", r.Tot_fee)
+	ret += fmt.Sprintln("Step                 ", r.Step)
+	ret += fmt.Sprintln("Queue_number         ", r.Queue_number)
+	ret += fmt.Sprintln("Subtime              ", r.Subtime)
+	ret += fmt.Sprintln("Inlinetime           ", r.Inlinetime)
+	ret += fmt.Sprintln("Calltime             ", r.Calltime)
+	ret += fmt.Sprintln("Charge_start_time    ", r.Charge_start_time)
+	ret += fmt.Sprintln("Charge_end_time      ", r.Charge_end_time)
+	ret += fmt.Sprintln("Terminate_flag       ", r.Terminate_flag)
+	ret += fmt.Sprintln("Terminate_time       ", r.Terminate_time)
+	ret += fmt.Sprintln("Failed_flag          ", r.Failed_flag)
+	ret += fmt.Sprintln("Failed_msg           ", r.Failed_msg)
 	return ret
 }

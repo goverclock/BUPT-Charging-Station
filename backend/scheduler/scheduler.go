@@ -18,7 +18,7 @@ type Scheduler struct {
 	fast_qind   int // QId of the next fast car to schdule to charging area
 	slow_qind   int
 
-	ongoing_report []*data.Report // every user should have at most 1 ongoing report
+	ongoing_reports []*data.Report // every user should have at most 1 ongoing report
 }
 
 var sched Scheduler
@@ -59,18 +59,30 @@ func init() {
 }
 
 // join the car into the waiting queue, so that we can schedule it
-func JoinCar(car *data.Car) bool {
+func JoinCar(user data.User, car *data.Car) bool {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
+
+	// create an ongoing report
+	rp := newOngoingReport(user)
 
 	// check if the waiting queue is full
 	free := data.MAX_WAITING_SLOT - len(sched.waitingcars)
 	if free == 0 { // fail
+		rp.Failed_flag = true
+		rp.Failed_msg = "the waiting queue is full, can't join"
+		archiveOngoingReport(rp) // charge end, save report(which failed)
 		return false
 	} else if free > 0 { // succeed
 		car.Stage = data.Waiting
 		car.QId = generateQId(car.ChargeMode)
 		sched.waitingcars = append(sched.waitingcars, car)
+		rp.Charge_mode = car.ChargeMode // update report
+		rp.Request_charge_amount = car.ChargeAmount
+		rp.Step = data.StepInline
+		rp.Queue_number = car.QId
+		rp.Inlinetime = time.Now().Unix()
+
 		return true
 	}
 
@@ -78,13 +90,28 @@ func JoinCar(car *data.Car) bool {
 	return false
 }
 
-// TODO: check if user has no ongoing report before the call
-func NewOngoingReport(u data.User) *data.Report {
+// TODO: check if user has no ongoing report before creating new
+// assume sched.mu is locked
+func newOngoingReport(u data.User) *data.Report {
+	if sched.mu.TryLock() {
+		log.Fatal("should have locked sched.mu in newOngoingReport")
+	}
+	rp := data.NewReport(u)
+	sched.ongoing_reports = append(sched.ongoing_reports, &rp)
+	return &rp
+}
+
+// archive and remove from sched's ongoing_reports
+func archiveOngoingReport(rp *data.Report) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
-	rp := data.NewReport(u)
-	sched.ongoing_report = append(sched.ongoing_report, &rp)
-	return &rp
+	for ri, r := range sched.ongoing_reports {
+		if r.Num == rp.Num {
+			sched.ongoing_reports = append(sched.ongoing_reports[:ri], sched.ongoing_reports[ri+1:]...)
+			r.Archive()
+			break
+		}
+	}
 }
 
 // returns all reports, no matter archived or ongoing
@@ -96,7 +123,7 @@ func ReportsByUser(u data.User) []data.Report {
 	// TODO: get all archived reports from DB
 
 	// get ongoing report for the user
-	for _, r := range sched.ongoing_report {
+	for _, r := range sched.ongoing_reports {
 		if r.User_id == u.Id {
 			rps = append(rps, *r)
 		}
@@ -104,16 +131,16 @@ func ReportsByUser(u data.User) []data.Report {
 	return rps
 }
 
-func OngoingReportByUser(u data.User) (*data.Report, error) {
+func OngoingReportByUser(u data.User) *data.Report {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
-
-	for _, r := range sched.ongoing_report {
+	for _, r := range sched.ongoing_reports {
 		if r.User_id == u.Id {
-			return r, nil
+			return r
 		}
 	}
-	return nil, errors.New("no ongoing report for the user")
+	log.Fatal("no ongoing report for user: ", u)
+	return nil
 }
 
 func CarByUser(u data.User) (*data.Car, error) {
@@ -149,6 +176,11 @@ func StartChargeCar(c *data.Car) error {
 		if len(st.Queue) > 0 && st.Queue[0].QId == c.QId {
 			// start charge
 			st.Queue[0].Stage = data.Charging
+
+			// update report
+			// rp := scheduler.OngoingReportByUser(user)
+			// rp.Charge_start_time = time.Now().Unix()
+			break
 		}
 	}
 	return nil

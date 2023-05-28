@@ -37,17 +37,11 @@ func charge_submit(ctx *gin.Context) {
 	car.ChargeMode = request.ChargeMode
 	car.ChargeAmount = request.ChargeAmount
 
-	// create an ongoing report
-	rp := scheduler.NewOngoingReport(user)
-
 	// try to join the car in the waiting area
-	if !scheduler.JoinCar(&car) {
+	if !scheduler.JoinCar(user, &car) {
 		// no available slot
 		response.Code = CodeForbidden
 		response.Msg = "the waiting queue is full"
-		rp.Failed_flag = true
-		rp.Failed_msg = "the waiting queue is full, report end"
-		rp.Archive()	// charge end, save report(which failed)
 	} else {
 		response.Code = CodeSucceed
 		response.Msg = "charging request submitted succssfully"
@@ -142,7 +136,7 @@ func charge_startCharge(ctx *gin.Context) {
 		if err != nil {
 			response.Code = CodeForbidden
 			response.Msg = "car is not ready to charge"
-		} else {
+		} else {	// ok to start charge
 			response.Code = CodeSucceed
 			response.Msg = "charge started"
 		}
