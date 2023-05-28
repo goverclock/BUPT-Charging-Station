@@ -3,12 +3,14 @@
 //在用户登陆后将订单文件id发到客户端,然后用户根据订单id查找订单,服务器再将详细内容发送至客户端.
 //2 排队号码查询,服务器需将排队号码发送至客户端
 //3 排队车辆查询,服务器需将前车的等待数发送至客户端.
-console.log(localStorage.getItem('user_id'));
-console.log(localStorage.getItem('tokens'));
 
 server_addr="http://localhost:8080";
 let user_id=localStorage.getItem('user_id');//获取本地存储的用户id
+let local_username=localStorage.getItem('username');
 let tokens=localStorage.getItem('tokens');
+console.log(user_id);
+console.log(localStorage.getItem('tokens'));
+console.log(localStorage.getItem('username'));
 const user_id_text=document.querySelector("#user_id");
 const money=document.querySelector("#money");
 
@@ -120,7 +122,7 @@ money_charge.addEventListener("click",()=>{
 //start_charge 开始充电代码
 const start_charge_url="/charge/startCharge";
 let start_charge_data={
-    username:""
+    user_id:-1
 }
 const start_charge=document.querySelector("#start_charge");
 start_charge.addEventListener("click",()=>{
@@ -138,6 +140,7 @@ start_charge.addEventListener("click",()=>{
     diag.appendChild(start_x);
     div_operation.appendChild(diag);
     diag.show();
+    start_charge_data.user_id=parseInt(user_id);
     const response=send_data(start_charge_url,start_charge_data);
     response.then(response=>response.json())
     .then(all_data=>{
@@ -163,6 +166,7 @@ const charge_submit_url="/charge/submit";
 let charge_date={
     chargeMode:0,
     chargeAmount:0.0,
+    user_id:-1
 }
 const charge_submit = document.querySelector("#charge_submit");
 const div_operation = document.querySelector("#div-present");
@@ -236,6 +240,7 @@ charge_submit.addEventListener("click", () => {
             charge_date.chargeMode=0;
         }
         charge_date.chargeAmount=parseFloat(start_input.value);
+        charge_date.user_id=parseInt(user_id);
         send_data(charge_submit_url,charge_date);
         div_operation.remove();
         div1.appendChild(div_background);
@@ -465,14 +470,15 @@ queue_ind_id.addEventListener("click",()=>{
     div_queue_ind_id.appendChild(exit_btn);
     exit_btn.textContent = 'x';
     exit_btn.id = "exit-btn";
-    quque_ind_id_data.username=user_id;
+    quque_ind_id_data.username=local_username;
+ 
     const response=send_data(queue_ind_id_url,quque_ind_id_data);
     response.then(response=>response.json())
          .then(all_data=>{
          if(all_data.code===200){
-            p1.textContent="排队号码: "+quque_ind_id_data.data["queue_number"];
+            //p1.textContent="排队号码: "+quque_ind_id_data.data["queue_number"];
             p2.textContent="正在等待的前车数量: "+quque_ind_id_data.data["waiting_count"];
-            if(quque_ind_id_data.data["charge_mode"]===1){
+            /*if(quque_ind_id_data.data["charge_mode"]===1){
                 p3.textContent="充电模式: 快充";
             }
             else{
@@ -490,7 +496,7 @@ queue_ind_id.addEventListener("click",()=>{
             }
             else{
                 p5.textContent="充电状态: 正在充电";
-            }
+            }*/
 
         }
     });

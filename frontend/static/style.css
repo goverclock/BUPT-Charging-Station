@@ -251,8 +251,8 @@ body {
 }
 #start_x{
   position: relative;
-  bottom:173px;
-  left:295px;
+  top:-20px;
+  left:208px;
   background-color: red;
 }
 #end_btn{

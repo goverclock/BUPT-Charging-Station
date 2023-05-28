@@ -47,8 +47,9 @@ btn2.addEventListener("click",()=>{
           console.log(responseObject.headers);
           localStorage.setItem('tokens',responseObject.headers.get("Authorization"));
         });
-        console.log(data.data.username);
-        localStorage.setItem('user_id',data.data.username);
+        localStorage.setItem('user_id',data.data.id);
+        localStorage.setItem('username',user_name.value);
+        console.log(localStorage.getItem("username"));
         window.location.href="ui.html";
       }
       else{
