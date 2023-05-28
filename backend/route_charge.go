@@ -13,10 +13,9 @@ func charge_submit(ctx *gin.Context) {
 	var request struct {
 		ChargeMode   int     `json:"chargeMode"`
 		ChargeAmount float64 `json:"chargeAmount"`
-		User_id      int     `json:"User_id"` // unused
+		User_id      int     `json:"user_id"` // unused
 	}
 	ctx.Bind(&request)
-
 	var response struct {
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`
@@ -27,22 +26,25 @@ func charge_submit(ctx *gin.Context) {
 	// get user
 	user_name, _ := ctx.Get("user_name") // ctx.Set in JWT
 	user, err := data.UserByName(user_name.(string))
-	// log.Println(user)
 	if err != nil {
 		log.Fatal("UserByName")
 	}
 
+	// create car for the user
 	car := data.Car{
 		OwnedBy: user.Uuid,
 	}
 	car.ChargeMode = request.ChargeMode
 	car.ChargeAmount = request.ChargeAmount
 
-	if !scheduler.JoinCar(car) {
+	// try to join the car in the waiting area
+	if !scheduler.JoinCar(&car) {
 		// no available slot
 		response.Code = CodeForbidden
 		response.Msg = "the waiting queue is full"
 	} else {
+		// create an ongoing report
+		scheduler.NewOngoingReport(user)
 		response.Code = CodeSucceed
 		response.Msg = "charging request submitted succssfully"
 	}
@@ -123,6 +125,11 @@ func charge_details(ctx *gin.Context) {
 			Failed_msg            string  `json:"failed_msg"`
 		} `json:"data"`
 	}
+
+	// user, err := data.UserById(request.User_id)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	ctx.JSON(http.StatusOK, response)
 }

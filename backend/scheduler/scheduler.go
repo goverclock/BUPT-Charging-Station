@@ -13,10 +13,12 @@ import (
 
 type Scheduler struct {
 	mu          sync.Mutex
-	stations    []data.Station
-	waitingcars []data.Car
+	stations    []*data.Station
+	waitingcars []*data.Car
 	fast_qind   int // QId of the next fast car to schdule to charging area
 	slow_qind   int
+
+	ongoing_report []*data.Report // every user should have at most 1 ongoing report
 }
 
 var sched Scheduler
@@ -29,27 +31,27 @@ func init() {
 	go ticker()
 	go show_info()
 
-	sched.stations = append(sched.stations, data.Station{
+	sched.stations = append(sched.stations, &data.Station{
 		Id:    0,
 		Mode:  1,
 		Speed: 30,
 	})
-	sched.stations = append(sched.stations, data.Station{
+	sched.stations = append(sched.stations, &data.Station{
 		Id:    1,
 		Mode:  1,
 		Speed: 30,
 	})
-	sched.stations = append(sched.stations, data.Station{
+	sched.stations = append(sched.stations, &data.Station{
 		Id:    2,
 		Mode:  0,
 		Speed: 7,
 	})
-	sched.stations = append(sched.stations, data.Station{
+	sched.stations = append(sched.stations, &data.Station{
 		Id:    3,
 		Mode:  0,
 		Speed: 7,
 	})
-	sched.stations = append(sched.stations, data.Station{
+	sched.stations = append(sched.stations, &data.Station{
 		Id:    4,
 		Mode:  0,
 		Speed: 7,
@@ -57,7 +59,7 @@ func init() {
 }
 
 // join the car into the waiting queue, so that we can schedule it
-func JoinCar(car data.Car) bool {
+func JoinCar(car *data.Car) bool {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 
@@ -76,13 +78,21 @@ func JoinCar(car data.Car) bool {
 	return false
 }
 
+// TODO: check if user has no ongoing report before the call
+func NewOngoingReport(u data.User) {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	rp := data.NewReport(u)
+	sched.ongoing_report = append(sched.ongoing_report, &rp)
+}
+
 func CarByUser(u data.User) (*data.Car, error) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	// 1. find in waitingcars
 	for _, c := range sched.waitingcars {
 		if c.OwnedBy == u.Uuid {
-			return &c, nil
+			return c, nil
 		}
 	}
 	// 2. find in every stations
@@ -171,8 +181,8 @@ func schduleFast() {
 				if !st.Available() || st.Mode != 1 { // fast station
 					continue
 				}
-				if min_wait < 0 || st.WaitingTimeForCar(c) < min_wait {
-					min_wait = st.WaitingTimeForCar(c)
+				if min_wait < 0 || st.WaitingTimeForCar(*c) < min_wait {
+					min_wait = st.WaitingTimeForCar(*c)
 					min_wait_sti = sti
 				}
 			}
@@ -184,7 +194,7 @@ func schduleFast() {
 					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
 					// join station queue
 				c.Stage = data.Queueing
-				sched.stations[min_wait_sti].Join(&c)
+				sched.stations[min_wait_sti].Join(c)
 				sched.fast_qind++
 			}
 
@@ -203,8 +213,8 @@ func scheduleSlow() {
 				if !st.Available() || st.Mode != 0 { // slow station
 					continue
 				}
-				if min_wait < 0 || st.WaitingTimeForCar(c) < min_wait {
-					min_wait = st.WaitingTimeForCar(c)
+				if min_wait < 0 || st.WaitingTimeForCar(*c) < min_wait {
+					min_wait = st.WaitingTimeForCar(*c)
 					min_wait_sti = sti
 				}
 			}
@@ -216,7 +226,7 @@ func scheduleSlow() {
 					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
 					// join station queue
 				c.Stage = data.Queueing
-				sched.stations[min_wait_sti].Join(&c)
+				sched.stations[min_wait_sti].Join(c)
 				sched.slow_qind++
 			}
 

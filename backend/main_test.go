@@ -102,7 +102,7 @@ func TestGetChargingMsg(t *testing.T) {
 	}
 
 	request.Username = "w"
-	body := send("GET", "/charge/getChargingMsg", request)
+	body := send("POST", "/charge/getChargingMsg", request)
 	json.Unmarshal(body, &response)
 	t.Log(response)
 	if response.Code != 200 {
