@@ -30,15 +30,15 @@ type Report struct {
 	Username              string  `json:"username"` // NewReport()
 	User_id               int     `json:"user_id"`  // NewReport()
 	Request_charge_amount float64 `json:"request_charge_amount"`
-	Real_charge_amount    float64 `json:"real_charge_amount"`
-	Charge_time           int64   `json:"charge_time"`
-	Charge_fee            float64 `json:"charge_fee"`
-	Service_fee           float64 `json:"service_fee"`
-	Tot_fee               float64 `json:"tot_fee"`
+	Real_charge_amount    float64 `json:"real_charge_amount"`	// ticker
+	Charge_time           int64   `json:"charge_time"`			// ticker
+	Charge_fee            float64 `json:"charge_fee"`			// ticker
+	Service_fee           float64 `json:"service_fee"`			// ticker
+	Tot_fee               float64 `json:"tot_fee"`				// ticker
 	Step                  int     `json:"step"` // NewReport()
 	Queue_number          string  `json:"queue_number"`
 	Subtime               int64   `json:"subtime"` // NewReport()
-	Inlinetime            int64   `json:"inlinetime"`
+	Inlinetime            int64   `json:"inlinetime"`	// i.e. StageQueueing
 	Calltime              int64   `json:"calltime"`
 	Charge_start_time     int64   `json:"charge_start_time"`
 	Charge_end_time       int64   `json:"charge_end_time"`

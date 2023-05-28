@@ -30,7 +30,7 @@ func main() {
 	// server.POST("/chargeports/getchargeports")
 	// server.POST("/chargeports/addchargeport")
 	// server.POST("/chargeports/delBatch")
-	// server.POST("/chargeports/turnon")
+	server.POST("/chargeports/turnon", authMiddleware, chargeports_turnon)
 	// server.POST("/chargeports/setfailure")
 	// server.POST("/chargeports/waitingCars")
 	// server.POST("/system/getsettings")

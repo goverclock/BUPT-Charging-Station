@@ -8,6 +8,9 @@ type Station struct {
 	Mode  int // 1 - Fast, 0 - Slow
 	Speed float64
 	Queue []*Car // the 1st Car can start charge
+
+	Running bool
+	Failure bool
 }
 
 func (st *Station) Available() bool {
