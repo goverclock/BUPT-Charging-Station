@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	StepSub	int = 0
+	StepSub    int = 0
 	StepInline int = 1
-	StepCall int = 2
+	StepCall   int = 2
 	StepCharge int = 3
 	StepFinish int = 4
 )
@@ -22,29 +22,29 @@ const (
 // not going to change in the future, archive it to DB
 
 type Report struct {
-	Id                    int // only visible to database
-	Num                   int64	// NewReport()
-	Charge_id             int
-	Charge_mode           int
-	Username              string	// NewReport()
-	User_id               int// NewReport()
-	Request_charge_amount float64
-	Real_charge_amount    float64
-	Charge_time           int64
-	Charge_fee            float64
-	Service_fee           float64
-	Tot_fee               float64
-	Step                  int// NewReport()
-	Queue_number          string
-	Subtime               int64// NewReport()
-	Inlinetime            int64
-	Calltime              int64
-	Charge_start_time     int64
-	Charge_end_time       int64
-	Terminate_flag        bool
-	Terminate_time        int64
-	Failed_flag           bool
-	Failed_msg            string
+	Id                    int     // only visible to database
+	Num                   int64   `json:"num"` // NewReport()
+	Charge_id             int     `json:"charge_id"`
+	Charge_mode           int     `json:"charge_mode"`
+	Username              string  `json:"username"` // NewReport()
+	User_id               int     `json:"user_id"`  // NewReport()
+	Request_charge_amount float64 `json:"request_charge_amount"`
+	Real_charge_amount    float64 `json:"real_charge_amount"`
+	Charge_time           int64   `json:"charge_time"`
+	Charge_fee            float64 `json:"charge_fee"`
+	Service_fee           float64 `json:"service_fee"`
+	Tot_fee               float64 `json:"tot_fee"`
+	Step                  int     `json:"step"` // NewReport()
+	Queue_number          string  `json:"queue_number"`
+	Subtime               int64   `json:"subtime"` // NewReport()
+	Inlinetime            int64   `json:"inlinetime"`
+	Calltime              int64   `json:"calltime"`
+	Charge_start_time     int64   `json:"charge_start_time"`
+	Charge_end_time       int64   `json:"charge_end_time"`
+	Terminate_flag        bool    `json:"terminate_flag"`
+	Terminate_time        int64   `json:"terminate_time"`
+	Failed_flag           bool    `json:"failed_flag"`	// chargeSubmit
+	Failed_msg            string  `json:"failed_msg"`	// chargeSubmit
 }
 
 func (r *Report) Archive() {
@@ -63,7 +63,7 @@ func (r *Report) Archive() {
 	}
 }
 
-func NewReport(u User) Report{
+func NewReport(u User) Report {
 	rp := Report{}
 	rp.Num = generateReportNum(u.Id)
 	rp.Username = u.Name

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: update to API
 func login_user(ctx *gin.Context) {
 	var request struct {
 		Username string `json:"username"`

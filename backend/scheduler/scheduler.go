@@ -79,11 +79,41 @@ func JoinCar(car *data.Car) bool {
 }
 
 // TODO: check if user has no ongoing report before the call
-func NewOngoingReport(u data.User) {
+func NewOngoingReport(u data.User) *data.Report {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	rp := data.NewReport(u)
 	sched.ongoing_report = append(sched.ongoing_report, &rp)
+	return &rp
+}
+
+// returns all reports, no matter archived or ongoing
+func ReportsByUser(u data.User) []data.Report {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+
+	rps := []data.Report{}
+	// TODO: get all archived reports from DB
+
+	// get ongoing report for the user
+	for _, r := range sched.ongoing_report {
+		if r.User_id == u.Id {
+			rps = append(rps, *r)
+		}
+	}
+	return rps
+}
+
+func OngoingReportByUser(u data.User) (*data.Report, error) {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+
+	for _, r := range sched.ongoing_report {
+		if r.User_id == u.Id {
+			return r, nil
+		}
+	}
+	return nil, errors.New("no ongoing report for the user")
 }
 
 func CarByUser(u data.User) (*data.Car, error) {

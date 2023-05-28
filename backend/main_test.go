@@ -1,6 +1,7 @@
 package main
 
 import (
+	"buptcs/data"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -125,6 +126,27 @@ func TestStartCharge(t *testing.T) {
 
 	request.User_id = 1
 	body := send("POST", "/charge/startCharge", request)
+	json.Unmarshal(body, &response)
+	t.Log(response)
+	if response.Code != 200 {
+		t.Fail()
+	}
+}
+
+func TestDetails(t *testing.T) {
+	TestLoginUser(t)
+
+	var request struct {
+		User_id int `json:"user_id"`
+	}
+	var response struct {
+		Code int           `json:"code"`
+		Msg  string        `json:"msg"`
+		Data []data.Report `json:"data"`
+	}
+
+	request.User_id = 1
+	body := send("POST", "/charge/details", request)
 	json.Unmarshal(body, &response)
 	t.Log(response)
 	if response.Code != 200 {
