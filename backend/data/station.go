@@ -7,7 +7,7 @@ type Station struct {
 	Id    int
 	Mode  int // 1 - Fast, 0 - Slow
 	Speed float64
-	Queue []Car // the 1st Car can start charge
+	Queue []*Car // the 1st Car can start charge
 }
 
 func (st *Station) Available() bool {
@@ -18,7 +18,7 @@ func (st *Station) Join(c *Car) {
 	if !st.Available() {
 		log.Fatal("station is not available!")
 	}
-	st.Queue = append(st.Queue, *c)
+	st.Queue = append(st.Queue, c)
 	// log.Println(st.Id, "car JOINED", c)
 }
 

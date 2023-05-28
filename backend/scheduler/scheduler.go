@@ -81,7 +81,6 @@ func JoinCar(user data.User, car *data.Car) bool {
 		rp.Request_charge_amount = car.ChargeAmount
 		rp.Step = data.StepInline
 		rp.Queue_number = car.QId
-		rp.Inlinetime = time.Now().Unix()
 		return true
 	}
 
@@ -104,7 +103,7 @@ func newOngoingReport(u data.User) *data.Report {
 // assume sched.mu is locked
 func archiveOngoingReport(rp *data.Report) {
 	if sched.mu.TryLock(){
-		log.Fatal("should have locked sched.mu in generate QId")
+		log.Fatal("should have locked sched.mu in archiveOngoingReport")
 	}
 	for ri, r := range sched.ongoing_reports {
 		if r.Num == rp.Num {
@@ -132,9 +131,11 @@ func ReportsByUser(u data.User) []data.Report {
 	return rps
 }
 
-func OngoingReportByUser(u data.User) *data.Report {
-	sched.mu.Lock()
-	defer sched.mu.Unlock()
+// assume sched.mu is locked
+func ongoingReportByUser(u data.User) *data.Report {
+	if sched.mu.TryLock(){
+		log.Fatal("should have locked sched.mu in ongoingReportByUser")
+	}
 	for _, r := range sched.ongoing_reports {
 		if r.User_id == u.Id {
 			return r
@@ -157,7 +158,7 @@ func CarByUser(u data.User) (*data.Car, error) {
 	for _, st := range sched.stations {
 		for _, c := range st.Queue {
 			if c.OwnedBy == u.Uuid {
-				return &c, nil
+				return c, nil
 			}
 		}
 	}
@@ -179,8 +180,9 @@ func StartChargeCar(c *data.Car) error {
 			st.Queue[0].Stage = data.Charging
 
 			// update report
-			// rp := scheduler.OngoingReportByUser(user)
-			// rp.Charge_start_time = time.Now().Unix()
+			rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
+			rp.Step = data.StepCharge
+			rp.Charge_start_time = time.Now().Unix()
 			break
 		}
 	}
@@ -229,6 +231,9 @@ func ticker() {
 		schduleFast()
 		// try to schedule the next slow car
 		scheduleSlow()
+		// cars in stations 1st slot should turn Stage from
+		// Queueing to Called
+		scheduleCall()
 
 		sched.mu.Unlock()
 	}
@@ -251,12 +256,17 @@ func schduleFast() {
 			}
 
 			// available station
-			// car moves to station
+			// car moves to station sti
 			if min_wait_sti != -1 {
 				sched.waitingcars =
 					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
 					// join station queue
-				c.Stage = data.Queueing
+				c.Stage = data.Queueing	// i.e. Inline
+
+				// update report
+				rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
+				rp.Inlinetime = time.Now().Unix()
+
 				sched.stations[min_wait_sti].Join(c)
 				sched.fast_qind++
 			}
@@ -289,12 +299,35 @@ func scheduleSlow() {
 					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
 					// join station queue
 				c.Stage = data.Queueing
+
+				// update report
+				rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
+				rp.Inlinetime = time.Now().Unix()
+
 				sched.stations[min_wait_sti].Join(c)
 				sched.slow_qind++
 			}
 
 			break
 		}
+	}
+}
+
+func scheduleCall() {
+	for _, st := range sched.stations {
+		if len(st.Queue) == 0 {
+			continue
+		}
+		car := st.Queue[0]
+		if car.Stage != data.Queueing {
+			continue
+		}
+		car.Stage = data.Called
+		// update report
+		user := data.UserByUUId(car.OwnedBy)
+		rp := ongoingReportByUser(user)
+		rp.Calltime = time.Now().Unix()
+		rp.Step = data.StepCall
 	}
 }
 

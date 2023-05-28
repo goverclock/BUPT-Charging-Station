@@ -2,8 +2,9 @@ package data
 
 type CarStage int
 const (
-	Waiting CarStage = iota
-	Queueing
+	Waiting CarStage = iota	// in waiting area
+	Queueing				// in station's queue
+	Called					// in station's charging slot(i.e. 1st in queue)
 	Charging
 )
 

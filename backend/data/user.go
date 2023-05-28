@@ -1,5 +1,7 @@
 package data
 
+import "log"
+
 type User struct {
 	Id              int
 	Uuid            string
@@ -42,4 +44,14 @@ func UserById(id int) (user User, err error) {
 	err = Db.QueryRow("SELECT * FROM users WHERE id = $1", id).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Password, &user.IsAdmin, &user.Balance, &user.BatteryCapacity)
 	return
+}
+
+func UserByUUId(uuid string) (user User) {
+	user = User{}
+	err := Db.QueryRow("SELECT * FROM users WHERE uuid = $1", uuid).
+		Scan(&user.Id, &user.Uuid, &user.Name, &user.Password, &user.IsAdmin, &user.Balance, &user.BatteryCapacity)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return user
 }
