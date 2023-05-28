@@ -14,7 +14,7 @@ console.log(localStorage.getItem('username'));
 const user_id_text=document.querySelector("#user_id");
 const money=document.querySelector("#money");
 
-user_id_text.textContent=user_id;
+user_id_text.textContent=local_username;
 
 //向服务器发送数据
 function send_data(part_url,object){
@@ -34,11 +34,71 @@ function send_data(part_url,object){
 
 
 //从服务器取数据
-function receive_data(part_url){
+function receive_data(part_url,object){
     url=server_addr+part_url;
-    const response=fetch(url);
-    
-    return response;
+    const res=fetch(url , {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':`${tokens}`,
+          'Access-Control-Allow-Headers':'Authorization',
+	      'Access-Control-Expose-Headers':'Authorization'
+        },
+        body: JSON.stringify(object)
+      });
+      return res;
+}
+function balance(){
+    let balance_data={
+      user_id:-1
+    }
+    balance_data.user_id=parseInt(user_id);
+    const res=send_data(getbalance_url,balance_data);
+    res.then(response=>response.json())
+      .then(all_data=>{
+      if(all_data.code===200){
+       money.textContent=all_data.data.balance;
+     }
+    });
+}
+//处理详细订单数据
+function detail_deal(i,object){
+    let string ;
+    let step=["申请已提交","排队","呼号","充电","结束充电"];
+    let true_or_false=['否','是'];
+    switch(parseInt(i)){
+
+        case 0:  string="详单编号: "+object.num; break;
+        case 1:  string="充电桩编号: "+object.charge_id; break;
+        case 2:  if(object.charge_mode===1){
+            string="充电模式: "+"快充"
+        }
+        else{
+            string="充电模式: "+"慢充"
+
+        }
+            break;
+        case 3:   string="用户名: "+object.username; break;
+        case 4:   string="用户id: "+object.user_id;    break;
+        case 5:   string="请求充电电量: "+object.request_charge_amount;   break;
+        case 6:   string="实际充电电量: "+object.real_charge_amount;   break;
+        case 7:   string="充电时长: "+object.charge_time+"分钟";   break;
+        case 8:   string="充电费用: "+object.charge_fee;   break;
+        case 9:   string="服务费用: "+object.service_fee;   break;
+        case 10:  string="总费用: "+object.tot_fee;   break;
+        case 11:  string="当前状态: "+step[object.step];    break;
+        case 12:  string="排队号码: "+object.queue_number;   break;
+        case 13:  string="订单提交时间: "+object.subtime;    break;
+        case 14:  string="进入等待区时间: "+object.inlinetime;   break;
+        case 15:  string="叫号时间: "+object.calltime;    break;
+        case 16:  string="开始充电时间: "+object.charge_start_time;   break;
+        case 17:  string="结束充电时间: "+object.charge_end_time;  break;
+        case 18:  string="用户是否主动取消订单: "+true_or_false[object.terminate_flag];   break;
+        case 19:  string="结束时间: "+object.terminate_time;    break;
+        case 20:  string="是否订单失败: "+true_or_false[object.failed_flag];  break;
+        case 21:  string="订单失败原因: "+object.failed_msg;   break;
+    }
+    return string;
 }
 
 
@@ -53,11 +113,16 @@ const form_login_out = document.querySelector("#form_login_out");
 btn_login_out.addEventListener("click", () => {
     form_login_out.submit();
 });
+
+///getbalance代码
+const getbalance_url="/getbalance";
+setInterval(balance(),"5000");
+
 //money_charge 余额充值代码
 const money_charge_url="/user/recharge";
 let money_charge_data={
-    recharge_amount:"",
-    username:""
+    recharge_amount:0.0,
+    user_id:0
 }
 const money_charge=document.querySelector("#money_charge");
 money_charge.addEventListener("click",()=>{
@@ -93,14 +158,14 @@ money_charge.addEventListener("click",()=>{
     diag.show();
 
     submit.addEventListener("click",()=>{
-        money_charge_data.recharge_amount=input.value;
-        money_charge_data.username=user_id;
+        money_charge_data.recharge_amount=parseFloat(input.value);
+        money_charge_data.user_id=parseInt(user_id);
         const response=send_data(money_charge_url,money_charge_data);
         response.then(response=>response.json())
         .then(all_data=>{
         if(all_data.code===200){
          diag.textContent="充值成功";
-         money.textContent=money.value+ money_charge_data.recharge_amount;
+         money.textContent=parseFloat(money.value)+ money_charge_data.recharge_amount;
        }
        else{
         diag.textContent="充值失败,请重试";
@@ -146,9 +211,14 @@ start_charge.addEventListener("click",()=>{
     .then(all_data=>{
     if(all_data.code===200){
         diag.textContent="已开始充电";
+        start_x.style.left="257px";
+        diag.appendChild(start_x);
     }
     else{
-        diag.textContent="服务器忙,请重试";
+        diag.textContent="请求失败了";
+        start_x.style.left="257px";
+        console.log(all_data.code);
+        diag.appendChild(start_x);
     }
     });
     start_x.addEventListener("click",()=>{
@@ -217,7 +287,7 @@ charge_submit.addEventListener("click", () => {
     form_charge.action = "start_charge";
     form_charge.method = "POST";
     start_x.textContent = "x";
-    start_x.id = "start_x";
+    start_x.id = "start_submit";
 
     submit.className = "btn btn-primary";
     submit.textContent = "确认";
@@ -259,10 +329,13 @@ charge_submit.addEventListener("click", () => {
 
 // queue_ind的代码
 const queue_ind_url="/charge/details";
+const queue_ind_data={
+    user_id:-1
+}
 const queue_ind = document.querySelector("#queue_ind");
 
 let div_queue_ind = document.createElement("div");
-let form_queue_ind = document.createElement("form");
+let form_queue_ind = document.createElement("div");
 let queue_ind_select = document.createElement("select");
     
 let submit = document.createElement("button");
@@ -275,16 +348,20 @@ queue_ind.addEventListener("click", () => {
         return;
     }
     //从服务器获取数据
-    const response=receive_data(queue_ind_url);
+    queue_ind_data.user_id=parseInt(user_id);
+    let response_data;
+    const response=receive_data(queue_ind_url,queue_ind_data);
     response.then(response=>response.json())
     .then(all_data=>{
         if(all_data.code===200){
             let data=all_data.data;
+            response_data=all_data;
+            console.log(data.length);
             for(i=0;i<data.length;i++){
                 //该用for语句创建option
                 let opt=document.createElement("option");
-                opt.textContent=data[i].order_id;
-                select.appendChild(opt);
+                opt.textContent=data[i].num;
+                queue_ind_select.appendChild(opt);
             }
 
         }
@@ -300,8 +377,6 @@ queue_ind.addEventListener("click", () => {
     form_queue_ind.appendChild(submit);
     div_queue_ind.appendChild(exit_btn);
 
-    form_queue_ind.action = "queue_ind";
-    form_queue_ind.method = "post";
     submit.textContent = "确认";
     submit.className = "btn btn-secondary";
     exit_btn.textContent = 'x';
@@ -311,28 +386,50 @@ queue_ind.addEventListener("click", () => {
 
     submit.addEventListener("click", () => {
         value = 0;
-        div_queue_ind.remove();
-        div_operation.remove();
-        div1.appendChild(div_background);
-    });
-    exit_btn.addEventListener("click", () => {
-        value = 0;
-        div_queue_ind.remove();
-        div_operation.remove();
-        div1.appendChild(div_background);
-         response.then(response=>response.json())
-         .then(all_data=>{
-         if(all_data.code===200){
-            let data=all_data.data[select.value];
-            const p=document.createElement("p");
-            p.textContent=data;
-            div_background.appendChild(p);
+        form_queue_ind.remove();
+         if(response_data.code===200){
+            let data=response_data.data;
+            console.log(data);
+            let index_num=-1;
+            for(let i=0 ;i<data.length; i++){
+                if(data[i].num===parseInt(queue_ind_select.value)){
+                    index_num=i;
+                    break;
+                }
+
+            }
+            const detail_div=document.createElement("div");
+            for(let i=0;i<22;i++){
+                if(i%2===1){
+                const p=document.createElement("p");
+                const lab1=document.createElement("label");
+                const lab2=document.createElement("label");
+                lab1.style.width="400px";
+                
+                
+                lab1.textContent=detail_deal(i-1,data[index_num]);
+                lab2.textContent=detail_deal(i-1,data[index_num]);
+                p.appendChild(lab1);
+                p.appendChild(lab2);
+                p.style.marginBottom='0';
+                detail_div.appendChild(p);
+                }
+            }
+            div_queue_ind.appendChild(detail_div);
+
         }
         else{
 
         }
     });
-});
+ });
+
+    exit_btn.addEventListener("click", () => {
+        value = 0;
+        div_queue_ind.remove();
+        div_operation.remove();
+        div1.appendChild(div_background);
+         
 });
 //modify_queue_ind代码
 const modify_queue_ind_url="/charge/changeSubmit";
@@ -423,7 +520,7 @@ modify_queue_ind.addEventListener("click", () => {
             modify_date.modifyMode=0;
         }
         modify_date.modifyAmount=elc_num.value;
-        modify_date.username=user_id;
+        modify_date.username=parseInt(user_id);
         send_data(modify_queue_ind_url,modify_date);
         div_operation.remove();
         div1.appendChild(div_background);

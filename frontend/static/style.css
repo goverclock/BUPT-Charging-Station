@@ -249,6 +249,13 @@ body {
 
   background-color: #1f5b83;
 }
+#start_submit{
+  position: relative;
+  top:-174px;
+  left:295px;
+  background-color: red;
+
+}
 #start_x{
   position: relative;
   top:-20px;
