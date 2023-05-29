@@ -5,8 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var JwtKey = []byte("my-secret-key")
-
 type Claims struct {
 	UserName string `json:"user_name"`
 	jwt.StandardClaims
