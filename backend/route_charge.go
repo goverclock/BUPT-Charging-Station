@@ -123,7 +123,11 @@ func charge_startCharge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user, err := data.UserById(request.User_id)
+	user_name, ok := ctx.Get("user_name")
+	if !ok {
+		log.Fatal("ctx.Get(user_name)")
+	}
+	user, err := data.UserByName(user_name.(string))
 	if err != nil {
 		log.Fatal(err, " no such user ", request.User_id)
 	}

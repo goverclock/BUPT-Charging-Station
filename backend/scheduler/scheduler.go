@@ -3,9 +3,7 @@ package scheduler
 import (
 	"buptcs/data"
 	"errors"
-	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -31,31 +29,16 @@ func init() {
 	go ticker()
 	go show_info()
 
-	sched.stations = append(sched.stations, &data.Station{
-		Id:    0,
-		Mode:  1,
-		Speed: 30,
-	})
-	sched.stations = append(sched.stations, &data.Station{
-		Id:    1,
-		Mode:  1,
-		Speed: 30,
-	})
-	sched.stations = append(sched.stations, &data.Station{
-		Id:    2,
-		Mode:  0,
-		Speed: 7,
-	})
-	sched.stations = append(sched.stations, &data.Station{
-		Id:    3,
-		Mode:  0,
-		Speed: 7,
-	})
-	sched.stations = append(sched.stations, &data.Station{
-		Id:    4,
-		Mode:  0,
-		Speed: 7,
-	})
+	// create stations
+	stid := 0
+	for ; stid < data.FAST_STATION_COUNT; stid++ {
+		st := data.NewStation(stid, 1, 30)
+		sched.stations = append(sched.stations, st)
+	}
+	for ; stid < data.SLOW_STATION_COUNT; stid++ {
+		st := data.NewStation(stid, 0, 7)
+		sched.stations = append(sched.stations, st)
+	}
 }
 
 // join the car into the waiting queue, so that we can schedule it
@@ -88,63 +71,6 @@ func JoinCar(user data.User, car *data.Car) bool {
 	return false
 }
 
-// TODO: check if user has no ongoing report before creating new
-// assume sched.mu is locked
-func newOngoingReport(u data.User) *data.Report {
-	if sched.mu.TryLock() {
-		log.Fatal("should have locked sched.mu in newOngoingReport")
-	}
-	rp := data.NewReport(u)
-	sched.ongoing_reports = append(sched.ongoing_reports, &rp)
-	return &rp
-}
-
-// archive and remove from sched's ongoing_reports
-// assume sched.mu is locked
-func archiveOngoingReport(rp *data.Report) {
-	if sched.mu.TryLock(){
-		log.Fatal("should have locked sched.mu in archiveOngoingReport")
-	}
-	for ri, r := range sched.ongoing_reports {
-		if r.Num == rp.Num {
-			sched.ongoing_reports = append(sched.ongoing_reports[:ri], sched.ongoing_reports[ri+1:]...)
-			r.Archive()
-			break
-		}
-	}
-}
-
-// returns all reports, no matter archived or ongoing
-func ReportsByUser(u data.User) []data.Report {
-	sched.mu.Lock()
-	defer sched.mu.Unlock()
-
-	rps := []data.Report{}
-	// TODO: get all archived reports from DB
-
-	// get ongoing report for the user
-	for _, r := range sched.ongoing_reports {
-		if r.User_id == u.Id {
-			rps = append(rps, *r)
-		}
-	}
-	return rps
-}
-
-// assume sched.mu is locked
-func ongoingReportByUser(u data.User) *data.Report {
-	if sched.mu.TryLock(){
-		log.Fatal("should have locked sched.mu in ongoingReportByUser")
-	}
-	for _, r := range sched.ongoing_reports {
-		if r.User_id == u.Id {
-			return r
-		}
-	}
-	log.Fatal("no ongoing report for user: ", u)
-	return nil
-}
-
 func CarByUser(u data.User) (*data.Car, error) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
@@ -163,6 +89,20 @@ func CarByUser(u data.User) (*data.Car, error) {
 		}
 	}
 	return &data.Car{}, errors.New("car not found, because user hasn't submit charge")
+}
+
+// assume sched.mu is locked
+func stationById(id int ) (*data.Station) {
+	if sched.mu.TryLock() {
+		log.Fatal("should have locked sched.mu in stationById")
+	}
+	for _, st := range sched.stations {
+		if st.Id == id {
+			return st
+		}
+	}
+	log.Fatal("can't find station with id ", id)
+	return nil
 }
 
 func StartChargeCar(c *data.Car) error {
@@ -223,7 +163,7 @@ func WaitCountByCar(c *data.Car) (int, error) {
 }
 
 // returns a copy
-func GetStation(stid int) data.Station {
+func GetStationById(stid int) data.Station {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	for _, st := range sched.stations {
@@ -263,7 +203,8 @@ func ticker() {
 		// Queueing to Called
 		scheduleCall()
 
-		// updateOngoingReports()
+		// actually charge happens here
+		updateOngoingReports()
 
 		sched.mu.Unlock()
 	}
@@ -358,103 +299,5 @@ func scheduleCall() {
 		rp := ongoingReportByUser(user)
 		rp.Calltime = time.Now().Unix()
 		rp.Step = data.StepCall
-	}
-}
-
-// only update real_charge_amount, charge_time, charge_fee, service_fee, tot_fee
-func updateOngoingReports() {
-	// for _, r := range sched.ongoing_reports {
-
-	// }
-}
-
-// assume sched.mu is locked
-func generateQId(mode int) string {
-	if sched.mu.TryLock(){
-		log.Fatal("should have locked sched.mu in generate QId")
-	}
-
-	isqidfree := func(s string) bool {
-		for _, cs := range sched.waitingcars {
-			if cs.QId == s {
-				return false
-			}
-		}
-		for _, st := range sched.stations {
-			for _, c := range st.Queue {
-				if c.QId == s {
-					return false
-				}
-			}
-		}
-		return true
-	}
-	if mode == 1 { // fast
-		for i := sched.fast_qind; ; i = (i + 1) % getMaxQId() {
-			qid := "F" + strconv.Itoa(i+1)
-			if isqidfree(qid) {
-				return qid
-			}
-		}
-	} else { // slow
-		for i := sched.slow_qind; ; i = (i + 1) % getMaxQId() {
-			qid := "T" + strconv.Itoa(i+1) // slow
-			if isqidfree(qid) {
-				return qid
-			}
-		}
-	}
-}
-
-// assume sched.mu is locked
-func getMaxQId() int {
-	if sched.mu.TryLock() {
-		log.Fatal("should have locked sched.mu in getMaxQid")
-	}
-	return data.MAX_WAITING_SLOT + data.MAX_STATION_QUEUE*len(sched.stations)
-}
-
-// for debug only
-// Waiting: 0
-// Sta1(T):	T1*
-// Sta2(T): T2
-// Sta3(F): F1*
-// Sta4(F):
-func show_info() {
-	v := os.Getenv("V")
-	if v != "" {
-		return
-	}
-
-	for {
-		time.Sleep(1 * time.Second)
-		sched.mu.Lock()
-
-		fmt.Printf("FastInd:\t%v\n", "F"+strconv.Itoa(sched.fast_qind+1))
-		fmt.Printf("SlowInd:\t%v\n", "T"+strconv.Itoa(sched.slow_qind+1))
-		fmt.Printf("Waiting:\t")
-		for _, c := range sched.waitingcars {
-			fmt.Printf("%v\t", c.QId)
-		}
-		fmt.Println()
-		for _, st := range sched.stations {
-			m := 'T'
-			if st.Mode == 1 {
-				m = 'F'
-			}
-			fmt.Printf("Sta%d(%c):%d\t", st.Id, m, len(st.Queue))
-			for _, c := range st.Queue {
-				if c.Stage == data.Charging {
-					fmt.Printf("%v*\t", c.QId)
-				} else {
-					fmt.Printf("%v\t", c.QId)
-				}
-			}
-
-			fmt.Println()
-		}
-
-		fmt.Println()
-		sched.mu.Unlock()
 	}
 }

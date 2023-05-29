@@ -1,0 +1,89 @@
+package scheduler
+
+import (
+	"buptcs/data"
+	"log"
+	"time"
+)
+
+// assume sched.mu is locked
+func ongoingReportByUser(u data.User) *data.Report {
+	if sched.mu.TryLock() {
+		log.Fatal("should have locked sched.mu in ongoingReportByUser")
+	}
+	for _, r := range sched.ongoing_reports {
+		if r.User_id == u.Id {
+			return r
+		}
+	}
+	log.Fatal("no ongoing report for user: ", u)
+	return nil
+}
+
+// returns all reports, no matter archived or ongoing
+func ReportsByUser(u data.User) []data.Report {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+
+	rps := []data.Report{}
+	// TODO: get all archived reports from DB
+
+	// get ongoing report for the user
+	for _, r := range sched.ongoing_reports {
+		if r.User_id == u.Id {
+			rps = append(rps, *r)
+		}
+	}
+	return rps
+}
+
+// archive and remove from sched's ongoing_reports
+// assume sched.mu is locked
+func archiveOngoingReport(rp *data.Report) {
+	if sched.mu.TryLock() {
+		log.Fatal("should have locked sched.mu in archiveOngoingReport")
+	}
+	for ri, r := range sched.ongoing_reports {
+		if r.Num == rp.Num {
+			sched.ongoing_reports = append(sched.ongoing_reports[:ri], sched.ongoing_reports[ri+1:]...)
+			r.Archive()
+			break
+		}
+	}
+}
+
+// TODO: check if user has no ongoing report before creating new
+// assume sched.mu is locked
+func newOngoingReport(u data.User) *data.Report {
+	if sched.mu.TryLock() {
+		log.Fatal("should have locked sched.mu in newOngoingReport")
+	}
+	rp := data.NewReport(u)
+	sched.ongoing_reports = append(sched.ongoing_reports, &rp)
+	return &rp
+}
+
+// only update real_charge_amount, charge_time, charge_fee, service_fee, tot_fee
+func updateOngoingReports() {
+	cur := time.Now().Unix()
+	for _, r := range sched.ongoing_reports {
+		// if user isn't charging, nothing should update
+		if r.Step != data.StepCharge {
+			continue
+		}
+		
+		// actually charge the car here
+		st := stationById(r.Charge_id)
+		elec_fee, service_fee := getFee()
+		select {
+		case elec := <-st.ChargeChan:
+			r.Real_charge_amount += elec // update real_charge_amount
+			r.Charge_fee += elec * elec_fee	// update charge_fee
+			r.Service_fee += elec * service_fee	// update service_fee
+			r.Tot_fee = r.Charge_fee + r.Service_fee	// update tot_fee
+		default:
+		}
+
+		r.Charge_time = (r.Charge_start_time - cur) / 60 // update charge_time
+	}
+}
