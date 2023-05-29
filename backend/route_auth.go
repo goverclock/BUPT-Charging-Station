@@ -49,7 +49,7 @@ func login_user(ctx *gin.Context) {
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
 	})
-	tokenString, err := token.SignedString(JwtKey)
+	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		ctx.JSON(500, gin.H{"message": "Internal server error"})
 		return
