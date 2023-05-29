@@ -47,10 +47,19 @@ btn2.addEventListener("click",()=>{
           console.log(responseObject.headers);
           localStorage.setItem('tokens',responseObject.headers.get("Authorization"));
         });
-        localStorage.setItem('user_id',data.data.id);
-        localStorage.setItem('username',user_name.value);
-        console.log(localStorage.getItem("username"));
-        window.location.href="ui.html";
+        if(data.data.id!==0){
+           localStorage.setItem('user_id',data.data.id);
+           localStorage.setItem('username',user_name.value);
+           console.log(localStorage.getItem("username"));
+           window.location.href="ui.html";
+        }
+        else{
+           localStorage.setItem('admin_id',data.data.id);
+           localStorage.setItem('adminname',user_name.value);
+           console.log(localStorage.getItem("username"));
+           window.location.href="admin.html";
+
+        }
       }
       else{
         para.textContent="登录失败,用户名或密码错误";

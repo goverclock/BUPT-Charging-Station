@@ -42,22 +42,23 @@
     <form action="operation" method="post">
       <div id="div1">
         <div id="div-buttons">
-          <p><label>用户名:</label><label id="user_id"></label></p>
-          <p><label>余额:</label><label id="money"></label></p>
-          <p><button type="button" id="money_charge" name="money_charge" class="btn btn-primary"
-            value="0">&ensp;&ensp;余额充值&ensp;&ensp;</button></p>
-          <p><button type="button" id="charge_submit" name="charge_submit" class="btn btn-primary"
-              value="0">提交充电申请</button></p>
-          <p><button type="button" id="start_charge" name="start_charge" class="btn btn-secondary"
-                value="0">&ensp;&ensp;开始充电&ensp;&ensp;</button></p>
-          <p><button type="button" id="queue_ind" name="queue_ind " class="btn btn-secondary" value="0">充电详单查询</button></p>
-          <p><button type="button" id="modify_queue_ind" name="modify_queue_ind" class="btn btn-primary"
-              value="0">修改充电请求</button></p>
-          <p><button type="button" id="queue_ind_id" name="queue_ind_id" class="btn btn-secondary" value="0">充电信息查询</button>
+          <p><label>管理员名:</label><label id="user_id"></label></p>
+          <p><button type="button" id="getreport" name="" class="btn btn-primary"
+            value="0">&ensp;&ensp;生成统计报表&ensp;&ensp;</button></p>
+          <p><button type="button" id="getreports" name="" class="btn btn-primary"
+              value="0">&ensp;获取充电桩状态&ensp;</button></p>
+          <p><button type="button" id="addchargeport" name="" class="btn btn-secondary"
+                value="0">&ensp;&ensp;&ensp;增加充电桩&ensp;&ensp;&ensp;</button></p>
+          <p><button type="button" id="delBatch" name=" " class="btn btn-secondary" value="0">&ensp;批量删除充电桩&ensp;</button></p>
+          <p><button type="button" id="switch" name="" class="btn btn-primary"
+              value="0">&ensp;&ensp;&ensp;开启充电桩&ensp;&ensp;&ensp;</button></p>
+          <p><button type="button" id="switchBroken" name="" class="btn btn-secondary" value="0">&ensp;充电桩状态切换&ensp;</button>
           </p>
-          <p><button type="button" id="cancel_charge" name="cancel_charge" class="btn btn-primary" value="0">&ensp;&ensp;取消充电&ensp;&ensp;</button></p>
-          <p><button type="button" id="stop_charge" name="stop_charge" class="btn btn-secondary"
-              value="0">&ensp;&ensp;结束充电&ensp;&ensp;</button></p>
+          <p><button type="button" id="waitingCars" name="" class="btn btn-primary" value="0">获取车辆排队信息</button></p>
+          <p><button type="button" id="getsettings" name="" class="btn btn-secondary"
+              value="0">&ensp;&ensp;获取系统参数&ensp;&ensp;</button></p>
+          <p><button type="button" id="setsettings" name="" class="btn btn-secondary"
+                value="0">&ensp;&ensp;修改系统参数&ensp;&ensp;</button></p>
         </div>
         <div id="div-present">
         </div>
@@ -69,6 +70,6 @@
   </div>
 </body>
 
-<script src="static/js/ui.js" defer></script>
+<script src="static/js/admin.js" defer></script>
 
 </html>

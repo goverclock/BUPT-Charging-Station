@@ -307,9 +307,47 @@ dialog{
   top:100px;
   background-color: #1f5b83;
   font-size: larger;
-  
 }
+/*!
+ * 管理员
 
+*/
+#getreport{
+  position: relative;
+  left: 20px;
+}
+#getreports{
+  position: relative;
+  left: 20px;
+}
+#addchargeport{
+  position: relative;
+  left: 20px;
+}
+#delBatch{
+  position: relative;
+  left: 20px;
+}
+#switch{
+  position: relative;
+  left: 20px;
+}
+#switchBroken{
+  position: relative;
+  left: 20px;
+}
+#waitingCars{
+  position: relative;
+  left: 20px;
+}
+#getsettings{
+  position: relative;
+  left: 20px;
+}
+#setsettings{
+  position: relative;
+  left: 20px;
+}
 /*添加到此为止*/
 
 hr {
