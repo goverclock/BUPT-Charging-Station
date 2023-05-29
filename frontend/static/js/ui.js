@@ -119,7 +119,7 @@ const getbalance_url="/getbalance";
 setInterval(balance(),"5000");
 
 //money_charge 余额充值代码
-const money_charge_url="/user/recharge";
+const money_charge_url="/recharge";
 let money_charge_data={
     recharge_amount:0.0,
     user_id:0
