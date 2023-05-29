@@ -21,13 +21,20 @@ func login_user(ctx *gin.Context) {
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
-			Id int `json:"id"`
+			User_id int `json:"user_id"`
+			User_type int `json:"user_type"`	// 0 - regular user, 1 - admin
+			Token string `json:"token"`	// may be used later
 		} `json:"data"`
 	}
 
 	// authenticate
 	user, err := data.UserByName(request.Username)
-	response.Data.Id = user.Id
+	response.Data.User_id = user.Id
+	if user.Id == 1 {	// note: in our database, user with id == 1 is considered admin
+		response.Data.User_type = 1
+	} else {
+		response.Data.User_type = 0
+	}
 	if request.Username == "" || request.Password == "" {
 		response.Code = CodeKeyError
 		response.Msg = "need user name or password"
@@ -55,6 +62,7 @@ func login_user(ctx *gin.Context) {
 		return
 	}
 
+	response.Data.Token = tokenString
 	ctx.Header("Authorization", tokenString)
 
 	ctx.JSON(http.StatusOK, response)
