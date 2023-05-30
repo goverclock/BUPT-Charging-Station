@@ -181,7 +181,70 @@ func charge_cancelCharge(ctx *gin.Context) {
 		response.Msg = "cancel succeeded"
 	} else {
 		response.Code = CodeForbidden
-		response.Msg = "user is charging, should end charge"
+		response.Msg = "user hasn't submitted or is charging, should end charge"
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func charge_end_charge(ctx *gin.Context) {
+	var request struct {
+		User_id int `json:"user_id"`
+	}
+	ctx.Bind(&request)
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	user_name, ok := ctx.Get("user_name")
+	if !ok {
+		log.Fatal("ctx.Get")
+	}
+	user, err := data.UserByName(user_name.(string))
+	if err != nil {
+		log.Fatal("UserByName: ", user_name)
+	}
+
+	if scheduler.EndCharge(user) {
+		response.Code = CodeSucceed
+		response.Msg = "end succeeded"
+	} else {
+		response.Code = CodeForbidden
+		response.Msg = "user is not charging"
+	}
+	ctx.JSON(http.StatusOK, response)
+}
+
+func charge_changeSubmit(ctx *gin.Context) {
+	var request struct {
+		Charge_mode   int     `json:"charge_mode"`
+		Charge_amount float64 `json:"charge_amount"`
+		User_id       int     `json:"user_id"` // unused
+	}
+	ctx.Bind(&request)
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	// get user
+	user_name, _ := ctx.Get("user_name")
+	user, err := data.UserByName(user_name.(string))
+	if err != nil {
+		log.Fatal("UserByName")
+	}
+
+	if scheduler.ChangeCharge(user, request.Charge_mode, request.Charge_amount) {
+		response.Code = CodeSucceed
+		response.Msg = "change succeeded"
+	} else {
+		response.Code = CodeForbidden
+		response.Msg = "change failed"
 	}
 
 	ctx.JSON(http.StatusOK, response)

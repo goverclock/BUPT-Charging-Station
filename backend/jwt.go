@@ -13,7 +13,7 @@ type Claims struct {
 var jwtKey = []byte("my-secret-key")
 
 // 进行 JWT 鉴权
-func authMiddleware(c *gin.Context) {
+func auth_middleware(c *gin.Context) {
     tokenString := c.GetHeader("Authorization")
     if tokenString == "" {
         c.JSON(401, gin.H{"message": "Authorization header is missing"})

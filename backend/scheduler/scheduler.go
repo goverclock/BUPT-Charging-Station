@@ -197,7 +197,7 @@ func CancelCharge(u data.User) bool {
 	defer sched.mu.Unlock()
 
 	rp := ongoingReportByUser(u)
-	if rp == nil { // user hasn't submitted charge
+	if rp == nil || rp.Step == data.StepCharge {
 		return false
 	}
 	// cancel the charge(report)
@@ -209,6 +209,51 @@ func CancelCharge(u data.User) bool {
 
 	// remove user'car from waiting area/station's queue
 	removeCar(u)
+
+	return true
+}
+
+// user must be charging
+func EndCharge(u data.User) bool {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+
+	rp := ongoingReportByUser(u)
+	if rp == nil || rp.Step != data.StepCharge {
+		return false
+	}
+
+	// end the charge(report)
+	now := time.Now().Unix()
+	rp.Step = data.StepFinish
+	rp.Charge_end_time = now
+	archiveOngoingReport(rp)
+
+	removeCar(u)
+
+	return true
+}
+
+// user must be in waiting area
+// if mode(fast/slow) changes, generate new QId
+func ChangeCharge(u data.User, mode int, amount float64) bool {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+
+	rp := ongoingReportByUser(u)
+	if rp == nil || rp.Step != data.StepInline {
+		return false
+	}
+
+	// changing ChargeAmount is straightforward
+	rp.Request_charge_amount = amount
+	// if mode changes, there's some extra work
+	if rp.Charge_mode != mode {
+		removeCar(u) // first remove from waiting area
+		rp.Charge_mode = mode
+		rp.Queue_number = generateQId(mode)
+		changeCar(u, mode, amount, rp.Queue_number)
+	}
 
 	return true
 }
@@ -338,6 +383,29 @@ func removeCar(u data.User) {
 		for ci, c := range st.Queue {
 			if c.OwnedBy == u.Uuid {
 				st.Queue = append(st.Queue[:ci], st.Queue[ci+1:]...)
+				return
+			}
+		}
+	}
+}
+
+func changeCar(u data.User, mode int, amount float64, qid string) {
+	// look for user's car in waiting area
+	for _, c := range sched.waitingcars {
+		if c.OwnedBy == u.Uuid {
+			c.ChargeMode = mode
+			c.ChargeAmount = amount
+			c.QId = qid
+			return
+		}
+	}
+	// look for the car in station's queue
+	for _, st := range sched.stations {
+		for _, c := range st.Queue {
+			if c.OwnedBy == u.Uuid {
+				c.ChargeMode = mode
+				c.ChargeAmount = amount
+				c.QId = qid
 				return
 			}
 		}
