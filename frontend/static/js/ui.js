@@ -397,15 +397,15 @@ queue_ind.addEventListener("click", () => {
     submit.className = "btn btn-secondary";
     exit_btn.textContent = 'x';
     exit_btn.id = "exit-btn";
+    const detail_div=document.createElement("div");
 
     value = 1;
 
     submit.addEventListener("click", () => {
-        value = 0;
         form_queue_ind.remove();
+        console.log("sub");
          if(response_data.code===200){
             let data=response_data.data;
-            console.log(data.length);
             let index_num=-1;
             for(let i=0 ;i<data.length; i++){
                 if(data[i].num===parseInt(queue_ind_select.value)){
@@ -414,7 +414,6 @@ queue_ind.addEventListener("click", () => {
                 }
 
             }
-            const detail_div=document.createElement("div");
             for(let i=0;i<22;i++){
                 if(i%2===1){
                 const p=document.createElement("p");
@@ -424,7 +423,7 @@ queue_ind.addEventListener("click", () => {
                 
                 
                 lab1.textContent=detail_deal(i-1,data[index_num]);
-                lab2.textContent=detail_deal(i-1,data[index_num]);
+                lab2.textContent=detail_deal(i,data[index_num]);
                 p.appendChild(lab1);
                 p.appendChild(lab2);
                 p.style.marginBottom='0';
@@ -435,13 +434,27 @@ queue_ind.addEventListener("click", () => {
 
         }
         else{
+            div_queue_ind.textContent="详细订单信息获取失败";
 
         }
-    });
+    },{once:true});
 
 
     exit_btn.addEventListener("click", () => {
         value = 0;
+        var pObjs = detail_div.childNodes;
+        console.log(pObjs.length - 1);
+        for (var i = pObjs.length - 1; i >= 0; i--) { // 一定要倒序，正序是删不干净的，可自行尝试
+            detail_div.removeChild(pObjs[i]);
+        }
+        console.log(pObjs.length - 1);
+        var pObjs = div_queue_ind.childNodes;
+        console.log(pObjs.length - 1);
+        for (var i = pObjs.length - 1; i >= 0; i--) { // 一定要倒序，正序是删不干净的，可自行尝试
+            div_queue_ind.removeChild(pObjs[i]);
+        }
+        console.log(pObjs.length - 1);
+        detail_div.remove();
         div_queue_ind.remove();
         div_operation.remove();
         queue_ind_select.options.length=0;
