@@ -146,9 +146,9 @@ money_charge.addEventListener("click",()=>{
     start_x.id="recharge-x";
     start_x.textContent="x";
     lab.textContent="请输入充值金额: ";
-    input.type="number";
     input.min=1;
-    input.max=1000000;
+    input.max=1000000000;
+    input.type="number";
     p.appendChild(lab);
     p.appendChild(input);
     diag.appendChild(p);
@@ -157,31 +157,48 @@ money_charge.addEventListener("click",()=>{
     div_operation.appendChild(diag);
     diag.show();
 
-    submit.addEventListener("click",()=>{
+    submit.addEventListener("click",(event)=>{
+        event.preventDefault();
         money_charge_data.recharge_amount=parseFloat(input.value);
         money_charge_data.user_id=parseInt(user_id);
         const response=send_data(money_charge_url,money_charge_data);
+        
         response.then(response=>response.json())
         .then(all_data=>{
         if(all_data.code===200){
-         diag.textContent="充值成功";
-         money.textContent=parseFloat(money.value)+ money_charge_data.recharge_amount;
-       }
-       else{
-        diag.textContent="充值失败,请重试";
-       }
-    });
+                p.remove();
+                diag.textContent="充值成功";
+                diag.appendChild(start_x);
+                start_x.style.left="278px";
+                start_x.style.top="-20px";
+                if(parseFloat(money_charge_data.recharge_amount)>1e-8){
+                    money.textContent=parseFloat(money.textContent)+parseFloat( money_charge_data.recharge_amount);
+                }
+                else{
+                    money.textContent=parseFloat(money.textContent);
+                }
+            }
+            else{
+                p.remove();
+                diag.textContent="充值失败";
+                diag.appendChild(start_x);
+            }
+            
 
+        });
     });
+       
+
+
     start_x.addEventListener("click",()=>{
         value = 0;
         div_operation.remove();
         div1.appendChild(div_background);
         diag.remove();
     });
-
-
 });
+
+
 
 
 //start_charge 开始充电代码
@@ -251,7 +268,7 @@ charge_submit.addEventListener("click", () => {
     if (value !== 0) {
         return;
     }
-    let form_charge = document.createElement("form");
+    let form_charge = document.createElement("div");
     let diag = document.createElement("dialog");
     let select = document.createElement("select");
     let opt1 = document.createElement("option");
@@ -284,8 +301,6 @@ charge_submit.addEventListener("click", () => {
     select.name = "select_mode";
     select.className = "myselect";
     select.id = "charge_select";
-    form_charge.action = "start_charge";
-    form_charge.method = "POST";
     start_x.textContent = "x";
     start_x.id = "start_submit";
 
@@ -348,6 +363,7 @@ queue_ind.addEventListener("click", () => {
         return;
     }
     //从服务器获取数据
+
     queue_ind_data.user_id=parseInt(user_id);
     let response_data;
     const response=receive_data(queue_ind_url,queue_ind_data);
@@ -389,7 +405,7 @@ queue_ind.addEventListener("click", () => {
         form_queue_ind.remove();
          if(response_data.code===200){
             let data=response_data.data;
-            console.log(data);
+            console.log(data.length);
             let index_num=-1;
             for(let i=0 ;i<data.length; i++){
                 if(data[i].num===parseInt(queue_ind_select.value)){
@@ -422,14 +438,16 @@ queue_ind.addEventListener("click", () => {
 
         }
     });
- });
+
 
     exit_btn.addEventListener("click", () => {
         value = 0;
         div_queue_ind.remove();
         div_operation.remove();
+        queue_ind_select.options.length=0;
         div1.appendChild(div_background);
          
+   });
 });
 //modify_queue_ind代码
 const modify_queue_ind_url="/charge/changeSubmit";
@@ -446,7 +464,7 @@ modify_queue_ind.addEventListener("click", () => {
         return;
     }
     let diag_modify = document.createElement("dialog");
-    let form_modify = document.createElement("form");
+    let form_modify = document.createElement("div");
     let options = document.createElement("select");
     let opt_fast = document.createElement("option");
     let opt_normal = document.createElement("option");
@@ -458,8 +476,7 @@ modify_queue_ind.addEventListener("click", () => {
     let start_x = document.createElement("button");
     let num_lab = document.createElement("lab");
 
-    form_modify.action = "modify_queue_ind";
-    form_modify.method = "post";
+    
     if (car_position === 1) {
         lab.textContent = "修改充电模式:";
         elc_num.min = 1;
@@ -481,8 +498,6 @@ modify_queue_ind.addEventListener("click", () => {
         options.name = "modify_mode";
         options.className = "myselect";
         options.id = "charge_select";
-        form_modify.action = "modify_charge";
-        form_modify.method = "POST";
         start_x.textContent = "x";
         start_x.id = "start_x";
 
@@ -530,6 +545,7 @@ modify_queue_ind.addEventListener("click", () => {
     start_x.addEventListener("click", () => {
         value = 0;
         div_operation.remove();
+        queue_ind_select.remove();
         div1.appendChild(div_background);
         diag_modify.remove();
 
@@ -541,7 +557,7 @@ modify_queue_ind.addEventListener("click", () => {
 //queue_ind_id代码
 const queue_ind_id_url="/charge/getChargingMsg";
 let quque_ind_id_data={
-    username:""
+    user_id:0
 }
 const queue_ind_id=document.querySelector("#queue_ind_id");
 queue_ind_id.addEventListener("click",()=>{
@@ -553,28 +569,24 @@ queue_ind_id.addEventListener("click",()=>{
     value=1;
     let div_queue_ind_id=document.createElement("div");
     let exit_btn=document.createElement("button");
-    let p1=document.createElement("p");
+
     let p2=document.createElement("p");
-    let p3=document.createElement("p");
-    let p4=document.createElement("p");
-    let p5=document.createElement("p");
-    div_operation.appendChild(div_queue_ind_id);
-    div_queue_ind_id.appendChild(p1);
+    
     div_queue_ind_id.appendChild(p2);
-    div_queue_ind_id.appendChild(p3);
-    div_queue_ind_id.appendChild(p4);
-    div_queue_ind_id.appendChild(p5);
+   
     div_queue_ind_id.appendChild(exit_btn);
     exit_btn.textContent = 'x';
     exit_btn.id = "exit-btn";
-    quque_ind_id_data.username=local_username;
+    quque_ind_id_data.user_id=parseInt(user_id);
+    div_operation.appendChild(div_queue_ind_id);
  
     const response=send_data(queue_ind_id_url,quque_ind_id_data);
     response.then(response=>response.json())
          .then(all_data=>{
          if(all_data.code===200){
             //p1.textContent="排队号码: "+quque_ind_id_data.data["queue_number"];
-            p2.textContent="正在等待的前车数量: "+quque_ind_id_data.data["waiting_count"];
+            p2.textContent="正在等待的前车数量: "+all_data.data["waiting_count"];
+            p2.style.color="red";
             /*if(quque_ind_id_data.data["charge_mode"]===1){
                 p3.textContent="充电模式: 快充";
             }
@@ -634,13 +646,16 @@ cancel_charge.addEventListener("click",()=>{
     diag_cancel.appendChild(submit);
     diag_cancel.appendChild(end_x1);
     diag_cancel.show();
-    submit.addEventListener("click",()=>{
+    submit.addEventListener("click",(event)=>{
+        event.preventDefault();
     const  response=send_data(cancel_charge_url,cancel_charge_data);
         response.then(response=>response.json())
          .then(all_data=>{
          if(all_data.code===200){
             diag_cancel.textContent="已取消充电";
             submit.remove();
+            diag_cancel.appendChild(end_x1);
+            end_x1.style.left="258px";
          }
          else{
             diag_cancel.textContent="服务器繁忙,请重新操作";
@@ -671,13 +686,11 @@ end_charge.addEventListener("click",()=>{
     }
     value=1;
     let diag_end=document.createElement("dialog");
-    let form_end=document.createElement("form");
+    let form_end=document.createElement("div");
     let submit=document.createElement("button");
     let end_x1=document.createElement("button");
     let end_x2=document.createElement("button");
 
-    form_end.action="end_charge_action";
-    form_end.method="POST";
     end_x1.textContent="x";
     end_x1.id="end-x";
     end_x2.textContent="x";

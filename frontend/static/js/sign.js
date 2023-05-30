@@ -47,14 +47,15 @@ btn2.addEventListener("click",()=>{
           console.log(responseObject.headers);
           localStorage.setItem('tokens',responseObject.headers.get("Authorization"));
         });
-        if(data.data.id!==0){
-           localStorage.setItem('user_id',data.data.id);
+        if(data.data.user_type!==0){
+           localStorage.setItem('user_id',data.data.user_id);
            localStorage.setItem('username',user_name.value);
            console.log(localStorage.getItem("username"));
+           console.log(localStorage.getItem("user_id"));
            window.location.href="ui.html";
         }
         else{
-           localStorage.setItem('admin_id',data.data.id);
+           localStorage.setItem('admin_id',data.data.user_id);
            localStorage.setItem('adminname',user_name.value);
            console.log(localStorage.getItem("username"));
            window.location.href="admin.html";
