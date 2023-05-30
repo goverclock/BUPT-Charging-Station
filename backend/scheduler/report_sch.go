@@ -7,6 +7,7 @@ import (
 )
 
 // assume sched.mu is locked
+// return nil if no report found
 func ongoingReportByUser(u data.User) *data.Report {
 	if sched.mu.TryLock() {
 		log.Fatal("should have locked sched.mu in ongoingReportByUser")
@@ -37,8 +38,8 @@ func ReportsByUser(u data.User) []data.Report {
 	return rps
 }
 
-// archive and remove from sched's ongoing_reports
 // assume sched.mu is locked
+// archive and remove from sched's ongoing_reports
 func archiveOngoingReport(rp *data.Report) {
 	if sched.mu.TryLock() {
 		log.Fatal("should have locked sched.mu in archiveOngoingReport")

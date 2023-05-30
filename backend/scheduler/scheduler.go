@@ -35,7 +35,7 @@ func init() {
 		st := data.NewStation(stid, 1, 30)
 		sched.stations = append(sched.stations, st)
 	}
-	for ; stid < data.SLOW_STATION_COUNT + data.FAST_STATION_COUNT; stid++ {
+	for ; stid < data.SLOW_STATION_COUNT+data.FAST_STATION_COUNT; stid++ {
 		st := data.NewStation(stid, 0, 7)
 		sched.stations = append(sched.stations, st)
 	}
@@ -92,7 +92,7 @@ func CarByUser(u data.User) (*data.Car, error) {
 }
 
 // assume sched.mu is locked
-func stationById(id int ) (*data.Station) {
+func stationById(id int) *data.Station {
 	if sched.mu.TryLock() {
 		log.Fatal("should have locked sched.mu in stationById")
 	}
@@ -163,7 +163,7 @@ func WaitCountByCar(c *data.Car) (int, error) {
 }
 
 // returns a copy
-func GetStationById(stid int) data.Station {
+func StationById(stid int) data.Station {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	for _, st := range sched.stations {
@@ -188,6 +188,29 @@ func SetStation(stid int, running bool, failure bool) {
 		st.Failure = failure
 		break
 	}
+}
+
+// user must have submitted the charge
+// and should not be charging
+func CancelCharge(u data.User) bool {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+
+	rp := ongoingReportByUser(u)
+	if rp == nil { // user hasn't submitted charge
+		return false
+	}
+	// cancel the charge(report)
+	now := time.Now().Unix()
+	rp.Terminate_flag = true
+	rp.Terminate_time = now
+	rp.Step = data.StepFinish
+	archiveOngoingReport(rp)
+
+	// remove user'car from waiting area/station's queue
+	removeCar(u)
+
+	return true
 }
 
 func ticker() {
@@ -232,7 +255,7 @@ func schduleFast() {
 				sched.waitingcars =
 					append(sched.waitingcars[:ci], sched.waitingcars[ci+1:]...) // remove from waiting cars
 					// join station queue
-				c.Stage = data.Queueing	// i.e. Inline
+				c.Stage = data.Queueing // i.e. Inline
 
 				// update report
 				rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
@@ -299,5 +322,24 @@ func scheduleCall() {
 		rp := ongoingReportByUser(user)
 		rp.Calltime = time.Now().Unix()
 		rp.Step = data.StepCall
+	}
+}
+
+func removeCar(u data.User) {
+	// look for user's car in waiting area
+	for ci, c := range sched.waitingcars {
+		if c.OwnedBy == u.Uuid {
+			sched.waitingcars = append(sched.waitingcars[:ci], sched.waitingcars[:ci+1]...)
+			return
+		}
+	}
+	// look for the car in station's queue
+	for _, st := range sched.stations {
+		for ci, c := range st.Queue {
+			if c.OwnedBy == u.Uuid {
+				st.Queue = append(st.Queue[:ci], st.Queue[ci+1:]...)
+				return
+			}
+		}
 	}
 }

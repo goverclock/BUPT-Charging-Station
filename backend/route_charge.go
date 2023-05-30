@@ -150,3 +150,35 @@ func charge_startCharge(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response)
 }
+
+func charge_cancelCharge(ctx *gin.Context) {
+	var request struct {
+		User_id int `json:"user_id"`
+	}
+	ctx.Bind(&request)
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	user_name, ok := ctx.Get("user_name")
+	if !ok {
+		log.Fatal("ctx.Get")
+	}
+	user, err := data.UserByName(user_name.(string))
+	if err != nil {
+		log.Fatal("UserByName: ", user_name)
+	}
+
+	if scheduler.CancelCharge(user) {
+		response.Code = CodeSucceed
+		response.Msg = "cancel succeeded"
+	} else {
+		response.Code = CodeForbidden
+		response.Msg = "user is charging, should end charge"
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}

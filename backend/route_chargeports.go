@@ -19,7 +19,7 @@ func chargeports_turnon(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	st := scheduler.GetStationById(request.Charge_id)
+	st := scheduler.StationById(request.Charge_id)
 	if st.Failure {
 		response.Code = CodeForbidden
 		response.Msg = "the station is in failure"
