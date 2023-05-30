@@ -101,9 +101,13 @@ func charge_details(ctx *gin.Context) {
 		Data []data.Report `json:"data"`
 	}
 
-	user, err := data.UserById(request.User_id)
+	user_name, ok := ctx.Get("user_name")
+	if !ok {
+		log.Fatal("ctx.Get()")
+	}
+	user, err := data.UserByName(user_name.(string))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err, user_name)
 	}
 	rps := scheduler.ReportsByUser(user)
 	response.Code = CodeSucceed

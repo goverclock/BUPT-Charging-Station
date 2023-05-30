@@ -30,15 +30,15 @@ type Report struct {
 	Username              string  `json:"username"` // NewReport()
 	User_id               int     `json:"user_id"`  // NewReport()
 	Request_charge_amount float64 `json:"request_charge_amount"`
-	Real_charge_amount    float64 `json:"real_charge_amount"`	// ticker
-	Charge_time           int64   `json:"charge_time"`			// ticker
-	Charge_fee            float64 `json:"charge_fee"`			// ticker
-	Service_fee           float64 `json:"service_fee"`			// ticker
-	Tot_fee               float64 `json:"tot_fee"`				// ticker
-	Step                  int     `json:"step"` // NewReport()
+	Real_charge_amount    float64 `json:"real_charge_amount"` // ticker
+	Charge_time           int64   `json:"charge_time"`        // ticker
+	Charge_fee            float64 `json:"charge_fee"`         // ticker
+	Service_fee           float64 `json:"service_fee"`        // ticker
+	Tot_fee               float64 `json:"tot_fee"`            // ticker
+	Step                  int     `json:"step"`               // NewReport()
 	Queue_number          string  `json:"queue_number"`
-	Subtime               int64   `json:"subtime"` // NewReport()
-	Inlinetime            int64   `json:"inlinetime"`	// i.e. StageQueueing
+	Subtime               int64   `json:"subtime"`    // NewReport()
+	Inlinetime            int64   `json:"inlinetime"` // i.e. StageQueueing
 	Calltime              int64   `json:"calltime"`
 	Charge_start_time     int64   `json:"charge_start_time"`
 	Charge_end_time       int64   `json:"charge_end_time"`
@@ -72,6 +72,24 @@ func NewReport(u User) Report {
 	rp.Step = StepSub
 	rp.Subtime = time.Now().Unix()
 	return rp
+}
+
+func ArchivedReportsByUser(u User) (rps []Report) {
+	rp := Report{}
+	rows, err := Db.Query("SELECT * FROM reports WHERE user_id = $1", u.Id)
+	if err != nil {
+		log.Fatal(err, "Db.Query()")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&rp.Id, &rp.Num, &rp.Charge_id, &rp.Charge_mode, &rp.Username, &rp.User_id, &rp.Request_charge_amount, &rp.Real_charge_amount, &rp.Charge_time, &rp.Charge_fee, &rp.Service_fee, &rp.Tot_fee, &rp.Step, &rp.Queue_number, &rp.Subtime, &rp.Inlinetime, &rp.Calltime, &rp.Charge_start_time, &rp.Charge_end_time, &rp.Terminate_flag, &rp.Terminate_time, &rp.Failed_flag, &rp.Failed_msg)
+		if err != nil {
+			log.Fatal(err, "rows.Scan()")
+		}
+		rps = append(rps, rp)
+	}
+	return
 }
 
 // using unix user_id + timestamp

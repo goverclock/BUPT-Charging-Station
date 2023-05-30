@@ -27,8 +27,8 @@ func ReportsByUser(u data.User) []data.Report {
 	defer sched.mu.Unlock()
 
 	rps := []data.Report{}
-	// TODO: get all archived reports from DB
-
+	// get archived reports from DB
+	rps = append(rps, data.ArchivedReportsByUser(u)...)
 	// get ongoing report for the user
 	for _, r := range sched.ongoing_reports {
 		if r.User_id == u.Id {
