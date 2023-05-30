@@ -17,7 +17,6 @@ func ongoingReportByUser(u data.User) *data.Report {
 			return r
 		}
 	}
-	log.Fatal("no ongoing report for user: ", u)
 	return nil
 }
 

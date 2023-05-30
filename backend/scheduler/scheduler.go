@@ -123,9 +123,10 @@ func StartChargeCar(c *data.Car) error {
 			rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
 			rp.Step = data.StepCharge
 			rp.Charge_start_time = time.Now().Unix()
-			break
+			return nil
 		}
 	}
+	log.Fatal("impossible status: StartChargeCar")
 	return nil
 }
 
