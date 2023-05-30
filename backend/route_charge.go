@@ -37,8 +37,10 @@ func charge_submit(ctx *gin.Context) {
 	car.ChargeMode = request.ChargeMode
 	car.ChargeAmount = request.ChargeAmount
 
-	// try to join the car in the waiting area
-	if !scheduler.JoinCar(user, &car) {
+	if car.ChargeAmount == 0.0 {
+		response.Code = CodeKeyError
+		response.Msg = "charge amount should not be 0"
+	} else if !scheduler.JoinCar(user, &car) { // try to join the car in the waiting area
 		// no available slot
 		response.Code = CodeForbidden
 		response.Msg = "the waiting queue is full"
@@ -140,7 +142,7 @@ func charge_startCharge(ctx *gin.Context) {
 		if err != nil {
 			response.Code = CodeForbidden
 			response.Msg = "car is not ready to charge"
-		} else {	// ok to start charge
+		} else { // ok to start charge
 			response.Code = CodeSucceed
 			response.Msg = "charge started"
 		}

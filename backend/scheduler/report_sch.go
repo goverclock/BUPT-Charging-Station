@@ -63,11 +63,12 @@ func newOngoingReport(u data.User) *data.Report {
 	return &rp
 }
 
+// assume sched.mu is locked
 // only update real_charge_amount, charge_time, charge_fee, service_fee, tot_fee
 func updateOngoingReports() {
 	cur := time.Now().Unix()
 	for _, r := range sched.ongoing_reports {
-		// if user isn't charging, nothing should update
+		// if user isn't charging, nothing should update here
 		if r.Step != data.StepCharge {
 			continue
 		}
@@ -77,10 +78,20 @@ func updateOngoingReports() {
 		elec_fee, service_fee := getFee()
 		select {
 		case elec := <-st.ChargeChan:
+			finished := false
+			if r.Real_charge_amount + elec >= r.Request_charge_amount {
+				elec = r.Request_charge_amount - r.Real_charge_amount
+				finished = true
+			}
 			r.Real_charge_amount += elec // update real_charge_amount
 			r.Charge_fee += elec * elec_fee	// update charge_fee
 			r.Service_fee += elec * service_fee	// update service_fee
 			r.Tot_fee = r.Charge_fee + r.Service_fee	// update tot_fee
+			if finished {
+				r.Charge_end_time = cur
+				r.Step = data.StepFinish
+				archiveOngoingReport(r)
+			}
 		default:
 		}
 

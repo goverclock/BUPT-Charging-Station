@@ -35,7 +35,7 @@ func init() {
 		st := data.NewStation(stid, 1, 30)
 		sched.stations = append(sched.stations, st)
 	}
-	for ; stid < data.SLOW_STATION_COUNT; stid++ {
+	for ; stid < data.SLOW_STATION_COUNT + data.FAST_STATION_COUNT; stid++ {
 		st := data.NewStation(stid, 0, 7)
 		sched.stations = append(sched.stations, st)
 	}
