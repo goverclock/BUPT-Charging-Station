@@ -91,6 +91,17 @@ func CarByUser(u data.User) (*data.Car, error) {
 	return &data.Car{}, errors.New("car not found, because user hasn't submit charge")
 }
 
+func OngoingCopyByUser(u data.User) data.Report {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	for _, rp := range sched.ongoing_reports {
+		if rp.Username == u.Name {
+			return *rp
+		}
+	}
+	return data.Report{}
+}
+
 // assume sched.mu is locked
 func stationById(id int) *data.Station {
 	if sched.mu.TryLock() {
@@ -163,31 +174,56 @@ func WaitCountByCar(c *data.Car) (int, error) {
 	}
 }
 
-// returns a copy
-func StationById(stid int) data.Station {
+// note: returns a copy
+func StationById(stid int) (data.Station, error) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	for _, st := range sched.stations {
 		if st.Id != stid {
 			continue
 		}
-		return *st
+		return *st, nil
 	}
-	log.Fatal("no such station: ", stid)
-	return data.Station{}
+	return data.Station{}, errors.New("no such station")
 }
 
-// only st.Running and st.Failure can be set
-func SetStation(stid int, running bool, failure bool) {
+func ChangeSettings(was int, cql int, cs int, fs int) {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	data.MAX_WAITING_SLOT = was
+	data.MAX_STATION_QUEUE = cql
+	data.CALL_SCHEDULE = cs
+	data.FAULT_SCHEDULE = fs
+}
+
+// on/off station
+func SwitchStation(stid int, is_on bool) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	for _, st := range sched.stations {
-		if st.Id != stid {
-			continue
+		if st.Id == stid {
+			if is_on {
+				st.On()
+			} else {
+				st.Off()
+			}
+			break
 		}
-		st.Running = running
-		st.Failure = failure
-		break
+	}
+}
+
+func SwitchBrokenStation(stid int, is_fail bool) {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	for _, st := range sched.stations {
+		if st.Id == stid {
+			if is_fail {
+				st.Down()
+			} else {
+				st.Up()
+			}
+			break
+		}
 	}
 }
 

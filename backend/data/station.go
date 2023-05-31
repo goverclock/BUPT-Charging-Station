@@ -5,17 +5,24 @@ import (
 	"time"
 )
 
+const (
+	StaOn   int = 0
+	StaOff  int = 1
+	StaDown int = 2
+	StaUp   int = 3
+)
+
 // 2 Fast, 3 Slow
 type Station struct {
-	Id         int
-	Mode       int     // 1 - Fast, 0 - Slow
-	Speed      float64 // `Speed` kWh per MINUTE(HOUR in api)
-	Queue      []*Car  // the 1st Car can start charge
-	ChargeChan chan float64
-	ControlChan chan bool
+	Id          int
+	Mode        int     // 1 - Fast, 0 - Slow
+	Speed       float64 // `Speed` kWh per MINUTE(HOUR in api)
+	Queue       []*Car  // the 1st Car can start charge
+	ChargeChan  chan float64
+	ControlChan chan int
 
 	Running bool
-	Failure bool
+	IsDown bool
 }
 
 func NewStation(id int, mode int, speed float64) *Station {
@@ -24,20 +31,62 @@ func NewStation(id int, mode int, speed float64) *Station {
 	st.Mode = mode
 	st.Speed = speed
 	st.ChargeChan = make(chan float64) // should not buffer too much
+	st.Running = true
+	st.IsDown = false
 	go st.generateElectricity()
 	return &st
 }
 
+func (st *Station) On() {
+	st.ControlChan <- StaOn
+}
+
+func (st *Station) Off() {
+	st.ControlChan <- StaOff
+}
+
+// set as failure
+func (st *Station) Down() {
+	st.ControlChan <- StaDown
+}
+
+// set as non-failure
+func (st *Station) Up() {
+	st.ControlChan <- StaUp
+}
+
+// assumes sched.mu is locked
 // put electricity into ChargeChan periodically
 func (st *Station) generateElectricity() {
+	run := true // only for this function
+	up := true
+
 	for {
 		time.Sleep(time.Second)
 
+		// first check if should turn on/off the station
+		select {
+		case ctl := <-st.ControlChan:
+			if ctl == StaOn {
+				run = true
+			} else if ctl == StaOff {
+				run = false
+			} else if ctl == StaUp {
+				up = true
+			} else if ctl == StaDown {
+				up = false
+			}
+			st.Running = run
+			st.IsDown = up
+		default:
+		}
+
 		// keep trying to send out electricity and
 		// simply blocks if no car is receiving electricity
-		st.ChargeChan <- st.Speed / 60 // 60 = seconds per minute
-		// log.Println(st.Id, " generated ", st.Speed /60)
-	 }
+		if up && run {
+			st.ChargeChan <- st.Speed / 60 // 60 = seconds per minute
+		}
+	}
 }
 
 func (st *Station) Available() bool {

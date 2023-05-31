@@ -35,11 +35,11 @@ func main() {
 	// server.POST("/chargeports/getchargeports")
 	// server.POST("/chargeports/addchargeport")
 	// server.POST("/chargeports/delBatch")
-	server.POST("/chargeports/turnon", auth_middleware, chargeports_turnon)
-	// server.POST("/chargeports/setfailure")
-	// server.POST("/chargeports/waitingCars")
-	// server.POST("/system/getsettings")
-	// server.POST("/system/setsettings")
+	server.POST("/chargeports/switch", auth_middleware, chargeports_switch)
+	server.POST("/chargeports/switchBroken", auth_middleware, chargeports_switchBroken)
+	server.POST("/chargeports/waitingCars", auth_middleware, chargeports_waitingCars)
+	server.POST("/system/getsettings", auth_middleware, system_getsettings)
+	server.POST("/system/setsettings", auth_middleware, system_setsettings)
 	
 	server.Run(":8080")
 }
