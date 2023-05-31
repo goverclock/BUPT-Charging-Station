@@ -1,9 +1,13 @@
 package main
 
 import (
+	"sync"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
+
+var amazing_lock sync.Mutex
 
 func main() {
 	server := gin.Default()

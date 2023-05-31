@@ -8,6 +8,8 @@ import (
 )
 
 func chargeports_turnon(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		Charge_id int `json:"charge_id"`
 	}
