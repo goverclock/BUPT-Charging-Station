@@ -10,6 +10,8 @@ import (
 )
 
 func charge_submit(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		ChargeMode   int     `json:"chargeMode"`
 		ChargeAmount float64 `json:"chargeAmount"`
@@ -29,6 +31,8 @@ func charge_submit(ctx *gin.Context) {
 	if err != nil {
 		log.Fatal("UserByName")
 	}
+
+	// TODO: check if the user already has a submit
 
 	// create car for the user
 	car := data.Car{
@@ -53,6 +57,8 @@ func charge_submit(ctx *gin.Context) {
 }
 
 func charge_getChargingMsg(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		Username string `json:"username"`
 	}
@@ -91,6 +97,8 @@ func charge_getChargingMsg(ctx *gin.Context) {
 }
 
 func charge_details(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		User_id int `json:"user_id"`
 	}
@@ -118,6 +126,8 @@ func charge_details(ctx *gin.Context) {
 }
 
 func charge_startCharge(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		User_id int `json:"user_id"`
 	}
@@ -156,6 +166,8 @@ func charge_startCharge(ctx *gin.Context) {
 }
 
 func charge_cancelCharge(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		User_id int `json:"user_id"`
 	}
@@ -188,6 +200,8 @@ func charge_cancelCharge(ctx *gin.Context) {
 }
 
 func charge_end_charge(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		User_id int `json:"user_id"`
 	}
@@ -219,6 +233,8 @@ func charge_end_charge(ctx *gin.Context) {
 }
 
 func charge_changeSubmit(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		Charge_mode   int     `json:"charge_mode"`
 		Charge_amount float64 `json:"charge_amount"`

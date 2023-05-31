@@ -9,6 +9,8 @@ import (
 )
 
 func getbalance(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		User_id int `json:"user_id"`
 	}
@@ -37,6 +39,8 @@ func getbalance(ctx *gin.Context) {
 }
 
 func recharge(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		Recharge_amount float64 `json:"recharge_amount"`
 		User_id         int     `json:"user_id"`

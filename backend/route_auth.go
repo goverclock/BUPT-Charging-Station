@@ -11,6 +11,8 @@ import (
 )
 
 func login_user(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -68,6 +70,8 @@ func login_user(ctx *gin.Context) {
 }
 
 func register_user(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
 	var request struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
