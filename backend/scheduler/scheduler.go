@@ -163,31 +163,47 @@ func WaitCountByCar(c *data.Car) (int, error) {
 	}
 }
 
-// returns a copy
-func StationById(stid int) data.Station {
+// note: returns a copy
+func StationById(stid int) (data.Station, error) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	for _, st := range sched.stations {
 		if st.Id != stid {
 			continue
 		}
-		return *st
+		return *st, nil
 	}
-	log.Fatal("no such station: ", stid)
-	return data.Station{}
+	return data.Station{}, errors.New("no such station")
 }
 
-// only st.Running and st.Failure can be set
-func SetStation(stid int, running bool, failure bool) {
+// on/off station
+func SwitchStation(stid int, is_on bool) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	for _, st := range sched.stations {
-		if st.Id != stid {
-			continue
+		if st.Id == stid {
+			if is_on {
+				st.On()
+			} else {
+				st.Off()
+			}
+			break
 		}
-		st.Running = running
-		st.Failure = failure
-		break
+	}
+}
+
+func SwitchBrokenStation(stid int, is_fail bool) {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	for _, st := range sched.stations {
+		if st.Id == stid {
+			if is_fail {
+				st.Down()
+			} else {
+				st.Up()
+			}
+			break
+		}
 	}
 }
 

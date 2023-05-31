@@ -74,11 +74,21 @@ func show_info() {
 		}
 		fmt.Println()
 		for _, st := range sched.stations {
-			m := 'T'
+			m := "T"
 			if st.Mode == 1 {
-				m = 'F'
+				m = "F"
 			}
-			fmt.Printf("Sta%d(%c):%d\t", st.Id, m, len(st.Queue))
+			if st.Running {
+				m += "1"
+			} else {
+				m += "0"
+			}
+			if st.IsDown {
+				m += "0"
+			} else {
+				m += "1"
+			}
+			fmt.Printf("Sta%d(%s):%d\t", st.Id, m, len(st.Queue))
 			for _, c := range st.Queue {
 				if c.Stage == data.Charging {
 					fmt.Printf("%v*\t", c.QId)
