@@ -187,6 +187,15 @@ func StationById(stid int) (data.Station, error) {
 	return data.Station{}, errors.New("no such station")
 }
 
+func ChangeSettings(was int, cql int, cs int, fs int) {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	data.MAX_WAITING_SLOT = was
+	data.MAX_STATION_QUEUE = cql
+	data.CALL_SCHEDULE = cs
+	data.FAULT_SCHEDULE = fs
+}
+
 // on/off station
 func SwitchStation(stid int, is_on bool) {
 	sched.mu.Lock()
