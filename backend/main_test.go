@@ -33,7 +33,7 @@ func send(method string, route string, request interface{}) []byte {
 		authToken = token
 		fmt.Println("Token is", authToken)
 	}
-	
+
 	body, _ := io.ReadAll(resp.Body)
 	return body
 }
@@ -45,10 +45,10 @@ func TestLoginUser(t *testing.T) {
 		Password string `json:"password"`
 	}
 	var response struct {
-		Code int `json:"code"`
+		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
-			Username        string  `json:"username"`
+			Username string `json:"username"`
 		} `json:"data"`
 	}
 	request.Username = "w"
@@ -62,13 +62,34 @@ func TestLoginUser(t *testing.T) {
 	}
 }
 
-// func TestRegisterUser(t *testing.T) {
-// }
+func TestLoginAdmin(t *testing.T) {
+	var request struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+			Username string `json:"username"`
+		} `json:"data"`
+	}
+	request.Username = "q"
+	request.Password = "q"
+
+	body := send("POST", "/login/user", request)
+	json.Unmarshal(body, &response)
+	t.Log(response)
+	if response.Code != 200 {
+		t.Fail()
+	}
+	t.Log("logined as admin")
+}
 
 // /charge/submit
 func TestChargeSubmit(t *testing.T) {
-	TestLoginUser(t)	// login in as user "w"
-	
+	TestLoginUser(t) // login in as user "w"
+
 	var request struct {
 		ChargeMode   int     `json:"chargeMode"`
 		ChargeAmount float64 `json:"chargeAmount"`
@@ -167,7 +188,7 @@ func TestGetBalance(t *testing.T) {
 			Balance float64 `json:"balance"`
 		} `json:"data"`
 	}
-	
+
 	request.User_id = 1
 	body := send("POST", "/getbalance", request)
 	json.Unmarshal(body, &response)
@@ -182,7 +203,7 @@ func TestRecharge(t *testing.T) {
 
 	var request struct {
 		Recharge_amount float64 `json:"recharge_amount"`
-		User_id int `json:"user_id"`
+		User_id         int     `json:"user_id"`
 	}
 	var response struct {
 		Code int    `json:"code"`
@@ -194,6 +215,28 @@ func TestRecharge(t *testing.T) {
 	request.Recharge_amount = 3.33
 	request.User_id = 1
 	body := send("POST", "/recharge", request)
+	json.Unmarshal(body, &response)
+	t.Log(response)
+	if response.Code != 200 {
+		t.Fail()
+	}
+}
+
+func TestFailure(t *testing.T) {
+	TestLoginAdmin(t)
+
+	var request struct {
+		Charge_id int `json:"charge_id"`
+	}
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	request.Charge_id = 1
+	body := send("POST", "/chargeports/switchBroken", request)
 	json.Unmarshal(body, &response)
 	t.Log(response)
 	if response.Code != 200 {

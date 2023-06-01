@@ -28,7 +28,7 @@ func chargeports_switch(ctx *gin.Context) {
 	if err != nil {
 		response.Code = CodeKeyError
 		response.Msg = "no such charging station"
-	} else if st.IsDown {
+	} else if st.GetIsDown() {
 		response.Code = CodeForbidden
 		response.Msg = "the station is in failure"
 	} else {
@@ -65,8 +65,8 @@ func chargeports_switchBroken(ctx *gin.Context) {
 		response.Msg = "no such charging station"
 	} else {
 		response.Code = CodeSucceed
-		scheduler.SwitchBrokenStation(request.Charge_id, !st.IsDown)
-		if st.IsDown {
+		scheduler.SwitchBrokenStation(request.Charge_id, !st.GetIsDown())
+		if st.GetIsDown() {
 			response.Msg = "charging station now is fixed"
 		} else {
 			response.Msg = "charging station now is broken"

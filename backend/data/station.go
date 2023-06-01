@@ -2,6 +2,7 @@ package data
 
 import (
 	"log"
+	"sync"
 	"time"
 )
 
@@ -23,6 +24,8 @@ type Station struct {
 
 	Running bool
 	IsDown  bool
+
+	mu sync.Mutex
 }
 
 func NewStation(id int, mode int, speed float64) *Station {
@@ -31,10 +34,35 @@ func NewStation(id int, mode int, speed float64) *Station {
 	st.Mode = mode
 	st.Speed = speed
 	st.ChargeChan = make(chan float64) // should not buffer too much
+	st.ControlChan = make(chan int)
 	st.Running = true
 	st.IsDown = false
 	go st.generateElectricity()
 	return &st
+}
+
+func (st *Station) GetRunning() bool {
+	st.mu.Lock()
+	defer st.mu.Unlock()
+	return st.Running
+}
+
+func (st *Station) SetRunning(r bool) {
+	st.mu.Lock()
+	defer st.mu.Unlock()
+	st.Running = r
+}
+
+func (st *Station) GetIsDown() bool {
+	st.mu.Lock()
+	defer st.mu.Unlock()
+	return st.IsDown
+}
+
+func (st *Station) SetIsDown(d bool) {
+	st.mu.Lock()
+	defer st.mu.Unlock()
+	st.IsDown = d	
 }
 
 func (st *Station) On() {
@@ -76,21 +104,24 @@ func (st *Station) generateElectricity() {
 			} else if ctl == StaDown {
 				up = false
 			}
-			st.Running = run
-			st.IsDown = up
+			st.SetRunning(run)
+			st.SetIsDown(!up)
 		default:
 		}
 
 		// keep trying to send out electricity and
 		// simply blocks if no car is receiving electricity
 		if up && run {
-			st.ChargeChan <- st.Speed / 60 // 60 = seconds per minute
+			select {
+			case st.ChargeChan <- st.Speed / 60: // 60 = seconds per minute
+			default:
+			}
 		}
 	}
 }
 
 func (st *Station) Available() bool {
-	return len(st.Queue) < MAX_STATION_QUEUE
+	return (len(st.Queue) < MAX_STATION_QUEUE) && !st.GetIsDown() && st.GetRunning()
 }
 
 func (st *Station) Join(c *Car) {

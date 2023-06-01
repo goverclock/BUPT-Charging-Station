@@ -84,12 +84,12 @@ func show_info() {
 			if st.Mode == 1 {
 				m = "F"
 			}
-			if st.Running {
+			if st.GetRunning() {
 				m += "1"
 			} else {
 				m += "0"
 			}
-			if st.IsDown {
+			if st.GetIsDown() {
 				m += "0"
 			} else {
 				m += "1"

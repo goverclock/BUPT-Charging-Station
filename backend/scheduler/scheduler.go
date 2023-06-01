@@ -310,15 +310,16 @@ func ticker() {
 
 		if checkFault() { // now should apply fault schedule
 
-		} else {	// no fault occurs
+		} else { // no fault occurs
 			// try to schdule the next fast car
 			schduleFast()
 			// try to schedule the next slow car
 			scheduleSlow()
-			// cars in stations 1st slot should turn Stage from
-			// Queueing to Called
-			scheduleCall()
 		}
+
+		// cars in stations 1st slot should turn Stage from
+		// Queueing to Called
+		scheduleCall()
 
 		// actually charge happens here
 		updateOngoingReports()
@@ -336,7 +337,7 @@ func checkFault() bool {
 		ret = true
 	} else {
 		for _, st := range sched.stations {
-			if st.IsDown && len(st.Queue) != 0 {
+			if st.GetIsDown() && len(st.Queue) != 0 {
 				ret = true
 				cars := st.LeaveAll()
 				sched.temp_area = append(sched.temp_area, cars...)
@@ -435,6 +436,21 @@ func scheduleCall() {
 		rp := ongoingReportByUser(user)
 		rp.Calltime = time.Now().Unix()
 		rp.Step = data.StepCall
+	}
+
+	// if a charging car moved to temp_area due to station failure
+	for _, tc := range sched.temp_area {
+		if tc.Stage != data.Called {
+			continue
+		}
+		tc.Stage = data.Queueing
+		user := data.UserByUUId(tc.OwnedBy)
+		rp := ongoingReportByUser(user)
+		if rp == nil {
+			log.Fatal("no ongoging report for user ", user)
+		}
+		rp.Calltime = 0
+		rp.Step = data.StepInline
 	}
 }
 
