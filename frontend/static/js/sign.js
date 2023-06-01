@@ -57,7 +57,7 @@ btn2.addEventListener("click",()=>{
         else{
            localStorage.setItem('admin_id',data.data.user_id);
            localStorage.setItem('adminname',user_name.value);
-           console.log(localStorage.getItem("username"));
+           console.log(localStorage.getItem("adminname"));
            window.location.href="admin.html";
 
         }
