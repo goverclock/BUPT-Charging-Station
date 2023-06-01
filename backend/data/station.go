@@ -13,6 +13,15 @@ const (
 	StaUp   int = 3
 )
 
+type StationReport struct {
+	Charge_id         int     `json:"charge_id"`
+	Charge_mode       int     `json:"charge_mode"`
+	Charge_state      int     `json:"charge_state"`
+	Tot_charge_amount float64 `json:"tot_charge_amount"`
+	Tot_charge_time   int     `json:"tot_charge_time"`
+	Tot_frequency     int     `json:"tot_frequency"`
+}
+
 // 2 Fast, 3 Slow
 type Station struct {
 	Id          int
@@ -39,6 +48,50 @@ func NewStation(id int, mode int, speed float64) *Station {
 	st.IsDown = false
 	go st.generateElectricity()
 	return &st
+}
+
+func (st *Station) GenerateStationReport(start int64, end int64) StationReport {
+	st.mu.Lock()
+	defer st.mu.Unlock()
+	strp := StationReport{}
+	strp.Charge_id = st.Id
+	strp.Charge_mode = st.Mode
+	if st.IsDown {
+		strp.Charge_state = 3
+	} else if !st.Running {
+		strp.Charge_state = 2
+	} else if len(st.Queue) != 0 && st.Queue[0].Stage == Charging {
+		strp.Charge_state = 1
+	} else {
+		strp.Charge_state = 0
+	}
+
+	// gather information from db
+	rp := Report{}
+	rows, err := Db.Query("SELECT * FROM reports WHERE charge_id = $1", st.Id)
+	if err != nil {
+		log.Fatal(err, "Db.Query()")
+	}
+	defer rows.Close()
+
+	secs := 0
+	for rows.Next() {
+		err = rows.Scan(&rp.Id, &rp.Num, &rp.Charge_id, &rp.Charge_mode, &rp.Username, &rp.User_id, &rp.Request_charge_amount, &rp.Real_charge_amount, &rp.Charge_time, &rp.Charge_fee, &rp.Service_fee, &rp.Tot_fee, &rp.Step, &rp.Queue_number, &rp.Subtime, &rp.Inlinetime, &rp.Calltime, &rp.Charge_start_time, &rp.Charge_end_time, &rp.Terminate_flag, &rp.Terminate_time, &rp.Failed_flag, &rp.Failed_msg)
+		if err != nil {
+			log.Fatal(err, "rows.Scan()")
+		}
+		if rp.Subtime < start || rp.Subtime > end {
+			continue
+		}
+		strp.Tot_charge_amount += rp.Real_charge_amount // total charge amount
+		strp.Tot_frequency++                            // total frequency
+		if rp.Charge_end_time > rp.Charge_start_time {
+			secs += int(rp.Charge_end_time - rp.Charge_start_time)
+		}
+	}
+	strp.Tot_charge_time = secs / 60	// total charge time
+
+	return strp
 }
 
 func (st *Station) GetRunning() bool {
@@ -68,7 +121,7 @@ func (st *Station) SetIsDown(d bool) {
 func (st *Station) GetQueue() []*Car {
 	st.mu.Lock()
 	defer st.mu.Unlock()
-	return st.Queue	
+	return st.Queue
 }
 
 func (st *Station) On() {

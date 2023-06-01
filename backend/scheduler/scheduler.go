@@ -219,6 +219,15 @@ func SwitchStation(stid int, is_on bool) {
 	}
 }
 
+func AllStationReports(start int64, end int64) (strps []data.StationReport) {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	for _, st := range sched.stations {
+		strps = append(strps, st.GenerateStationReport(start, end))
+	}
+	return
+}
+
 func SwitchBrokenStation(stid int, is_fail bool) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()

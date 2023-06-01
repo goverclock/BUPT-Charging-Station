@@ -123,3 +123,42 @@ func chargeports_waitingCars(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response)
 }
+
+// specified range
+func chargeports_getreport(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
+	var request struct {
+		StartDate int64 `json:"startDate"`
+		EndDate   int64 `json:"endDate"`
+	}
+	ctx.Bind(&request)
+	var response struct {
+		Code int                  `json:"code"`
+		Msg  string               `json:"msg"`
+		Data []data.StationReport `json:"data"`
+	}
+
+	response.Code = CodeSucceed
+	response.Msg = "succeeded"
+	response.Data = scheduler.AllStationReports(request.StartDate, request.EndDate)
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+// till now
+func chargeports_getreports(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
+	var response struct {
+		Code int                  `json:"code"`
+		Msg  string               `json:"msg"`
+		Data []data.StationReport `json:"data"`
+	}
+
+	response.Code = CodeSucceed
+	response.Msg = "succeeded"
+	response.Data = scheduler.AllStationReports(0, 0)
+
+	ctx.JSON(http.StatusOK, response)
+}
