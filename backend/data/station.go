@@ -62,7 +62,13 @@ func (st *Station) GetIsDown() bool {
 func (st *Station) SetIsDown(d bool) {
 	st.mu.Lock()
 	defer st.mu.Unlock()
-	st.IsDown = d	
+	st.IsDown = d
+}
+
+func (st *Station) GetQueue() []*Car {
+	st.mu.Lock()
+	defer st.mu.Unlock()
+	return st.Queue	
 }
 
 func (st *Station) On() {

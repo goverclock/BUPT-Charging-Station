@@ -108,7 +108,7 @@ func chargeports_waitingCars(ctx *gin.Context) {
 			Battery_capacity float64 `json:"battery_capacity"`
 		}{}
 
-		for _, c := range st.Queue {
+		for _, c := range st.GetQueue() {
 			user := data.UserByUUId(c.OwnedBy)
 			rp := scheduler.OngoingCopyByUser(user)
 			ent.Username = user.Name

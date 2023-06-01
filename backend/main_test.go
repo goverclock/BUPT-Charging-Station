@@ -235,7 +235,7 @@ func TestFailure(t *testing.T) {
 		} `json:"data"`
 	}
 
-	request.Charge_id = 1
+	request.Charge_id = 0
 	body := send("POST", "/chargeports/switchBroken", request)
 	json.Unmarshal(body, &response)
 	t.Log(response)

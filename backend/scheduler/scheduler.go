@@ -176,17 +176,16 @@ func WaitCountByCar(c *data.Car) (int, error) {
 	}
 }
 
-// note: returns a copy
-func StationById(stid int) (data.Station, error) {
+func StationById(stid int) (*data.Station, error) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	for _, st := range sched.stations {
 		if st.Id != stid {
 			continue
 		}
-		return *st, nil
+		return st, nil
 	}
-	return data.Station{}, errors.New("no such station")
+	return &data.Station{}, errors.New("no such station")
 }
 
 func GetFautlSchedule() int {
