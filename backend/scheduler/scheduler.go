@@ -13,10 +13,12 @@ type Scheduler struct {
 	mu          sync.Mutex
 	stations    []*data.Station
 	waitingcars []*data.Car
+	temp_area   []*data.Car
 	fast_qind   int // QId of the next fast car to schdule to charging area
 	slow_qind   int
 
 	ongoing_reports []*data.Report // every user should have at most 1 ongoing report
+	fault_schedule  int            // 优先级调度:0/时间顺序调度:1
 }
 
 var sched Scheduler
@@ -187,13 +189,19 @@ func StationById(stid int) (data.Station, error) {
 	return data.Station{}, errors.New("no such station")
 }
 
+func GetFautlSchedule() int {
+	sched.mu.Lock()
+	defer sched.mu.Unlock()
+	return sched.fault_schedule
+}
+
 func ChangeSettings(was int, cql int, cs int, fs int) {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
 	data.MAX_WAITING_SLOT = was
 	data.MAX_STATION_QUEUE = cql
 	data.CALL_SCHEDULE = cs
-	data.FAULT_SCHEDULE = fs
+	sched.fault_schedule = fs
 }
 
 // on/off station
@@ -300,19 +308,42 @@ func ticker() {
 		time.Sleep(1 * time.Second)
 		sched.mu.Lock()
 
-		// try to schdule the next fast car
-		schduleFast()
-		// try to schedule the next slow car
-		scheduleSlow()
-		// cars in stations 1st slot should turn Stage from
-		// Queueing to Called
-		scheduleCall()
+		if checkFault() { // now should apply fault schedule
+
+		} else {	// no fault occurs
+			// try to schdule the next fast car
+			schduleFast()
+			// try to schedule the next slow car
+			scheduleSlow()
+			// cars in stations 1st slot should turn Stage from
+			// Queueing to Called
+			scheduleCall()
+		}
 
 		// actually charge happens here
 		updateOngoingReports()
 
 		sched.mu.Unlock()
 	}
+}
+
+// returns true if some car is in temp_area
+// or some car is in a failed station
+// if returns true, should enter fault schedule
+func checkFault() bool {
+	ret := false
+	if len(sched.temp_area) != 0 {
+		ret = true
+	} else {
+		for _, st := range sched.stations {
+			if st.IsDown && len(st.Queue) != 0 {
+				ret = true
+				cars := st.LeaveAll()
+				sched.temp_area = append(sched.temp_area, cars...)
+			}
+		}
+	}
+	return ret
 }
 
 func schduleFast() {

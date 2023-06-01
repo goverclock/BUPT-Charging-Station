@@ -29,7 +29,7 @@ func system_getsettings(ctx *gin.Context) {
 	response.Data.Waiting_area_size = data.MAX_WAITING_SLOT
 	response.Data.Charging_queue_len = data.MAX_STATION_QUEUE
 	response.Data.Call_schedule = data.CALL_SCHEDULE
-	response.Data.Fault_schedule = data.FAULT_SCHEDULE
+	response.Data.Fault_schedule = scheduler.GetFautlSchedule()
 
 	ctx.JSON(http.StatusOK, response)
 }

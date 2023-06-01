@@ -39,6 +39,8 @@ func ReportsByUser(u data.User) []data.Report {
 
 // assume sched.mu is locked
 // archive and remove from sched's ongoing_reports
+// also remove the car in the station
+// also updates user's balance
 func archiveOngoingReport(rp *data.Report) {
 	if sched.mu.TryLock() {
 		log.Fatal("should have locked sched.mu in archiveOngoingReport")
@@ -47,6 +49,16 @@ func archiveOngoingReport(rp *data.Report) {
 		if r.Num == rp.Num {
 			sched.ongoing_reports = append(sched.ongoing_reports[:ri], sched.ongoing_reports[ri+1:]...)
 			r.Archive()
+			// remove car from station
+			st := stationById(r.Charge_id)
+			st.Leave(r.Queue_number)
+			// update user's balance
+			user, err := data.UserById(r.User_id)
+			if err != nil {
+				log.Fatal("no such user ", user)
+			}
+			user.Balance -= r.Tot_fee
+			user.Update()
 			break
 		}
 	}

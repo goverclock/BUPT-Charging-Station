@@ -74,6 +74,11 @@ func show_info() {
 			fmt.Printf("%v\t", c.QId)
 		}
 		fmt.Println()
+		fmt.Printf("Temp:\t")
+		for _, c := range sched.temp_area {
+			fmt.Printf("%v\t", c.QId)
+		}
+		fmt.Println()
 		for _, st := range sched.stations {
 			m := "T"
 			if st.Mode == 1 {

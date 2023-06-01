@@ -22,7 +22,7 @@ type Station struct {
 	ControlChan chan int
 
 	Running bool
-	IsDown bool
+	IsDown  bool
 }
 
 func NewStation(id int, mode int, speed float64) *Station {
@@ -98,7 +98,21 @@ func (st *Station) Join(c *Car) {
 		log.Fatal("station is not available!")
 	}
 	st.Queue = append(st.Queue, c)
-	// log.Println(st.Id, "car JOINED", c)
+}
+
+func (st *Station) Leave(qid string) {
+	if len(st.Queue) != 0 && st.Queue[0].QId == qid {
+		st.Queue = st.Queue[1:]
+	} else {
+		log.Fatal("st.Leave()")
+	}
+}
+
+// when the station fails
+func (st *Station) LeaveAll() []*Car {
+	ret := st.Queue
+	st.Queue = nil
+	return ret
 }
 
 // time needed for car before finishing charging
