@@ -61,11 +61,15 @@ func recharge(ctx *gin.Context) {
 	if err != nil {
 		log.Fatal(err, "no such user: ", request.User_id)
 	}
-	user.Balance += request.Recharge_amount
-	log.Println(user)
-	user.Update()
-	response.Code = CodeSucceed
-	response.Msg = "recharge succeeded"
+	if request.Recharge_amount < 0 {
+		response.Code = CodeKeyError
+		response.Msg = "must charge more than 0"
+	} else {
+		user.Balance += request.Recharge_amount
+		user.Update()
+		response.Code = CodeSucceed
+		response.Msg = "recharge succeeded"
+	}
 
 	ctx.JSON(http.StatusOK, response)
 }

@@ -52,7 +52,8 @@ func getMaxQId() int {
 	if sched.mu.TryLock() {
 		log.Fatal("should have locked sched.mu in getMaxQid")
 	}
-	return data.MAX_WAITING_SLOT + data.MAX_STATION_QUEUE*len(sched.stations)
+	// return data.MAX_WAITING_SLOT + data.MAX_STATION_QUEUE*len(sched.stations)
+	return 100
 }
 
 // for debug only
