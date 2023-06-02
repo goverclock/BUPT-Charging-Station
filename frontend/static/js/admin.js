@@ -114,7 +114,7 @@ getreport.addEventListener("click",()=>{
         console.log(end_date.getTime());
 
         getreport_data.startDate=parseInt(start_date.getTime());
-        getreport_data.endDate=parseInt(end_date.getTime());
+        getreport_data.endDate=parseInt(end_date.getTime())+86400;
         const response=send_data(getreport_url,getreport_data);
         response.then(response=>response.json())
         .then(all_data=>{
@@ -165,10 +165,10 @@ getreport.addEventListener("click",()=>{
             div_msg.textContent="充电桩编号: "+object[i].charge_id;
             lab1.textContent="累计充电次数: "+object[i].tot_frequency;
             lab2.textContent="累计充电时长: "+object[i].tot_charge_time+"分钟";
-            lab3.textContent="累计充电电量: "+object[i].tot_charge_amount+"度";
-            lab4.textContent="累计充电费用: "+object[i].tot_charge_fee+"元";
-            lab5.textContent="累计服务费用: "+object[i].tot_service_fee+"元";
-            lab6.textContent="累计总费用: "+object[i].tot_tot_fee+"元";
+            lab3.textContent="累计充电电量: "+object[i].tot_charge_amount.toFixed(2)+"度";
+            lab4.textContent="累计充电费用: "+object[i].tot_charge_fee.toFixed(2)+"元";
+            lab5.textContent="累计服务费用: "+object[i].tot_service_fee.toFixed(2)+"元";
+            lab6.textContent="累计总费用: "+object[i].tot_tot_fee.toFixed(2)+"元";
             p1.appendChild(lab1); p1.appendChild(lab2);
             p2.appendChild(lab3); p2.appendChild(lab4);
             p3.appendChild(lab5); p3.appendChild(lab6);
@@ -177,9 +177,7 @@ getreport.addEventListener("click",()=>{
             div_report.appendChild(div_msg);
         }
         div_report.id="scrollable-div";
-        div_operation.id="scrollable-div";
         div_operation.appendChild(div_report);
-
 
     }
 
@@ -258,7 +256,7 @@ getreports.addEventListener("click",()=>{
                 case 2: lab3.textContent="充电桩状态: "+"关闭";break;
                 default: lab3.textContent="充电桩状态: "+"故障";break;
             }
-            lab4.textContent="充电总量: "+object[i].tot_charge_amount+"度";
+            lab4.textContent="充电总量: "+object[i].tot_charge_amount.toFixed(2)+"度";
             lab5.textContent="充电总时长: "+object[i].tot_charge_time+"分钟";
             lab6.textContent="累计充电次数"+object[i].tot_frequency;
             lab1.style.color="red"; lab2.style.color="red";
