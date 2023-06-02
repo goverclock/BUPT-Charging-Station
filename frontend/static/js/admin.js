@@ -450,7 +450,7 @@ switchBroken_charge.addEventListener("click",()=>{
 //获取充电桩排队车辆信息
 const waitingCars_url="/chargeports/waitingCars"
 const waitingCars_data={
-    chargeid:0
+    charge_id:0
 }
 const waitingCars=document.querySelector("#waitingCars");
 waitingCars.addEventListener("click",()=>{
@@ -506,7 +506,7 @@ waitingCars.addEventListener("click",()=>{
         submit.remove();
         select.remove();
         var numbers = select.value.match(/\d+/g);
-        waitingCars_data.chargeid=parseInt(numbers);
+        waitingCars_data.charge_id=parseInt(numbers);
         const response=send_data(waitingCars_url,waitingCars_data);
         response.then(response=>response.json())
         .then(all_data=>{
