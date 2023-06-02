@@ -79,9 +79,9 @@ getreport.addEventListener("click",()=>{
     const lab_end=document.createElement("label");
 
     lab_start.textContent="输入开始时间";
-    start_time.placeholder ="2023-01-01 00:00:00"
+    start_time.placeholder ="2023-01-01"
     lab_end.textContent="输入结束时间";
-    end_time.placeholder="2023-01-01 00:00:00"
+    end_time.placeholder="2023-01-01"
     submit.className="btn btn-primary";
     submit.textContent="确认";
     submit.id="submit";
@@ -116,14 +116,14 @@ getreport.addEventListener("click",()=>{
         getreport_data.startDate=parseInt(start_date.getTime());
         getreport_data.endDate=parseInt(end_date.getTime());
         const response=send_data(getreport_url,getreport_data);
-        response.then(response=>response.json)
+        response.then(response=>response.json())
         .then(all_data=>{
+            console.log(all_data);
             if(all_data.code===200){
                 diag.remove();
                 div_operation.appendChild(exit);
                 //分析统计报表
                 analyse_report(all_data.data);
-
 
             }
             else{
@@ -173,7 +173,12 @@ getreport.addEventListener("click",()=>{
             p2.appendChild(lab3); p2.appendChild(lab4);
             p3.appendChild(lab5); p3.appendChild(lab6);
             div_msg.appendChild(p1); div_msg.appendChild(p2); div_msg.appendChild(p3);
+            p1.style.color="white"; p2.style.color="white"; p3.style.color="white";
+            div_report.appendChild(div_msg);
         }
+        div_report.id="scrollable-div";
+        div_operation.id="scrollable-div";
+        div_operation.appendChild(div_report);
 
 
     }
@@ -419,8 +424,8 @@ switchBroken_charge.addEventListener("click",()=>{
         submit.remove();
         select.remove();
         var numbers = select.value.match(/\d+/g);
-        switch_data.charge_id=parseInt(numbers);
-        const response=send_data(switch_url,switch_data);
+        switchBroken_data.charge_id=parseInt(numbers);
+        const response=send_data(switchBroken_url,switchBroken_data);
         response.then(response=>response.json())
         .then(all_data=>{
             if(all_data.code===200){
@@ -514,6 +519,12 @@ waitingCars.addEventListener("click",()=>{
             if(all_data.code===200){
                 diag.remove();
                 analyse_cars(all_data.data);
+
+            }
+            else if(all_data.code===0){
+                diag.textContent="当前无排队车辆";
+                diag.appendChild(exit);
+                exit.style.left="95px";
 
             }
             else{
@@ -715,7 +726,7 @@ setsettings.addEventListener("click",()=>{
         const cnt2=select_index(select_fault_schedule,select_fault_schedule.value);
         console.log("cnt1"+cnt1);console.log("cnt2"+cnt2);
         setsettings_data.waiting_area_size=parseInt(input_waiting.value);
-        setsettings_data.charging_queue_len=parseInt(input_queue);
+        setsettings_data.charging_queue_len=parseInt(input_queue.value);
         setsettings_data.call_schedule=cnt1;
         setsettings_data.fault_schedule=cnt2;
         const response=send_data(setsettings_url,setsettings_data);

@@ -101,6 +101,15 @@ function analyse_details(object){//传入的是response中的data部分数据
     return charge_msg;
 
 }
+function time_trance(timestamp){
+    let date=new Date(new Date(timestamp*1000).getTime()+8*3600*1000);
+
+  date=date.toJSON();
+  date=date.substring(0,19).replace('T',' ');
+return date;
+
+
+}
 
 
 //处理详细订单数据
@@ -130,13 +139,13 @@ function detail_deal(i,object){
         case 10:  string="总费用: "+object.tot_fee+"元";   break;
         case 11:  string="当前状态: "+step[object.step];    break;
         case 12:  string="排队号码: "+object.queue_number;   break;
-        case 13:  string="订单提交时间: "+new Date(object.subtime*1000).toUTCString();    break;
-        case 14:  string="进入等待区时间: "+new Date(object.inlinetime*1000).toUTCString();   break;
-        case 15:  string="叫号时间: "+new Date(object.calltime*1000).toUTCString();    break;
-        case 16:  string="开始充电时间: "+new Date(object.charge_start_time*1000).toUTCString() ;   break;
-        case 17:  var date = new Date(object.charge_end_time * 1000); string="结束充电时间: "+date.toUTCString();  console.log(object.charge_end_time); break;
+        case 13:  string="订单提交时间: "+time_trance(object.subtime);    break;
+        case 14:  string="进入等待区时间: "+time_trance(object.inlinetime);   break;
+        case 15:  string="叫号时间: "+time_trance(object.calltime);    break;
+        case 16:  string="开始充电时间: "+time_trance(object.charge_start_time) ;   break;
+        case 17:  string="结束充电时间: "+time_trance(object.charge_end_time);   break;
         case 18:  if(object.terminate_flag==="true")string="用户是否主动取消订单: 是"; else{string="用户是否主动取消订单: 否"}  break;
-        case 19:  string="结束时间: "+new Date(object.terminate_time*1000).toUTCString();    break;
+        case 19:  string="结束时间: "+time_trance(object.terminate_time);    break;
         case 20:  if(object.failed_flag==="true") string="是否订单失败: 是"; else{string="是否订单失败: 否"} break;
         case 21:  string="订单失败原因: "+object.failed_msg;   break;
     }
@@ -181,7 +190,9 @@ btn_login_out.addEventListener("click", () => {
 });
 
 ///getbalance代码
+user_statue(statue_lab);
 const getbalance_url="/getbalance";
+balance();
 setInterval(balance,5000);
 
 //获取用户状态的代码
@@ -233,7 +244,6 @@ money_charge.addEventListener("click",()=>{
 
     submit.addEventListener("click",(event)=>{
         event.preventDefault();
-        while(input.value<=0);
         money_charge_data.recharge_amount=parseFloat(input.value);
         money_charge_data.user_id=parseInt(user_id);
         const response=send_data(money_charge_url,money_charge_data);
@@ -246,12 +256,7 @@ money_charge.addEventListener("click",()=>{
                 diag.appendChild(start_x);
                 start_x.style.left="270px";
                 start_x.style.top="-20px";
-                if(parseFloat(money_charge_data.recharge_amount)>1e-8){
-                    money.textContent=parseFloat(money.textContent)+parseFloat( money_charge_data.recharge_amount);
-                }
-                else{
-                    money.textContent=parseFloat(money.textContent);
-                }
+                balance();
             }
             else{
                 p.remove();
