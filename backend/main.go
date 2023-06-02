@@ -28,8 +28,8 @@ func main() {
 	server.POST("/login/user", login_user)
 	server.POST("/register/user", register_user)
 	server.POST("/charge/submit", auth_middleware, charge_submit)
-	server.POST("/charge/getChargingMsg", auth_middleware, charge_getChargingMsg)
-	server.POST("/charge/chargeSubmit", auth_middleware, charge_changeSubmit)	// maybe changeSubmit
+	server.POST("/charge/getChargingMsg", auth_middleware, charge_getChargingMsg)	// pending
+	server.POST("/charge/chargeSubmit", auth_middleware, charge_changeSubmit)	// maybe changeSubmit	// pending
 	server.POST("/charge/changeSubmit", auth_middleware, charge_changeSubmit)
 	server.POST("/charge/cancelCharge", auth_middleware, charge_cancelCharge)
 	server.POST("/charge/startCharge", auth_middleware, charge_startCharge)

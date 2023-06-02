@@ -17,3 +17,17 @@ TODO:
 - [ ] 余额不足Request_charge_amount时直接拒绝充电请求
 
 - [ ] StationReport缺少tot_charge_fee...(/chargeports/getreport(s))
+
+- [ ] endCharge之后没有结束时间
+
+FRONTEND:
+
+- [ ] 格林威治时间转换为北京时间
+
+- [ ] 余额充值时负数卡死,以及刷新界面后不立刻显示余额
+
+- [ ] chargeports/getreport
+
+- [ ] 充电桩状态切换应该发到switchBroken而不是switch路径
+
+- [ ] chargeports/waitingCars
