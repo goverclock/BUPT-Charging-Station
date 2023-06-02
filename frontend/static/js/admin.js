@@ -78,8 +78,10 @@ getreport.addEventListener("click",()=>{
     const lab_start=document.createElement("label");
     const lab_end=document.createElement("label");
 
-    lab_start.textContent="输入开始时间戳";
-    lab_end.textContent="输入结束时间戳";
+    lab_start.textContent="输入开始时间";
+    start_time.placeholder ="2023-01-01 00:00:00"
+    lab_end.textContent="输入结束时间";
+    end_time.placeholder="2023-01-01 00:00:00"
     submit.className="btn btn-primary";
     submit.textContent="确认";
     submit.id="submit";
@@ -104,8 +106,15 @@ getreport.addEventListener("click",()=>{
     diag.show();
 
     submit.addEventListener("click",()=>{
-        getreport_data.startDate=start_time;
-        getreport_data.endDate=end_time;
+        var start_date = new Date(start_time.value);
+        var end_date = new Date(end_time.value);
+        console.log(start_date);
+        console.log(end_date);
+        console.log(start_date.getTime());
+        console.log(end_date.getTime());
+
+        getreport_data.startDate=parseInt(start_date.getTime());
+        getreport_data.endDate=parseInt(end_date.getTime());
         const response=send_data(getreport_url,getreport_data);
         response.then(response=>response.json)
         .then(all_data=>{
