@@ -14,6 +14,13 @@ console.log(localStorage.getItem('username'));
 const user_id_text=document.querySelector("#user_id");
 const money=document.querySelector("#money");
 
+const div_operation = document.querySelector("#div-present");
+const div1=document.querySelector("#div1");
+const div_background=document.querySelector("#div-background");
+const body = document.querySelector("body");
+const statue_lab=document.createElement("label");
+div_background.appendChild(statue_lab);
+
 user_id_text.textContent=local_username;
 
 //向服务器发送数据
@@ -136,6 +143,29 @@ function detail_deal(i,object){
     return string;
 }
 
+function user_statue(statue_lab){
+    const queue_ind_url="/charge/details";
+    const queue_ind_data={
+    user_id:-1
+}
+    queue_ind_data.user_id=parseInt(user_id);
+    const response=send_data(queue_ind_url,queue_ind_data);
+    response.then(response=>response.json())
+    .then(all_data=>{
+       const msg=analyse_details(all_data.data);
+       switch(msg.step){
+        case 0: statue_lab.textContent="充电申请已提交请耐心等待";break;
+        case 1: statue_lab.textContent="等待区排队中请耐心等待";break;
+        case 2: statue_lab.textContent="叫号中,请开始充电";break;
+        case 3: statue_lab.textContent="正在充电中";break;
+        case 4: statue_lab.textContent="已结束充电";break;
+        default:statue_lab.textContent="没有正在进行的充电方案";
+    }
+
+    });
+
+}
+
 
 
 //状态变量
@@ -152,7 +182,12 @@ btn_login_out.addEventListener("click", () => {
 
 ///getbalance代码
 const getbalance_url="/getbalance";
-setInterval(balance(),"5000");
+setInterval(balance,5000);
+
+//获取用户状态的代码
+setInterval("user_statue(statue_lab)",5000);
+
+
 
 //money_charge 余额充值代码
 const money_charge_url="/recharge";
@@ -273,6 +308,7 @@ start_charge.addEventListener("click",()=>{
     if(all_data.code===200){
         diag.textContent="已开始充电";
         start_x.style.left="248px";
+        user_statue(statue_lab);
         diag.appendChild(start_x);
     }
     else{
@@ -300,10 +336,6 @@ let charge_date={
     user_id:-1
 }
 const charge_submit = document.querySelector("#charge_submit");
-const div_operation = document.querySelector("#div-present");
-const div1=document.querySelector("#div1");
-const div_background=document.querySelector("#div-background");
-const body = document.querySelector("body");
 div_operation.remove();
 
 charge_submit.addEventListener("click", () => {
@@ -373,6 +405,7 @@ charge_submit.addEventListener("click", () => {
         charge_date.chargeAmount=parseFloat(start_input.value);
         charge_date.user_id=parseInt(user_id);
         send_data(charge_submit_url,charge_date);
+        user_statue(statue_lab);
         div_operation.remove();
         div1.appendChild(div_background);
         diag.remove();
@@ -821,6 +854,7 @@ function cancel_charge(){
          .then(all_data=>{
          if(all_data.code===200){
             diag_cancel.textContent="已取消充电";
+            user_statue(statue_lab);
             submit.remove();
             diag_cancel.appendChild(end_x1);
             end_x1.style.left="258px";
@@ -895,6 +929,7 @@ function end_charge(){
      diag_end.textContent="确定结束充电吗?";
      end_charge_data.user_id=parseInt(user_id);
      send_data(end_charge_url,end_charge_data);
+     user_statue(statue_lab);
      diag_end.appendChild(form_end);
      form_end.appendChild(submit);
      diag_end.appendChild(end_x1);
