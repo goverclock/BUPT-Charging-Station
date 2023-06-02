@@ -123,13 +123,13 @@ function detail_deal(i,object){
         case 10:  string="总费用: "+object.tot_fee+"元";   break;
         case 11:  string="当前状态: "+step[object.step];    break;
         case 12:  string="排队号码: "+object.queue_number;   break;
-        case 13:  string="订单提交时间: "+object.subtime;    break;
-        case 14:  string="进入等待区时间: "+object.inlinetime;   break;
-        case 15:  string="叫号时间: "+object.calltime;    break;
-        case 16:  string="开始充电时间: "+object.charge_start_time;   break;
-        case 17:  string="结束充电时间: "+object.charge_end_time;  break;
+        case 13:  string="订单提交时间: "+new Date(object.subtime*1000).toUTCString();    break;
+        case 14:  string="进入等待区时间: "+new Date(object.inlinetime*1000).toUTCString();   break;
+        case 15:  string="叫号时间: "+new Date(object.calltime*1000).toUTCString();    break;
+        case 16:  string="开始充电时间: "+new Date(object.charge_start_time*1000).toUTCString() ;   break;
+        case 17:  var date = new Date(object.charge_end_time * 1000); string="结束充电时间: "+date.toUTCString();  console.log(object.charge_end_time); break;
         case 18:  if(object.terminate_flag==="true")string="用户是否主动取消订单: 是"; else{string="用户是否主动取消订单: 否"}  break;
-        case 19:  string="结束时间: "+object.terminate_time;    break;
+        case 19:  string="结束时间: "+new Date(object.terminate_time*1000).toUTCString();    break;
         case 20:  if(object.failed_flag==="true") string="是否订单失败: 是"; else{string="是否订单失败: 否"} break;
         case 21:  string="订单失败原因: "+object.failed_msg;   break;
     }
