@@ -317,7 +317,8 @@ func ticker() {
 		sched.mu.Lock()
 
 		if checkFault() { // now should apply fault schedule
-
+			scheduleFaultFast() // both in QId order
+			scheduleFaultSlow()
 		} else { // no fault occurs
 			// try to schdule the next fast car
 			schduleFast()
@@ -343,29 +344,44 @@ func ticker() {
 func checkFault() bool {
 	// check if some car is in a failed station
 	for _, st := range sched.stations {
-		if st.GetIsDown() && len(st.Queue) != 0 {
-			cars := st.LeaveAll()    // move all cars in failed station to temp area
-			for _, c := range cars { // and end these reports
-				user := data.UserByUUId(c.OwnedBy)
-				rp := ongoingReportByUser(user)
-				rp.Failed_flag = true
-				rp.Failed_msg = "station failed"
-				rp.Step = data.StepFinish
-				already_charged_amount := rp.Real_charge_amount
-				if rp.Charge_start_time != 0 {
-					rp.Charge_end_time = time.Now().Unix()
-				}
-				archiveOngoingReport(rp)
-				// start a new report for cars in temp area
-				nrp := newOngoingReport(user)
-				nrp.Charge_mode = c.ChargeMode
-				nrp.Request_charge_amount = c.ChargeAmount - already_charged_amount
-				nrp.Inlinetime = nrp.Subtime
-				nrp.Step = data.StepInline
-				nrp.Queue_number = c.QId
-			}
-			sched.temp_area = append(sched.temp_area, cars...)
+		if !st.GetIsDown() || len(st.GetQueue()) == 0 {
+			continue
 		}
+		cars := st.LeaveAll()          // move all cars in failed station to temp area
+		if sched.fault_schedule == 1 { // involves other stations
+			for _, ost := range sched.stations {
+				if ost.Mode != st.Mode {
+					continue
+				}
+				for _, oc := range ost.GetQueue() {
+					if oc.Stage == data.Queueing {
+						cars = append(cars, ost.Leave(oc.QId))
+					}
+				}
+			}
+		}
+		for _, c := range cars { // and end these reports
+			user := data.UserByUUId(c.OwnedBy)
+			rp := ongoingReportByUser(user)
+			rp.Failed_flag = true
+			rp.Failed_msg = "station failed"
+			rp.Step = data.StepFinish
+			already_charged_amount := rp.Real_charge_amount
+			if rp.Charge_start_time != 0 {
+				rp.Charge_end_time = time.Now().Unix()
+			}
+			archiveOngoingReport(rp)
+			// start a new report for cars in temp area
+			nrp := newOngoingReport(user)
+			nrp.Charge_mode = c.ChargeMode
+			nrp.Request_charge_amount = c.ChargeAmount - already_charged_amount
+			nrp.Inlinetime = nrp.Subtime
+			nrp.Step = data.StepInline
+			nrp.Queue_number = c.QId
+		}
+		sched.temp_area = append(sched.temp_area, cars...)
+
+		break // deal with 1 failure each call is enough
 	}
 	return len(sched.temp_area) != 0
 }
@@ -397,6 +413,7 @@ func schduleFast() {
 				// update report
 				rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
 				rp.Inlinetime = time.Now().Unix()
+				rp.Charge_id = min_wait_sti
 
 				sched.stations[min_wait_sti].Join(c)
 				sched.fast_qind++
@@ -434,12 +451,105 @@ func scheduleSlow() {
 				// update report
 				rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
 				rp.Inlinetime = time.Now().Unix()
+				rp.Charge_id = min_wait_sti
 
 				sched.stations[min_wait_sti].Join(c)
 				sched.slow_qind++
 			}
 
 			break
+		}
+	}
+}
+
+func scheduleFaultFast() {
+	is_qid_in_temp := func(qid string) bool {
+		for _, c := range sched.temp_area {
+			if c.QId == qid {
+				return true
+			}
+		}
+		return false
+	}
+	qid := "F1"
+	for i := 2; !is_qid_in_temp(qid) && i < getMaxQId(); i++ {
+		qid = "F" + strconv.Itoa(i)
+	}
+
+	for ci, c := range sched.temp_area {
+		if c.QId != qid {
+			continue
+		}
+		// look for a station with min wait time for the car
+		min_wait := -1.0
+		min_wait_sti := -1
+		for sti, st := range sched.stations {
+			if !st.Available() || st.Mode != 1 { // fast station
+				continue
+			}
+			if min_wait < 0 || st.WaitingTimeForCar(*c) < min_wait {
+				min_wait = st.WaitingTimeForCar(*c)
+				min_wait_sti = sti
+			}
+		}
+		// available station
+		// car moves to station
+		if min_wait_sti != -1 {
+			sched.temp_area =
+				append(sched.temp_area[:ci], sched.temp_area[ci+1:]...) // remove from waiting cars
+				// join station queue
+			c.Stage = data.Queueing
+			// update report
+			rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
+			rp.Inlinetime = time.Now().Unix()
+			rp.Charge_id = min_wait_sti
+			sched.stations[min_wait_sti].Join(c)
+		}
+	}
+}
+
+func scheduleFaultSlow() {
+	is_qid_in_temp := func(qid string) bool {
+		for _, c := range sched.temp_area {
+			if c.QId == qid {
+				return true
+			}
+		}
+		return false
+	}
+	qid := "T1"
+	for i := 2; !is_qid_in_temp(qid) && i < getMaxQId(); i++ {
+		qid = "T" + strconv.Itoa(i)
+	}
+
+	for ci, c := range sched.temp_area {
+		if c.QId != qid {
+			continue
+		}
+		// look for a station with min wait time for the car
+		min_wait := -1.0
+		min_wait_sti := -1
+		for sti, st := range sched.stations {
+			if !st.Available() || st.Mode != 0 { // fast station
+				continue
+			}
+			if min_wait < 0 || st.WaitingTimeForCar(*c) < min_wait {
+				min_wait = st.WaitingTimeForCar(*c)
+				min_wait_sti = sti
+			}
+		}
+		// available station
+		// car moves to station
+		if min_wait_sti != -1 {
+			sched.temp_area =
+				append(sched.temp_area[:ci], sched.temp_area[ci+1:]...) // remove from waiting cars
+				// join station queue
+			c.Stage = data.Queueing
+			// update report
+			rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
+			rp.Inlinetime = time.Now().Unix()
+			rp.Charge_id = min_wait_sti
+			sched.stations[min_wait_sti].Join(c)
 		}
 	}
 }

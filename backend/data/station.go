@@ -171,11 +171,12 @@ func (st *Station) generateElectricity() {
 		// keep trying to send out electricity and
 		// simply blocks if no car is receiving electricity
 		if up && run {
-			timeout := time.After(3 * time.Second)
+			timer := time.NewTimer(3 * time.Second)
 			select {
 			case st.ChargeChan <- st.Speed / 60: // 60 = seconds per minute
-			case <-timeout:
+			case <-timer.C:
 			}
+			timer.Stop()
 		}
 	}
 }
@@ -192,13 +193,15 @@ func (st *Station) Join(c *Car) {
 }
 
 // need not to be the first in queue to leave
-func (st *Station) Leave(qid string) {
+func (st *Station) Leave(qid string) *Car {
 	for ci, c := range st.Queue {
 		if c.QId != qid {
 			continue
 		}
 		st.Queue = append(st.Queue[:ci], st.Queue[ci+1:]...)
+		return c
 	}
+	return nil
 }
 
 // when the station fails

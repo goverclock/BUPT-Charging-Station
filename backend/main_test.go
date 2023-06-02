@@ -189,9 +189,7 @@ func TestFailure(t *testing.T) {
 	}
 
 	request.Charge_id = 0
-	t.Log("sending break request")
 	body := send("POST", "/chargeports/switchBroken", request)
-	t.Log("done sending break request")
 	json.Unmarshal(body, &response)
 	t.Log(response)
 	if response.Code != 200 {

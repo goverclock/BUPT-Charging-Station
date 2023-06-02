@@ -1,6 +1,10 @@
 package main
 
 import (
+	"log"
+	"net/http"
+	_ "net/http/pprof"
+	"runtime"
 	"sync"
 
 	"github.com/gin-contrib/cors"
@@ -10,6 +14,11 @@ import (
 var amazing_lock sync.Mutex
 
 func main() {
+	runtime.SetBlockProfileRate(1)
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+ 
 	server := gin.Default()
 
 	server.Use(cors.New(cors.Config{
