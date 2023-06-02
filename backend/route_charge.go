@@ -15,7 +15,7 @@ func charge_submit(ctx *gin.Context) {
 	var request struct {
 		Charge_mode   int     `json:"charge_mode"`
 		Charge_amount float64 `json:"charge_amount"`
-		User_id      int     `json:"user_id"` // unused
+		User_id       int     `json:"user_id"` // unused
 	}
 	ctx.Bind(&request)
 	var response struct {
@@ -38,7 +38,7 @@ func charge_submit(ctx *gin.Context) {
 	if scheduler.OngoingCopyByUser(user).Num != 0 {
 		response.Code = CodeForbidden
 		response.Msg = "已经有进行中的请求了"
-	} else if fee > user.Balance{	// if balance not enough, refuse submit
+	} else if fee > user.Balance { // if balance not enough, refuse submit
 		response.Code = CodeForbidden
 		response.Msg = "余额不足"
 	} else {
@@ -60,9 +60,9 @@ func charge_submit(ctx *gin.Context) {
 			response.Code = CodeSucceed
 			response.Msg = "charging request submitted succssfully"
 		}
-
-		ctx.JSON(http.StatusOK, response)
 	}
+
+	ctx.JSON(http.StatusOK, response)
 }
 
 func charge_getChargingMsg(ctx *gin.Context) {
