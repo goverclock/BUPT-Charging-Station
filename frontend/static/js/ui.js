@@ -64,7 +64,7 @@ function balance(){
     res.then(response=>response.json())
       .then(all_data=>{
       if(all_data.code===200){
-       money.textContent=all_data.data.balance;
+       money.textContent=all_data.data.balance.toFixed(2);
      }
     });
 }
@@ -81,7 +81,6 @@ function analyse_details(object){//传入的是response中的data部分数据
     for(let i=0;i<object.length;i++){
         if(parseInt(object[i].step)!==4){
             cnt=i;
-            console.log("cnt: " +cnt);
             break;
         }
     }
@@ -409,11 +408,33 @@ charge_submit.addEventListener("click", () => {
         }
         charge_date.charge_amount=parseFloat(start_input.value);
         charge_date.user_id=parseInt(user_id);
-        send_data(charge_submit_url,charge_date);
+        const res=send_data(charge_submit_url,charge_date);
+        res.then(res=>res.json())
+        .then(all_data=>{
+            console.log(all_data);
+            if(all_data.code===200){
+                diag.textContent="提交成功";
+                diag.appendChild(start_x)
+                start_x.style.top="-19px";
+                start_x.style.left="270px";
+                start_x.style.position="relative";
+            }
+            else if(all_data.code===403){
+                diag.textContent="余额不足";
+                diag.appendChild(start_x);
+                start_x.style.top="-19px";
+                start_x.style.left="270px";
+                start_x.style.position="relative";
+            }
+            else{
+                diag.textContent="提交失败";
+                diag.appendChild(start_x);
+                start_x.style.top="-19px";
+                start_x.style.left="270px";
+                start_x.style.position="relative";
+            }
+        })
         user_statue(statue_lab);
-        div_operation.remove();
-        div1.appendChild(div_background);
-        diag.remove();
 
     })
     start_x.addEventListener("click", () => {
@@ -630,7 +651,10 @@ function modidy_queue(){
         options.id = "charge_select";
         start_x.textContent = "x";
         start_x.id = "start_x";
-        
+
+        start_x.style.position="relative";
+        start_x.style.left="285px";
+        start_x.style.top="-174px";
 
         submit.className = "btn btn-primary";
         submit.textContent = "确认";
@@ -678,10 +702,32 @@ function modidy_queue(){
         }
         modify_date.charge_amount=elc_num.value;
         modify_date.user_id=parseInt(user_id);
-        send_data(modify_queue_ind_url,modify_date);
-        div_operation.remove();
-        div1.appendChild(div_background);
-        diag_modify.remove();
+        const res=send_data(modify_queue_ind_url,modify_date);
+        res.then(res=>res.json())
+        .then(all_data=>{
+            if(all_data.code===200){
+                diag_modify.textContent="修改成功";
+                diag_modify.appendChild(start_x);
+                start_x.style.top="-19px";
+                start_x.style.left="270px";
+                start_x.style.position="relative";
+            }
+            else if(all_data.code===403){
+                diag_modify.textContent="余额不足";
+                diag_modify.appendChild(start_x);
+                start_x.style.top="-19px";
+                start_x.style.left="270px";
+                start_x.style.position="relative";
+            }
+            else{
+                diag_modify.textContent="修改失败";
+                diag_modify.appendChild(start_x);
+                start_x.style.top="-19px";
+                start_x.style.left="270px";
+                start_x.style.position="relative";
+            }
+
+        });
 
     });
     start_x.addEventListener("click", () => {
@@ -919,7 +965,7 @@ end_charge.addEventListener("click",()=>{
         }
         else{
 
-            diag_end.textContent="获取充电状态失败?";
+            diag_end.textContent="获取充电状态失败";
             end_charge_data.user_id=parseInt(user_id);
             diag_end.appendChild(form_end);
             diag_end.appendChild(end_x1);
@@ -932,8 +978,6 @@ end_charge.addEventListener("click",()=>{
 function end_charge(){
     if(parseInt(charge_msg.step)===3){
      diag_end.textContent="确定结束充电吗?";
-     end_charge_data.user_id=parseInt(user_id);
-     send_data(end_charge_url,end_charge_data);
      user_statue(statue_lab);
      diag_end.appendChild(form_end);
      form_end.appendChild(submit);
@@ -953,6 +997,8 @@ function end_charge(){
     
     submit.addEventListener("click",()=>{
         value=0;
+        end_charge_data.user_id=parseInt(user_id);
+        send_data(end_charge_url,end_charge_data);
         div_operation.remove();
         div1.appendChild(div_background);
         diag_end.remove();

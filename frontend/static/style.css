@@ -180,7 +180,7 @@ body {
 }
 #scrollable-div {
   overflow: auto;
-  height: 800px; /* 设置高度，超过高度将出现滚动条 */
+  height: 500px; /* 设置高度，超过高度将出现滚动条 */
 }
 #queue_ind{
   position: relative;
