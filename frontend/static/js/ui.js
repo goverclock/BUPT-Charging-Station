@@ -145,7 +145,7 @@ function detail_deal(i,object){
         case 16:  string="开始充电时间: "+time_trance(object.charge_start_time) ;   break;
         case 17:  string="结束充电时间: "+time_trance(object.charge_end_time);   break;
         case 18:  if(object.terminate_flag==="true")string="用户是否主动取消订单: 是"; else{string="用户是否主动取消订单: 否"}  break;
-        case 19:  string="结束时间: "+time_trance(object.terminate_time);    break;
+        case 19:  if(object.terminate_time!==0){string="主动结束时间: "+time_trance(object.terminate_time);} else{string="用户未主动结束订单"} break;
         case 20:  if(object.failed_flag==="true") string="是否订单失败: 是"; else{string="是否订单失败: 否"} break;
         case 21:  string="订单失败原因: "+object.failed_msg;   break;
     }
