@@ -100,6 +100,8 @@ func chargeports_waitingCars(ctx *gin.Context) {
 		response.Code = CodeForbidden
 		response.Msg = "no such charging station"
 	} else {
+		response.Code = CodeSucceed
+		response.Msg = "查询成功"
 		ent := struct {
 			Username         string  `json:"username"`
 			User_id          int     `json:"user_id"`

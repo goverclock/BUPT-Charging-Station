@@ -187,7 +187,7 @@ getreport.addEventListener("click",()=>{
 
 
 //获取所有充电桩状态的代码
-const getreports_url="/chargeports/getchargeports";
+const getreports_url="/chargeports/getreports";
 let getreports_data={
 
 }
