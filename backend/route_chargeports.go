@@ -158,7 +158,7 @@ func chargeports_getreports(ctx *gin.Context) {
 
 	response.Code = CodeSucceed
 	response.Msg = "succeeded"
-	response.Data = scheduler.AllStationReports(0, 0)
+	response.Data = scheduler.AllStationReports(0, 1893456000)
 
 	ctx.JSON(http.StatusOK, response)
 }

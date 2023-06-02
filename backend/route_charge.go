@@ -32,10 +32,15 @@ func charge_submit(ctx *gin.Context) {
 		log.Fatal("UserByName")
 	}
 
+	cp, sp := scheduler.GetFee()
+	fee := request.Charge_amount * (cp + sp)
 	// check if the user already has a submit
 	if scheduler.OngoingCopyByUser(user).Num != 0 {
 		response.Code = CodeForbidden
-		response.Msg = "user already submitted"
+		response.Msg = "已经有进行中的请求了"
+	} else if fee > user.Balance{	// if balance not enough, refuse submit
+		response.Code = CodeForbidden
+		response.Msg = "余额不足"
 	} else {
 		// create car for the user
 		car := data.Car{

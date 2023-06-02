@@ -112,7 +112,7 @@ func show_info() {
 }
 
 // yuan per kWh
-func getFee() (elec float64, service float64)  {
+func GetFee() (elec float64, service float64)  {
 	service = 0.8
 	now := time.Now()
 	// minute := time.Minute

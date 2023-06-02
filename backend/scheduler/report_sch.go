@@ -64,7 +64,7 @@ func archiveOngoingReport(rp *data.Report) {
 	}
 }
 
-// TODO: check if user has no ongoing report before creating new
+// do in other functions: check if user has no ongoing report before creating new
 // assume sched.mu is locked
 func newOngoingReport(u data.User) *data.Report {
 	if sched.mu.TryLock() {
@@ -87,7 +87,7 @@ func updateOngoingReports() {
 		
 		// actually charge the car here
 		st := stationById(r.Charge_id)
-		elec_fee, service_fee := getFee()
+		elec_fee, service_fee := GetFee()
 		select {
 		case elec := <-st.ChargeChan:
 			finished := false
