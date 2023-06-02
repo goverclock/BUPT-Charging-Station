@@ -53,7 +53,7 @@ func archiveOngoingReport(rp *data.Report) {
 			st := stationById(r.Charge_id)
 			st.Leave(r.Queue_number)
 			// update user's balance
-			user, err := data.UserById(r.User_id)
+			user, err := data.UserByName(r.Username)
 			if err != nil {
 				log.Fatal("no such user ", user)
 			}
