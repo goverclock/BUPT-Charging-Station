@@ -2,6 +2,8 @@
 
 TODO:
 
+- [ ] 充电桩数量作为系统启动参数
+
 - [x] JWT or user_id
 
 // - [ ] JWT token in header or response.data.token
@@ -9,8 +11,6 @@ TODO:
 - [x] turn all user_id into ctx.Get("user_name")
 
 // - [ ] some operation needs admin power, check in handler function
-
-- [ ] 前端根据user_id or user_type确定是否为管理员
 
 - [ ] /charge/getChargingMsg是否保留
 
@@ -23,6 +23,8 @@ TODO:
 - [x] StationReport缺少tot_charge_fee...(/chargeports/getreport(s))
 
 FRONTEND:
+
+- [ ] 根据user_id or user_type确定是否为管理员
 
 - [ ] 格林威治时间转换为北京时间
 
