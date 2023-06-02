@@ -13,8 +13,8 @@ func charge_submit(ctx *gin.Context) {
 	amazing_lock.Lock()
 	defer amazing_lock.Unlock()
 	var request struct {
-		ChargeMode   int     `json:"chargeMode"`
-		ChargeAmount float64 `json:"chargeAmount"`
+		Charge_mode   int     `json:"charge_mode"`
+		Charge_amount float64 `json:"charge_amount"`
 		User_id      int     `json:"user_id"` // unused
 	}
 	ctx.Bind(&request)
@@ -32,28 +32,32 @@ func charge_submit(ctx *gin.Context) {
 		log.Fatal("UserByName")
 	}
 
-	// TODO: check if the user already has a submit
-
-	// create car for the user
-	car := data.Car{
-		OwnedBy: user.Uuid,
-	}
-	car.ChargeMode = request.ChargeMode
-	car.ChargeAmount = request.ChargeAmount
-
-	if car.ChargeAmount == 0.0 {
-		response.Code = CodeKeyError
-		response.Msg = "charge amount should not be 0"
-	} else if !scheduler.JoinCar(user, &car) { // try to join the car in the waiting area
-		// no available slot
+	// check if the user already has a submit
+	if scheduler.OngoingCopyByUser(user).Num != 0 {
 		response.Code = CodeForbidden
-		response.Msg = "the waiting queue is full"
+		response.Msg = "user already submitted"
 	} else {
-		response.Code = CodeSucceed
-		response.Msg = "charging request submitted succssfully"
-	}
+		// create car for the user
+		car := data.Car{
+			OwnedBy: user.Uuid,
+		}
+		car.ChargeMode = request.Charge_mode
+		car.ChargeAmount = request.Charge_amount
 
-	ctx.JSON(http.StatusOK, response)
+		if car.ChargeAmount == 0.0 {
+			response.Code = CodeKeyError
+			response.Msg = "charge amount should not be 0"
+		} else if !scheduler.JoinCar(user, &car) { // try to join the car in the waiting area
+			// no available slot
+			response.Code = CodeForbidden
+			response.Msg = "the waiting queue is full"
+		} else {
+			response.Code = CodeSucceed
+			response.Msg = "charging request submitted succssfully"
+		}
+
+		ctx.JSON(http.StatusOK, response)
+	}
 }
 
 func charge_getChargingMsg(ctx *gin.Context) {
@@ -96,7 +100,45 @@ func charge_getChargingMsg(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func charge_details(ctx *gin.Context) {
+// "chargeSubmit" also goes here
+func charge_changeSubmit(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
+	var request struct {
+		Charge_mode   int     `json:"charge_mode"`
+		Charge_amount float64 `json:"charge_amount"`
+		User_id       int     `json:"user_id"` // unused
+	}
+	ctx.Bind(&request)
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	// get user
+	user_name, ok := ctx.Get("user_name")
+	if !ok {
+		log.Fatal("ctx.Get()")
+	}
+	user, err := data.UserByName(user_name.(string))
+	if err != nil {
+		log.Fatal("UserByName")
+	}
+
+	if scheduler.ChangeCharge(user, request.Charge_mode, request.Charge_amount) {
+		response.Code = CodeSucceed
+		response.Msg = "change succeeded"
+	} else {
+		response.Code = CodeForbidden
+		response.Msg = "change failed"
+	}
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func charge_cancelCharge(ctx *gin.Context) {
 	amazing_lock.Lock()
 	defer amazing_lock.Unlock()
 	var request struct {
@@ -104,23 +146,28 @@ func charge_details(ctx *gin.Context) {
 	}
 	ctx.Bind(&request)
 	var response struct {
-		Code int           `json:"code"`
-		Msg  string        `json:"msg"`
-		Data []data.Report `json:"data"`
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
 	}
 
 	user_name, ok := ctx.Get("user_name")
 	if !ok {
-		log.Fatal("ctx.Get()")
+		log.Fatal("ctx.Get")
 	}
 	user, err := data.UserByName(user_name.(string))
 	if err != nil {
-		log.Fatal(err, user_name)
+		log.Fatal("UserByName: ", user_name)
 	}
-	rps := scheduler.ReportsByUser(user)
-	response.Code = CodeSucceed
-	response.Msg = "succeed"
-	response.Data = rps
+
+	if scheduler.CancelCharge(user) {
+		response.Code = CodeSucceed
+		response.Msg = "cancel succeeded"
+	} else {
+		response.Code = CodeForbidden
+		response.Msg = "user hasn't submitted or is charging, should end charge"
+	}
 
 	ctx.JSON(http.StatusOK, response)
 }
@@ -165,40 +212,6 @@ func charge_startCharge(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func charge_cancelCharge(ctx *gin.Context) {
-	amazing_lock.Lock()
-	defer amazing_lock.Unlock()
-	var request struct {
-		User_id int `json:"user_id"`
-	}
-	ctx.Bind(&request)
-	var response struct {
-		Code int    `json:"code"`
-		Msg  string `json:"msg"`
-		Data struct {
-		} `json:"data"`
-	}
-
-	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Fatal("ctx.Get")
-	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Fatal("UserByName: ", user_name)
-	}
-
-	if scheduler.CancelCharge(user) {
-		response.Code = CodeSucceed
-		response.Msg = "cancel succeeded"
-	} else {
-		response.Code = CodeForbidden
-		response.Msg = "user hasn't submitted or is charging, should end charge"
-	}
-
-	ctx.JSON(http.StatusOK, response)
-}
-
 func charge_end_charge(ctx *gin.Context) {
 	amazing_lock.Lock()
 	defer amazing_lock.Unlock()
@@ -232,36 +245,31 @@ func charge_end_charge(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func charge_changeSubmit(ctx *gin.Context) {
+func charge_details(ctx *gin.Context) {
 	amazing_lock.Lock()
 	defer amazing_lock.Unlock()
 	var request struct {
-		Charge_mode   int     `json:"charge_mode"`
-		Charge_amount float64 `json:"charge_amount"`
-		User_id       int     `json:"user_id"` // unused
+		User_id int `json:"user_id"`
 	}
 	ctx.Bind(&request)
 	var response struct {
-		Code int    `json:"code"`
-		Msg  string `json:"msg"`
-		Data struct {
-		} `json:"data"`
+		Code int           `json:"code"`
+		Msg  string        `json:"msg"`
+		Data []data.Report `json:"data"`
 	}
 
-	// get user
-	user_name, _ := ctx.Get("user_name")
+	user_name, ok := ctx.Get("user_name")
+	if !ok {
+		log.Fatal("ctx.Get()")
+	}
 	user, err := data.UserByName(user_name.(string))
 	if err != nil {
-		log.Fatal("UserByName")
+		log.Fatal(err, user_name)
 	}
-
-	if scheduler.ChangeCharge(user, request.Charge_mode, request.Charge_amount) {
-		response.Code = CodeSucceed
-		response.Msg = "change succeeded"
-	} else {
-		response.Code = CodeForbidden
-		response.Msg = "change failed"
-	}
+	rps := scheduler.ReportsByUser(user)
+	response.Code = CodeSucceed
+	response.Msg = "succeed"
+	response.Data = rps
 
 	ctx.JSON(http.StatusOK, response)
 }

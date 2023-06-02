@@ -93,6 +93,7 @@ func CarByUser(u data.User) (*data.Car, error) {
 	return &data.Car{}, errors.New("car not found, because user hasn't submit charge")
 }
 
+// if no report found, returns a dumb value with Num = 0
 func OngoingCopyByUser(u data.User) data.Report {
 	sched.mu.Lock()
 	defer sched.mu.Unlock()
@@ -101,7 +102,7 @@ func OngoingCopyByUser(u data.User) data.Report {
 			return *rp
 		}
 	}
-	return data.Report{}
+	return data.Report{Num: 0}
 }
 
 // assume sched.mu is locked

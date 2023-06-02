@@ -31,11 +31,16 @@ func login_user(ctx *gin.Context) {
 	// authenticate
 	user, err := data.UserByName(request.Username)
 	response.Data.User_id = user.Id
-	if user.Id == 1 { // note: in our database, user with id == 1 is considered admin
+	if user.IsAdmin {
 		response.Data.User_type = 1
 	} else {
 		response.Data.User_type = 0
 	}
+	// if user.Id == 1 { // note: in our database, user with id == 1 is considered admin
+	// 	response.Data.User_type = 1
+	// } else {
+	// 	response.Data.User_type = 0
+	// }
 	if request.Username == "" || request.Password == "" {
 		response.Code = CodeKeyError
 		response.Msg = "need user name or password"
@@ -83,10 +88,7 @@ func register_user(ctx *gin.Context) {
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
-			Username        string  `json:"username"`
-			Password        string  `json:"password"`
-			Balance         float64 `json:"balance"`
-			BatteryCapacity float64 `json:"batteryCapacity"`
+			User_id int `json:"user_id"`
 		} `json:"data"`
 	}
 
@@ -111,10 +113,7 @@ func register_user(ctx *gin.Context) {
 			log.Fatal(err, "fail to create user")
 		}
 
-		response.Data.Username = user.Name
-		response.Data.Password = user.Password
-		response.Data.Balance = user.Balance
-		response.Data.BatteryCapacity = user.BatteryCapacity
+		response.Data.User_id = user.Id
 	}
 
 	ctx.JSON(http.StatusOK, response)
