@@ -169,19 +169,21 @@ getreport.addEventListener("click",()=>{
             lab4.textContent="累计充电费用: "+object[i].tot_charge_fee.toFixed(2)+"元";
             lab5.textContent="累计服务费用: "+object[i].tot_service_fee.toFixed(2)+"元";
             lab6.textContent="累计总费用: "+object[i].tot_tot_fee.toFixed(2)+"元";
-            p1.appendChild(lab1); p1.appendChild(lab2);
-            p2.appendChild(lab3); p2.appendChild(lab4);
+            p1.appendChild(lab1); p1.appendChild(lab2);p1.style.marginBottom="0";
+            p2.appendChild(lab3); p2.appendChild(lab4);p2.style.marginBottom="0"
             p3.appendChild(lab5); p3.appendChild(lab6);
+            lab1.style.width="300px"; lab2.style.width="300px"; lab3.style.width="300px";
+            lab4.style.width="300px"; lab5.style.width="300px"; lab6.style.width="300px";
             div_msg.appendChild(p1); div_msg.appendChild(p2); div_msg.appendChild(p3);
             p1.style.color="white"; p2.style.color="white"; p3.style.color="white";
             div_report.appendChild(div_msg);
         }
+        exit.style.left="810px";
+        exit.style.top="0px";
         div_report.id="scrollable-div";
         div_operation.appendChild(div_report);
 
     }
-
-
 
 });
 
@@ -259,15 +261,16 @@ getreports.addEventListener("click",()=>{
             lab4.textContent="充电总量: "+object[i].tot_charge_amount.toFixed(2)+"度";
             lab5.textContent="充电总时长: "+object[i].tot_charge_time+"分钟";
             lab6.textContent="累计充电次数"+object[i].tot_frequency;
-            lab1.style.color="red"; lab2.style.color="red";
-            lab3.style.color="red"; lab4.style.color="red";
-            lab5.style.color="red"; lab6.style.color="red";
+            lab1.style.color="white"; lab2.style.color="white";
+            lab3.style.color="white"; lab4.style.color="white";
+            lab5.style.color="white"; lab6.style.color="white";
             p1.style.marginBottom="0";
             p1.appendChild(lab1); p1.appendChild(lab2);
             p1.appendChild(lab3); p3.appendChild(lab4);
             p3.appendChild(lab5); p3.appendChild(lab6);
             div_getreports.appendChild(p1);
             div_getreports.appendChild(p3);
+            div_getreports.id="scrollable-div";
             div_operation.appendChild(div_getreports);
         }
 
@@ -364,7 +367,6 @@ switch_charge.addEventListener("click",()=>{
 });
 
 //充电桩故障状态切换代码
-//管理员修改充电桩开关状态代码
 const switchBroken_url="/chargeports/switchBroken";
 let switchBroken_data={
     charge_id:0
@@ -522,13 +524,14 @@ waitingCars.addEventListener("click",()=>{
             else if(all_data.code===0){
                 diag.textContent="当前无排队车辆";
                 diag.appendChild(exit);
-                exit.style.left="95px";
+                exit.style.left="213px";
 
             }
             else{
-                exit.style.left="95px";
+                
                 diag.textContent="获取充电桩车辆排队信息失败";
                 diag.appendChild(exit);
+                exit.style.left="113px";
 
             }
 
@@ -567,8 +570,10 @@ waitingCars.addEventListener("click",()=>{
             lab3.style.width="200px"; lab4.style.width="200px"; lab5.style.width="200px"; 
             p1.appendChild(lab1); p1.appendChild(lab2); p1.style.marginBottom="0";
             p2.appendChild(lab3); p2.appendChild(lab4); p2.appendChild(lab5); 
+            p1.style.color="white"; p2.style.color="white";
             div_car_msg.appendChild(p1); div_car_msg.appendChild(p2);
         }
+        div_car_msg.id="scrollable-div";
         div_operation.appendChild(div_car_msg);
 
     }
@@ -615,8 +620,8 @@ getsettings.addEventListener("click",()=>{
             p2.textContent="充电桩排队队列最大长度: "+all_data.data.charging_queue_len;
             p3.textContent="调度策略: "+schedule[all_data.data.call_schedule];
             p4.textContent="调度策略: "+fault_schedule[all_data.data.fault_schedule];
-            p1.style.color="red"; p2.style.color="red"; p3.style.color="red";
-            p4.style.color="red";
+            p1.style.color="white"; p2.style.color="white"; p3.style.color="white";
+            p4.style.color="white";
             div_getsettings.appendChild(p1); div_getsettings.appendChild(p2);
             div_getsettings.appendChild(p3); div_getsettings.appendChild(p4);
             div_operation.appendChild(div_getsettings);
@@ -770,5 +775,160 @@ setsettings.addEventListener("click",()=>{
 
     }
 
+
+});
+//添加充电桩
+const addchargeport_url="/chargeports/addchargeport";
+let addchargeport_data={
+    charge_mode:-1
+}
+const  addchargeport=document.querySelector("#addchargeport");
+addchargeport.addEventListener("click",()=>{
+    div_background.remove();
+    div1.appendChild(div_operation);
+    if (value !== 0) {
+        return;
+    }
+    value=1;
+
+    const diag=document.createElement("dialog");
+    const select=document.createElement("select");
+    const exit=document.createElement("button");
+    const submit=document.createElement("button");
+    const opt1=document.createElement("option");
+    const opt2=document.createElement("option");
+    exit.textContent="x";
+    exit.id="exit";
+    exit.style.left="27px";
+    exit.style.bottom="20px";
+    exit.className="btn btn-primary";
+    submit.className="btn btn-primary";
+    submit.textContent="确认";
+    submit.id="submit";
+    submit.style.top="100px";
+    submit.style.left="150px";
+    opt1.textContent="快充";
+    opt2.textContent="慢充";
+    diag.textContent="请选择要添加的充电桩的类型:";
+    select.appendChild(opt1); select.appendChild(opt2);
+    diag.appendChild(select);
+    diag.appendChild(exit);
+    diag.appendChild(submit);
+    div_operation.appendChild(diag);
+    diag.show();
+    
+    submit.addEventListener("click",()=>{
+      if(select.value==="快充"){
+        addchargeport_data.charge_mode=1;
+      }
+      else{
+        addchargeport_data.charge_mode=0;
+      }
+      const res=send_data(addchargeport_url,addchargeport_data);
+      res.then(res=>res.json())
+      .then(all_data=>{
+        if(all_data==="200"){
+            diag.textContent="添加成功";
+            diag.appendChild(exit);
+            exit.style.top="-19px";
+            exit.style.left="270px";
+            exit.style.position="relative";
+        }
+        else{
+            diag.textContent="添加失败";
+            diag.appendChild(exit);
+            exit.style.top="-19px";
+            exit.style.left="270px";
+            exit.style.position="relative";
+        }
+      });
+
+    });
+
+    exit.addEventListener("click",()=>{
+        value=0;
+        diag.remove();
+        div_operation.remove();
+        div1.appendChild(div_background);
+    });
+
+    
+
+});
+
+
+
+//批量删除充电桩
+const delBatch_url="/chargeports/delBatch";
+let delBatch_data={
+    ids:[]
+}
+const delBatch=document.querySelector("#delBatch");
+delBatch.addEventListener("click",()=>{
+    div_background.remove();
+    div1.appendChild(div_operation);
+    if (value !== 0) {
+        return;
+    }
+    value=1;
+
+    const diag=document.createElement("dialog");
+    const input=document.createElement("input");
+    const exit=document.createElement("button");
+    const submit=document.createElement("button");
+    exit.textContent="x";
+    exit.id="exit";
+    exit.style.left="100px";
+    exit.style.bottom="50px";
+    exit.className="btn btn-primary";
+    submit.className="btn btn-primary";
+    submit.textContent="确认";
+    submit.id="submit";
+    submit.style.top="100px";
+    submit.style.right="130px";
+    diag.textContent="请输入要删除的充电桩的id(用英文逗号隔开):";
+    
+    diag.appendChild(input);
+    diag.appendChild(exit);
+    diag.appendChild(submit);
+    div_operation.appendChild(diag);
+    diag.show();
+
+
+
+    submit.addEventListener("click",()=>{
+        let s=input.value.split(",");
+        for(let i=0;i<s.length;i++){
+            delBatch_data.ids.push(parseInt(s[i]))
+        }
+        console.log(delBatch_data.ids);
+        const res=send_data(delBatch_url,delBatch_data);
+        res.then(res=>res.json())
+        .then(all_data=>{
+            if(all_data.code===200){
+                diag.textContent="删除成功";
+                diag.appendChild(exit);
+                exit.style.top="-19px";
+                exit.style.left="270px";
+                exit.style.position="relative";
+            }
+            else{
+                diag.textContent="删除失败";
+                diag.appendChild(exit);
+                exit.style.top="-19px";
+                exit.style.left="270px";
+                exit.style.position="relative";
+            }
+
+        });
+
+    });
+
+    exit.addEventListener("click",()=>{
+        value=0;
+        diag.remove();
+        div_operation.remove();
+        div1.appendChild(div_background);
+    });
 
 });
