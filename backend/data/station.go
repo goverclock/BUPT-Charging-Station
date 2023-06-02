@@ -20,6 +20,11 @@ type StationReport struct {
 	Tot_charge_amount float64 `json:"tot_charge_amount"`
 	Tot_charge_time   int     `json:"tot_charge_time"`
 	Tot_frequency     int     `json:"tot_frequency"`
+
+	// only in /chargeports/getreports
+	Tot_charge_fee  float64	  `json:"tot_charge_fee"`
+	Tot_service_fee float64	  `json:"tot_service_fee"`
+	Tot_tot_fee     float64	  `json:"tot_tot_fee"`
 }
 
 // 2 Fast, 3 Slow
@@ -88,6 +93,9 @@ func (st *Station) GenerateStationReport(start int64, end int64) StationReport {
 		if rp.Charge_end_time > rp.Charge_start_time {
 			secs += int(rp.Charge_end_time - rp.Charge_start_time)
 		}
+		strp.Tot_charge_fee += rp.Charge_fee
+		strp.Tot_service_fee += rp.Service_fee
+		strp.Tot_tot_fee += rp.Tot_fee
 	}
 	strp.Tot_charge_time = secs / 60 // total charge time
 
