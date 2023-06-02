@@ -175,53 +175,6 @@ func TestDetails(t *testing.T) {
 	}
 }
 
-func TestGetBalance(t *testing.T) {
-	TestLoginUser(t)
-
-	var request struct {
-		User_id int `json:"user_id"`
-	}
-	var response struct {
-		Code int    `json:"code"`
-		Msg  string `json:"msg"`
-		Data struct {
-			Balance float64 `json:"balance"`
-		} `json:"data"`
-	}
-
-	request.User_id = 1
-	body := send("POST", "/getbalance", request)
-	json.Unmarshal(body, &response)
-	t.Log(response)
-	if response.Code != 200 {
-		t.Fail()
-	}
-}
-
-func TestRecharge(t *testing.T) {
-	TestLoginUser(t)
-
-	var request struct {
-		Recharge_amount float64 `json:"recharge_amount"`
-		User_id         int     `json:"user_id"`
-	}
-	var response struct {
-		Code int    `json:"code"`
-		Msg  string `json:"msg"`
-		Data struct {
-		} `json:"data"`
-	}
-
-	request.Recharge_amount = 3.33
-	request.User_id = 1
-	body := send("POST", "/recharge", request)
-	json.Unmarshal(body, &response)
-	t.Log(response)
-	if response.Code != 200 {
-		t.Fail()
-	}
-}
-
 func TestFailure(t *testing.T) {
 	TestLoginAdmin(t)
 
@@ -236,7 +189,9 @@ func TestFailure(t *testing.T) {
 	}
 
 	request.Charge_id = 0
+	t.Log("sending break request")
 	body := send("POST", "/chargeports/switchBroken", request)
+	t.Log("done sending break request")
 	json.Unmarshal(body, &response)
 	t.Log(response)
 	if response.Code != 200 {

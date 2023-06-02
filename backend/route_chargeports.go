@@ -67,9 +67,9 @@ func chargeports_switchBroken(ctx *gin.Context) {
 		response.Code = CodeSucceed
 		scheduler.SwitchBrokenStation(request.Charge_id, !st.GetIsDown())
 		if st.GetIsDown() {
-			response.Msg = "charging station now is fixed"
-		} else {
 			response.Msg = "charging station now is broken"
+		} else {
+			response.Msg = "charging station now is fixed"
 		}
 	}
 

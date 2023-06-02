@@ -22,16 +22,16 @@ func login_user(ctx *gin.Context) {
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`
 		Data struct {
-			User_id int `json:"user_id"`
-			User_type int `json:"user_type"`	// 0 - regular user, 1 - admin
-			Token string `json:"token"`	// may be used later
+			User_id   int    `json:"user_id"`
+			User_type int    `json:"user_type"` // 0 - regular user, 1 - admin
+			Token     string `json:"token"`     // may be used later
 		} `json:"data"`
 	}
 
 	// authenticate
 	user, err := data.UserByName(request.Username)
 	response.Data.User_id = user.Id
-	if user.Id == 1 {	// note: in our database, user with id == 1 is considered admin
+	if user.Id == 1 { // note: in our database, user with id == 1 is considered admin
 		response.Data.User_type = 1
 	} else {
 		response.Data.User_type = 0
@@ -51,21 +51,23 @@ func login_user(ctx *gin.Context) {
 	}
 
 	// JWT
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
-		UserName: request.Username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-		},
-	})
-	tokenString, err := token.SignedString(jwtKey)
-	if err != nil {
-		ctx.JSON(500, gin.H{"message": "Internal server error"})
-		return
+	if response.Code == CodeSucceed {
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
+			UserName: request.Username,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			},
+		})
+		tokenString, err := token.SignedString(jwtKey)
+		if err != nil {
+			ctx.JSON(500, gin.H{"message": "Internal server error"})
+			return
+		}
+
+		response.Data.Token = tokenString
+		ctx.Header("Authorization", tokenString)
+
 	}
-
-	response.Data.Token = tokenString
-	ctx.Header("Authorization", tokenString)
-
 	ctx.JSON(http.StatusOK, response)
 }
 
@@ -77,8 +79,6 @@ func register_user(ctx *gin.Context) {
 		Password string `json:"password"`
 	}
 	ctx.BindJSON(&request)
-	log.Println(request)
-
 	var response struct {
 		Code int    `json:"code"`
 		Msg  string `json:"msg"`

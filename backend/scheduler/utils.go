@@ -74,7 +74,7 @@ func show_info() {
 			fmt.Printf("%v\t", c.QId)
 		}
 		fmt.Println()
-		fmt.Printf("Temp:\t")
+		fmt.Printf("Temp:\t\t")
 		for _, c := range sched.temp_area {
 			fmt.Printf("%v\t", c.QId)
 		}

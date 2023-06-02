@@ -42,7 +42,7 @@ func NewStation(id int, mode int, speed float64) *Station {
 	st.Id = id
 	st.Mode = mode
 	st.Speed = speed
-	st.ChargeChan = make(chan float64) // should not buffer too much
+	st.ChargeChan = make(chan float64)
 	st.ControlChan = make(chan int)
 	st.Running = true
 	st.IsDown = false
@@ -89,7 +89,7 @@ func (st *Station) GenerateStationReport(start int64, end int64) StationReport {
 			secs += int(rp.Charge_end_time - rp.Charge_start_time)
 		}
 	}
-	strp.Tot_charge_time = secs / 60	// total charge time
+	strp.Tot_charge_time = secs / 60 // total charge time
 
 	return strp
 }
@@ -171,9 +171,10 @@ func (st *Station) generateElectricity() {
 		// keep trying to send out electricity and
 		// simply blocks if no car is receiving electricity
 		if up && run {
+			timeout := time.After(3 * time.Second)
 			select {
 			case st.ChargeChan <- st.Speed / 60: // 60 = seconds per minute
-			default:
+			case <-timeout:
 			}
 		}
 	}
@@ -190,11 +191,13 @@ func (st *Station) Join(c *Car) {
 	st.Queue = append(st.Queue, c)
 }
 
+// need not to be the first in queue to leave
 func (st *Station) Leave(qid string) {
-	if len(st.Queue) != 0 && st.Queue[0].QId == qid {
-		st.Queue = st.Queue[1:]
-	} else {
-		log.Fatal("st.Leave()")
+	for ci, c := range st.Queue {
+		if c.QId != qid {
+			continue
+		}
+		st.Queue = append(st.Queue[:ci], st.Queue[ci+1:]...)
 	}
 }
 

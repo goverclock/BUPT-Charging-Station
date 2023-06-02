@@ -338,21 +338,36 @@ func ticker() {
 
 // returns true if some car is in temp_area
 // or some car is in a failed station
-// if returns true, should enter fault schedule
+// should enter fault schedule if returns true
+// also moves cars to temp area if necessary
 func checkFault() bool {
-	ret := false
-	if len(sched.temp_area) != 0 {
-		ret = true
-	} else {
-		for _, st := range sched.stations {
-			if st.GetIsDown() && len(st.Queue) != 0 {
-				ret = true
-				cars := st.LeaveAll()
-				sched.temp_area = append(sched.temp_area, cars...)
+	// check if some car is in a failed station
+	for _, st := range sched.stations {
+		if st.GetIsDown() && len(st.Queue) != 0 {
+			cars := st.LeaveAll()    // move all cars in failed station to temp area
+			for _, c := range cars { // and end these reports
+				user := data.UserByUUId(c.OwnedBy)
+				rp := ongoingReportByUser(user)
+				rp.Failed_flag = true
+				rp.Failed_msg = "station failed"
+				rp.Step = data.StepFinish
+				already_charged_amount := rp.Real_charge_amount
+				if rp.Charge_start_time != 0 {
+					rp.Charge_end_time = time.Now().Unix()
+				}
+				archiveOngoingReport(rp)
+				// start a new report for cars in temp area
+				nrp := newOngoingReport(user)
+				nrp.Charge_mode = c.ChargeMode
+				nrp.Request_charge_amount = c.ChargeAmount - already_charged_amount
+				nrp.Inlinetime = nrp.Subtime
+				nrp.Step = data.StepInline
+				nrp.Queue_number = c.QId
 			}
+			sched.temp_area = append(sched.temp_area, cars...)
 		}
 	}
-	return ret
+	return len(sched.temp_area) != 0
 }
 
 func schduleFast() {
