@@ -9,9 +9,7 @@ import (
 // assume sched.mu is locked
 // return nil if no report found
 func ongoingReportByUser(u data.User) *data.Report {
-	if sched.mu.TryLock() {
-		log.Fatal("should have locked sched.mu in ongoingReportByUser")
-	}
+	Assert(!sched.mu.TryLock(), "should have locked sched.mu in ongoingReportByUser")
 	for _, r := range sched.ongoing_reports {
 		if r.User_id == u.Id {
 			return r
@@ -42,9 +40,7 @@ func ReportsByUser(u data.User) []data.Report {
 // also remove the car in the station
 // also updates user's balance
 func archiveOngoingReport(rp *data.Report) {
-	if sched.mu.TryLock() {
-		log.Fatal("should have locked sched.mu in archiveOngoingReport")
-	}
+	Assert(!sched.mu.TryLock(), "should have locked sched.mu in archiveOngoingReport")
 	for ri, r := range sched.ongoing_reports {
 		if r.Num == rp.Num {
 			sched.ongoing_reports = append(sched.ongoing_reports[:ri], sched.ongoing_reports[ri+1:]...)
@@ -55,7 +51,7 @@ func archiveOngoingReport(rp *data.Report) {
 			// update user's balance
 			user, err := data.UserByName(r.Username)
 			if err != nil {
-				log.Fatal("no such user ", user)
+				log.Println("no such user ", user)
 			}
 			user.Balance -= r.Tot_fee
 			user.Update()
@@ -67,9 +63,7 @@ func archiveOngoingReport(rp *data.Report) {
 // do in other functions: check if user has no ongoing report before creating new
 // assume sched.mu is locked
 func newOngoingReport(u data.User) *data.Report {
-	if sched.mu.TryLock() {
-		log.Fatal("should have locked sched.mu in newOngoingReport")
-	}
+	Assert(!sched.mu.TryLock(), "should have locked sched.mu in newOngoingReport")
 	rp := data.NewReport(u)
 	sched.ongoing_reports = append(sched.ongoing_reports, &rp)
 	return &rp
@@ -84,21 +78,21 @@ func updateOngoingReports() {
 		if r.Step != data.StepCharge {
 			continue
 		}
-		
+
 		// actually charge the car here
 		st := stationById(r.Charge_id)
 		elec_fee, service_fee := GetFee()
 		select {
 		case elec := <-st.ChargeChan:
 			finished := false
-			if r.Real_charge_amount + elec >= r.Request_charge_amount {
+			if r.Real_charge_amount+elec >= r.Request_charge_amount {
 				elec = r.Request_charge_amount - r.Real_charge_amount
 				finished = true
 			}
-			r.Real_charge_amount += elec // update real_charge_amount
-			r.Charge_fee += elec * elec_fee	// update charge_fee
-			r.Service_fee += elec * service_fee	// update service_fee
-			r.Tot_fee = r.Charge_fee + r.Service_fee	// update tot_fee
+			r.Real_charge_amount += elec             // update real_charge_amount
+			r.Charge_fee += elec * elec_fee          // update charge_fee
+			r.Service_fee += elec * service_fee      // update service_fee
+			r.Tot_fee = r.Charge_fee + r.Service_fee // update tot_fee
 			if finished {
 				r.Charge_end_time = cur
 				r.Step = data.StepFinish

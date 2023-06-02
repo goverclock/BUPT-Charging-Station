@@ -55,12 +55,12 @@ func (r *Report) Archive() {
 			"returning id"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(r.Num, r.Charge_id, r.Charge_mode, r.Username, r.User_id, r.Request_charge_amount, r.Real_charge_amount, r.Charge_time, r.Charge_fee, r.Service_fee, r.Tot_fee, r.Step, r.Queue_number, r.Subtime, r.Inlinetime, r.Calltime, r.Charge_start_time, r.Charge_end_time, r.Terminate_flag, r.Terminate_time, r.Failed_flag, r.Failed_msg).Scan(&r.Id)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 
@@ -78,14 +78,14 @@ func ArchivedReportsByUser(u User) (rps []Report) {
 	rp := Report{}
 	rows, err := Db.Query("SELECT * FROM reports WHERE user_id = $1", u.Id)
 	if err != nil {
-		log.Fatal(err, "Db.Query()")
+		log.Println(err, "Db.Query()")
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		err = rows.Scan(&rp.Id, &rp.Num, &rp.Charge_id, &rp.Charge_mode, &rp.Username, &rp.User_id, &rp.Request_charge_amount, &rp.Real_charge_amount, &rp.Charge_time, &rp.Charge_fee, &rp.Service_fee, &rp.Tot_fee, &rp.Step, &rp.Queue_number, &rp.Subtime, &rp.Inlinetime, &rp.Calltime, &rp.Charge_start_time, &rp.Charge_end_time, &rp.Terminate_flag, &rp.Terminate_time, &rp.Failed_flag, &rp.Failed_msg)
 		if err != nil {
-			log.Fatal(err, "rows.Scan()")
+			log.Println(err, "rows.Scan()")
 		}
 		rps = append(rps, rp)
 	}
@@ -99,7 +99,7 @@ func generateReportNum(user_id int) int64 {
 	str = strconv.Itoa(user_id) + str
 	ret, err := strconv.ParseInt(str, 10, 64)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	return ret
 }

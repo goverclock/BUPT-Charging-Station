@@ -56,7 +56,7 @@ func UserByUUId(uuid string) (user User) {
 	err := Db.QueryRow("SELECT * FROM users WHERE uuid = $1", uuid).
 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Password, &user.IsAdmin, &user.Balance, &user.BatteryCapacity)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	return user
 }

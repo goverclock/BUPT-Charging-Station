@@ -110,7 +110,7 @@ func register_user(ctx *gin.Context) {
 		user.BatteryCapacity = 0
 		err = user.Create(false) // save user register information
 		if err != nil {
-			log.Fatal(err, "fail to create user")
+			log.Println(err, "fail to create user")
 		}
 
 		response.Data.User_id = user.Id

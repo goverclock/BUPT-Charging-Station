@@ -2,6 +2,7 @@ package main
 
 import (
 	"buptcs/data"
+	"buptcs/scheduler"
 	"log"
 	"net/http"
 
@@ -22,14 +23,7 @@ func recharge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Fatal("ctx.Get()")
-	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Fatal(err, "no such user: ", request.User_id)
-	}
+	user := scheduler.UserByContext(ctx)
 	if request.Recharge_amount < 0 {
 		response.Code = CodeKeyError
 		response.Msg = "must charge more than 0"
@@ -60,11 +54,11 @@ func getbalance(ctx *gin.Context) {
 
 	user_name, ok := ctx.Get("user_name")
 	if !ok {
-		log.Fatal("no such user ", user_name)
+		log.Println("no such user ", user_name)
 	}
 	user, err := data.UserByName(user_name.(string))
 	if err != nil {
-		log.Fatal(err, " no such user ", request.User_id)
+		log.Println(err, " no such user ", request.User_id)
 	}
 	response.Code = CodeSucceed
 	response.Msg = "succeed"

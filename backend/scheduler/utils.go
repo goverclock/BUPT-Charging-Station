@@ -7,13 +7,31 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
+
+func Assert(b bool, s string) {
+	if !b {
+		log.Fatal(s)
+	}
+}
+
+func UserByContext(ctx *gin.Context) data.User{
+	user_name, ok := ctx.Get("user_name")
+	if !ok {
+		log.Fatal("ctx.Get")
+	}
+	user, err := data.UserByName(user_name.(string))
+	if err != nil {
+		log.Fatal("UserByName: ", user_name)
+	}
+	return user
+}
 
 // assume sched.mu is locked
 func generateQId(mode int) string {
-	if sched.mu.TryLock(){
-		log.Fatal("should have locked sched.mu in generate QId")
-	}
+	Assert(!sched.mu.TryLock(), "should have locked sched.mu in generate QId")
 
 	isqidfree := func(s string) bool {
 		for _, cs := range sched.waitingcars {
@@ -49,9 +67,7 @@ func generateQId(mode int) string {
 
 // assume sched.mu is locked
 func getMaxQId() int {
-	if sched.mu.TryLock() {
-		log.Fatal("should have locked sched.mu in getMaxQid")
-	}
+	Assert(!sched.mu.TryLock(), "should have locked sched.mu in getMaxQid")
 	// return data.MAX_WAITING_SLOT + data.MAX_STATION_QUEUE*len(sched.stations)
 	return 100
 }
@@ -112,15 +128,15 @@ func show_info() {
 }
 
 // yuan per kWh
-func GetFee() (elec float64, service float64)  {
+func GetFee() (elec float64, service float64) {
 	service = 0.8
 	now := time.Now()
 	// minute := time.Minute
 	hour := now.Hour()
-	
+
 	if (hour >= 10 && hour <= 15) || (hour >= 18 && hour <= 21) {
 		elec = 1.0
-	} else if (hour >= 7 && hour <= 10) || (hour >= 15 && hour <= 18) || (hour >= 21 && hour <= 23) {	// 7:00 - 10:00
+	} else if (hour >= 7 && hour <= 10) || (hour >= 15 && hour <= 18) || (hour >= 21 && hour <= 23) { // 7:00 - 10:00
 		elec = 0.7
 	} else {
 		elec = 0.4

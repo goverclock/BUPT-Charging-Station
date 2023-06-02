@@ -69,7 +69,7 @@ func JoinCar(user data.User, car *data.Car) bool {
 		return true
 	}
 
-	log.Fatal("impossible waiting slots:", free)
+	log.Println("impossible waiting slots:", free)
 	return false
 }
 
@@ -107,15 +107,13 @@ func OngoingCopyByUser(u data.User) data.Report {
 
 // assume sched.mu is locked
 func stationById(id int) *data.Station {
-	if sched.mu.TryLock() {
-		log.Fatal("should have locked sched.mu in stationById")
-	}
+	Assert(!sched.mu.TryLock(), "should have locked sched.mu in stationById")
 	for _, st := range sched.stations {
 		if st.Id == id {
 			return st
 		}
 	}
-	log.Fatal("can't find station with id ", id)
+	log.Println("can't find station with id ", id)
 	return nil
 }
 
@@ -140,8 +138,7 @@ func StartChargeCar(c *data.Car) error {
 			return nil
 		}
 	}
-	log.Fatal("impossible status: StartChargeCar")
-	return nil
+	return errors.New("no such car")
 }
 
 // 0 if car is not in waiting area
@@ -581,7 +578,8 @@ func scheduleCall() {
 		user := data.UserByUUId(tc.OwnedBy)
 		rp := ongoingReportByUser(user)
 		if rp == nil {
-			log.Fatal("no ongoging report for user ", user)
+			log.Println("no ongoing report for user!")
+			continue
 		}
 		rp.Calltime = 0
 		rp.Step = data.StepInline

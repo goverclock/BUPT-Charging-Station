@@ -75,7 +75,7 @@ func (st *Station) GenerateStationReport(start int64, end int64) StationReport {
 	rp := Report{}
 	rows, err := Db.Query("SELECT * FROM reports WHERE charge_id = $1", st.Id)
 	if err != nil {
-		log.Fatal(err, "Db.Query()")
+		log.Println(err, "Db.Query()")
 	}
 	defer rows.Close()
 
@@ -83,7 +83,7 @@ func (st *Station) GenerateStationReport(start int64, end int64) StationReport {
 	for rows.Next() {
 		err = rows.Scan(&rp.Id, &rp.Num, &rp.Charge_id, &rp.Charge_mode, &rp.Username, &rp.User_id, &rp.Request_charge_amount, &rp.Real_charge_amount, &rp.Charge_time, &rp.Charge_fee, &rp.Service_fee, &rp.Tot_fee, &rp.Step, &rp.Queue_number, &rp.Subtime, &rp.Inlinetime, &rp.Calltime, &rp.Charge_start_time, &rp.Charge_end_time, &rp.Terminate_flag, &rp.Terminate_time, &rp.Failed_flag, &rp.Failed_msg)
 		if err != nil {
-			log.Fatal(err, "rows.Scan()")
+			log.Println(err, "rows.Scan()")
 		}
 		if rp.Subtime < start || rp.Subtime > end {
 			continue
@@ -197,7 +197,8 @@ func (st *Station) Available() bool {
 
 func (st *Station) Join(c *Car) {
 	if !st.Available() {
-		log.Fatal("station is not available!")
+		log.Println("station is not available!")
+		return
 	}
 	st.Queue = append(st.Queue, c)
 }

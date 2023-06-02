@@ -29,7 +29,7 @@ func charge_submit(ctx *gin.Context) {
 	user_name, _ := ctx.Get("user_name") // ctx.Set in JWT
 	user, err := data.UserByName(user_name.(string))
 	if err != nil {
-		log.Fatal("UserByName")
+		log.Println("UserByName")
 	}
 
 	cp, sp := scheduler.GetFee()
@@ -84,7 +84,7 @@ func charge_getChargingMsg(ctx *gin.Context) {
 	user_name, _ := ctx.Get("user_name") // ctx.Set in JWT
 	user, err := data.UserByName(user_name.(string))
 	if err != nil {
-		log.Fatal("UserByName")
+		log.Println("UserByName")
 	}
 	car, err := scheduler.CarByUser(user)
 	if err != nil {
@@ -97,7 +97,7 @@ func charge_getChargingMsg(ctx *gin.Context) {
 		response.Msg = "succeed"
 		wc, err := scheduler.WaitCountByCar(car)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 		response.Data.Waiting_count = wc
 	}
@@ -123,15 +123,7 @@ func charge_changeSubmit(ctx *gin.Context) {
 	}
 
 	// get user
-	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Fatal("ctx.Get()")
-	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Fatal("UserByName")
-	}
-
+	user := scheduler.UserByContext(ctx)
 	if scheduler.ChangeCharge(user, request.Charge_mode, request.Charge_amount) {
 		response.Code = CodeSucceed
 		response.Msg = "change succeeded"
@@ -157,15 +149,7 @@ func charge_cancelCharge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Fatal("ctx.Get")
-	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Fatal("UserByName: ", user_name)
-	}
-
+	user := scheduler.UserByContext(ctx)
 	if scheduler.CancelCharge(user) {
 		response.Code = CodeSucceed
 		response.Msg = "cancel succeeded"
@@ -191,14 +175,7 @@ func charge_startCharge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Fatal("ctx.Get(user_name)")
-	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Fatal(err, " no such user ", request.User_id)
-	}
+	user := scheduler.UserByContext(ctx)
 	car, err := scheduler.CarByUser(user)
 	if err != nil {
 		response.Code = CodeForbidden
@@ -231,15 +208,7 @@ func charge_end_charge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Fatal("ctx.Get")
-	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Fatal("UserByName: ", user_name)
-	}
-
+	user := scheduler.UserByContext(ctx)
 	if scheduler.EndCharge(user) {
 		response.Code = CodeSucceed
 		response.Msg = "end succeeded"
@@ -263,14 +232,7 @@ func charge_details(ctx *gin.Context) {
 		Data []data.Report `json:"data"`
 	}
 
-	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Fatal("ctx.Get()")
-	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Fatal(err, user_name)
-	}
+	user := scheduler.UserByContext(ctx)
 	rps := scheduler.ReportsByUser(user)
 	response.Code = CodeSucceed
 	response.Msg = "succeed"

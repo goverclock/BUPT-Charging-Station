@@ -14,13 +14,11 @@ TODO:
 
 - [ ] /charge/getChargingMsg是否保留
 
-- [ ] remove all log.Fatal
+- [x] remove all log.Fatal
 
 - [x] 余额不足Request_charge_amount时直接拒绝充电请求
 
 - [x] StationReport缺少tot_charge_fee...(/chargeports/getreport(s))
-
-- [ ] terminate_time有时为0
 
 FRONTEND:
 

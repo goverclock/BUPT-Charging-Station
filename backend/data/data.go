@@ -16,7 +16,7 @@ func init() {
 	var err error
 	Db, err = sql.Open("postgres", "postgres://postgres:@localhost/buptcs?sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 
@@ -32,7 +32,7 @@ func createUUID() (uuid string) {
 	u := new([16]byte)
 	_, err := rand.Read(u[:])
 	if err != nil {
-		log.Fatalln("Cannot generate UUID", err)
+		log.Println("Cannot generate UUID", err)
 	}
 
 	// 0x40 is reserved variant from RFC 4122
