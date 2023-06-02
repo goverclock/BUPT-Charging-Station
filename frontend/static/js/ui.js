@@ -331,8 +331,8 @@ start_charge.addEventListener("click",()=>{
 //charge_submit代码
 const charge_submit_url="/charge/submit";
 let charge_date={
-    chargeMode:0,
-    chargeAmount:0.0,
+    charge_mode:0,
+    charge_amount:0.0,
     user_id:-1
 }
 const charge_submit = document.querySelector("#charge_submit");
@@ -397,12 +397,12 @@ charge_submit.addEventListener("click", () => {
     submit.addEventListener("click", () => {
         value = 0;
         if(select.value==="快充"){
-            charge_date.chargeMode=1;
+            charge_date.charge_mode=1;
         }
         else{
-            charge_date.chargeMode=0;
+            charge_date.charge_mode=0;
         }
-        charge_date.chargeAmount=parseFloat(start_input.value);
+        charge_date.charge_amount=parseFloat(start_input.value);
         charge_date.user_id=parseInt(user_id);
         send_data(charge_submit_url,charge_date);
         user_statue(statue_lab);
@@ -547,9 +547,9 @@ queue_ind.addEventListener("click", () => {
 //modify_queue_ind代码
 const modify_queue_ind_url="/charge/changeSubmit";
 let modify_date={
-    modifyMode:"",
-    modifyAmount:"",
-    username:""
+    charge_mode:"",
+    charge_amount:"",
+    user_id:""
 }
 let userid_data={
     user_id:-1
@@ -666,13 +666,13 @@ function modidy_queue(){
     submit.addEventListener("click", () => {
         value = 0;
         if(options.value==="快充"){
-            modify_date.modifyMode=1;
+            modify_date.charge_mode=1;
         }
         else{
-            modify_date.modifyMode=0;
+            modify_date.charge_mode=0;
         }
-        modify_date.modifyAmount=elc_num.value;
-        modify_date.username=parseInt(user_id);
+        modify_date.charge_amount=elc_num.value;
+        modify_date.user_id=parseInt(user_id);
         send_data(modify_queue_ind_url,modify_date);
         div_operation.remove();
         div1.appendChild(div_background);
@@ -694,7 +694,7 @@ function modidy_queue(){
 //queue_ind_id代码
 const queue_ind_id_url="/charge/getChargingMsg";
 let quque_ind_id_data={
-    user_id:0
+    user_id:-1
 }
 const queue_ind_id=document.querySelector("#queue_ind_id");
 queue_ind_id.addEventListener("click",()=>{
