@@ -876,6 +876,10 @@ function cancel_charge(){
 
       div_operation.appendChild(diag_cancel);
       diag_cancel.textContent="确认要取消充电吗?";
+      end_x1.style.left="125px";
+      end_x1.style.top="-20px";
+      
+
       diag_cancel.appendChild(submit);
       diag_cancel.appendChild(end_x1);
       diag_cancel.show();
@@ -901,10 +905,13 @@ function cancel_charge(){
             user_statue(statue_lab);
             submit.remove();
             diag_cancel.appendChild(end_x1);
-            end_x1.style.left="258px";
+            end_x1.style.left="250px";
+            end_x1.style.top="-20px";
          }
          else{
             diag_cancel.textContent="服务器繁忙,请重新操作";
+            submit.remove();
+            diag_cancel.appendChild(end_x1);
          }
         });
 
