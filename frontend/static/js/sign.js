@@ -15,7 +15,8 @@ let usr={
     username:"",
     password:""}
 btn1.addEventListener("click",()=>{
-    server_addr=ip.value+":"+port.value;
+    server_addr="http://"+ip.value+":"+port.value;
+    console.log(server_addr);
     usr.username=user_name.value;
     usr.password=pwd.value;
     const response=send_data(register_url,usr);
@@ -23,23 +24,20 @@ btn1.addEventListener("click",()=>{
     .then(data=>{
       console.log(data);
       if(data.code===200){
-        para.textContent="注册成功请登录";
+        para.textContent=data.msg;
         
       }
       else{
-        para.textContent="注册失败用户名已存在";
+        para.textContent=data.msg;
       }
       
     })
-    
-    
-    
 });
 
 btn2.addEventListener("click",()=>{
     usr.username=user_name.value;
     usr.password=pwd.value;
-    server_addr=ip.value+":"+port.value;
+    server_addr="http://"+ip.value+":"+port.value;
     console.log(server_addr);
     const response=send_data(login_url,usr);
     response.then(response=>response.json())
@@ -69,7 +67,7 @@ btn2.addEventListener("click",()=>{
         }
       }
       else{
-        para.textContent="登录失败,用户名或密码错误";
+        para.textContent=data.msg;
       }
       
     })
