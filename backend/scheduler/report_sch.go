@@ -101,6 +101,6 @@ func updateOngoingReports() {
 		default:
 		}
 
-		r.Charge_time = (r.Charge_start_time - cur) / 60 // update charge_time
+		r.Charge_time = (cur - r.Charge_start_time) / 60 // update charge_time
 	}
 }
