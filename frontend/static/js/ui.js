@@ -105,7 +105,7 @@ function time_trance(timestamp){
 
   date=date.toJSON();
   date=date.substring(0,19).replace('T',' ');
-return date;
+      return date;
 
 
 }
@@ -420,7 +420,7 @@ charge_submit.addEventListener("click", () => {
                 start_x.style.position="relative";
             }
             else{
-                diag.textContent="提交失败";
+                diag.textContent="请求失败";
                 diag.appendChild(start_x);
                 start_x.style.top="-19px";
                 start_x.style.left="270px";
