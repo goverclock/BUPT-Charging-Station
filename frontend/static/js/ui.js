@@ -419,13 +419,6 @@ charge_submit.addEventListener("click", () => {
                 start_x.style.left="270px";
                 start_x.style.position="relative";
             }
-            else if(all_data.code===403){
-                diag.textContent="余额不足";
-                diag.appendChild(start_x);
-                start_x.style.top="-19px";
-                start_x.style.left="270px";
-                start_x.style.position="relative";
-            }
             else{
                 diag.textContent="提交失败";
                 diag.appendChild(start_x);
@@ -478,11 +471,11 @@ queue_ind.addEventListener("click", () => {
         if(all_data.code===200){
             let data=all_data.data;
             response_data=all_data;
-            console.log(data.length);
-            for(i=0;i<data.length;i++){
+            let datas=all_data.data.sort((a,b)=>b.charge_start_time-a.charge_start_time);
+            for(i=0;i<datas.length;i++){
                 //该用for语句创建option
                 let opt=document.createElement("option");
-                opt.textContent=data[i].num;
+                opt.textContent=datas[i].num;
                 queue_ind_select.appendChild(opt);
             }
 

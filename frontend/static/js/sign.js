@@ -45,7 +45,7 @@ btn2.addEventListener("click",()=>{
           console.log(responseObject.headers.get("Authorization"));
           console.log(responseObject.headers.get("Content-Type"));
           console.log(responseObject.headers);
-          localStorage.setItem('tokens',responseObject.headers.get("Authorization"));
+          localStorage.setItem('tokens',data.data.token);
         });
         if(data.data.user_type===0){
            localStorage.setItem('user_id',data.data.user_id);
