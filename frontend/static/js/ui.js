@@ -872,7 +872,7 @@ cancel_charge.addEventListener("click",()=>{
     });
 
 function cancel_charge(){
-    if(parseInt(charge_msg.step)!==3 &&parseInt(charge_msg.step)!==-1&&parseInt(charge_msg.step)!==2){
+    if(parseInt(charge_msg.step)!==3 &&parseInt(charge_msg.step)!==-1){
 
       div_operation.appendChild(diag_cancel);
       diag_cancel.textContent="确认要取消充电吗?";
