@@ -25,7 +25,7 @@ func system_getsettings(ctx *gin.Context) {
 	}
 
 	response.Code = CodeSucceed
-	response.Msg = "succeeded"
+	response.Msg = "获取成功"
 	response.Data.Waiting_area_size = data.MAX_WAITING_SLOT
 	response.Data.Charging_queue_len = data.MAX_STATION_QUEUE
 	response.Data.Call_schedule = data.CALL_SCHEDULE
@@ -54,7 +54,7 @@ func system_setsettings(ctx *gin.Context) {
 
 	scheduler.ChangeSettings(request.Waiting_area_size, request.Charging_queue_len, request.Call_schedule, request.Fault_schedule)
 	response.Code = CodeSucceed
-	response.Msg = "succeeded"
+	response.Msg = "设置成功"
 
 	ctx.JSON(http.StatusOK, response)
 }

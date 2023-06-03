@@ -55,7 +55,7 @@ func JoinCar(user data.User, car *data.Car) bool {
 	free := data.MAX_WAITING_SLOT - len(sched.waitingcars)
 	if free == 0 { // fail
 		rp.Failed_flag = true
-		rp.Failed_msg = "the waiting queue is full, can't join"
+		rp.Failed_msg = "等待队列已满,无法加入"
 		archiveOngoingReport(rp) // charge end, save report(which failed)
 		return false
 	} else if free > 0 { // succeed
@@ -362,7 +362,7 @@ func checkFault() bool {
 			user := data.UserByUUId(c.OwnedBy)
 			rp := ongoingReportByUser(user)
 			rp.Failed_flag = true
-			rp.Failed_msg = "station failed"
+			rp.Failed_msg = "充电桩故障"
 			rp.Step = data.StepFinish
 			already_charged_amount := rp.Real_charge_amount
 			if rp.Charge_start_time != 0 {

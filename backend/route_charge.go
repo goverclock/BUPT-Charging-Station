@@ -51,14 +51,14 @@ func charge_submit(ctx *gin.Context) {
 
 		if car.ChargeAmount == 0.0 {
 			response.Code = CodeKeyError
-			response.Msg = "charge amount should not be 0"
+			response.Msg = "充电量不能为零"
 		} else if !scheduler.JoinCar(user, &car) { // try to join the car in the waiting area
 			// no available slot
 			response.Code = CodeForbidden
-			response.Msg = "the waiting queue is full"
+			response.Msg = "等候区已满"
 		} else {
 			response.Code = CodeSucceed
-			response.Msg = "charging request submitted succssfully"
+			response.Msg = "成功提交申请"
 		}
 	}
 
@@ -91,10 +91,10 @@ func charge_getChargingMsg(ctx *gin.Context) {
 		// user hasn't submit the car
 		log.Println(err)
 		response.Code = CodeForbidden
-		response.Msg = "user hasn't submit charge"
+		response.Msg = "用户尚未提交充电申请"
 	} else {
 		response.Code = CodeSucceed
-		response.Msg = "succeed"
+		response.Msg = "成功获取充电状态"
 		wc, err := scheduler.WaitCountByCar(car)
 		if err != nil {
 			log.Println(err)
@@ -126,10 +126,10 @@ func charge_changeSubmit(ctx *gin.Context) {
 	user := scheduler.UserByContext(ctx)
 	if scheduler.ChangeCharge(user, request.Charge_mode, request.Charge_amount) {
 		response.Code = CodeSucceed
-		response.Msg = "change succeeded"
+		response.Msg = "修改成功"
 	} else {
 		response.Code = CodeForbidden
-		response.Msg = "change failed"
+		response.Msg = "修改失败"
 	}
 
 	ctx.JSON(http.StatusOK, response)
@@ -152,10 +152,10 @@ func charge_cancelCharge(ctx *gin.Context) {
 	user := scheduler.UserByContext(ctx)
 	if scheduler.CancelCharge(user) {
 		response.Code = CodeSucceed
-		response.Msg = "cancel succeeded"
+		response.Msg = "已取消"
 	} else {
 		response.Code = CodeForbidden
-		response.Msg = "user hasn't submitted or is charging, should end charge"
+		response.Msg = "用户未提交申请或应该结束充电"
 	}
 
 	ctx.JSON(http.StatusOK, response)
@@ -179,15 +179,15 @@ func charge_startCharge(ctx *gin.Context) {
 	car, err := scheduler.CarByUser(user)
 	if err != nil {
 		response.Code = CodeForbidden
-		response.Msg = "user hasn't submit charge"
+		response.Msg = "尚未提交充电申请"
 	} else {
 		err = scheduler.StartChargeCar(car)
 		if err != nil {
 			response.Code = CodeForbidden
-			response.Msg = "car is not ready to charge"
+			response.Msg = "未被叫号,无法开始充电"
 		} else { // ok to start charge
 			response.Code = CodeSucceed
-			response.Msg = "charge started"
+			response.Msg = "已开始充电"
 		}
 	}
 
@@ -211,10 +211,10 @@ func charge_end_charge(ctx *gin.Context) {
 	user := scheduler.UserByContext(ctx)
 	if scheduler.EndCharge(user) {
 		response.Code = CodeSucceed
-		response.Msg = "end succeeded"
+		response.Msg = "已结束"
 	} else {
 		response.Code = CodeForbidden
-		response.Msg = "user is not charging"
+		response.Msg = "用户不处在充电状态"
 	}
 	ctx.JSON(http.StatusOK, response)
 }
@@ -235,7 +235,7 @@ func charge_details(ctx *gin.Context) {
 	user := scheduler.UserByContext(ctx)
 	rps := scheduler.ReportsByUser(user)
 	response.Code = CodeSucceed
-	response.Msg = "succeed"
+	response.Msg = "成功获取详单"
 	response.Data = rps
 
 	ctx.JSON(http.StatusOK, response)

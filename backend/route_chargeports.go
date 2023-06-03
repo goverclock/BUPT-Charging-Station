@@ -27,18 +27,18 @@ func chargeports_switch(ctx *gin.Context) {
 	st, err := scheduler.StationById(request.Charge_id)
 	if err != nil {
 		response.Code = CodeKeyError
-		response.Msg = "no such charging station"
+		response.Msg = "请求的充电桩不存在"
 	} else if st.GetIsDown() {
 		response.Code = CodeForbidden
-		response.Msg = "the station is in failure"
+		response.Msg = "请求的充电桩故障中,无法开关"
 	} else {
 		// turn on/off the station
 		scheduler.SwitchStation(request.Charge_id, !st.Running)
 		response.Code = CodeSucceed
 		if st.Running {
-			response.Msg = "station off"
+			response.Msg = "充电桩已关闭"
 		} else {
-			response.Msg = "station on"
+			response.Msg = "充电桩已开启"
 		}
 	}
 
@@ -62,14 +62,14 @@ func chargeports_switchBroken(ctx *gin.Context) {
 	st, err := scheduler.StationById(request.Charge_id)
 	if err != nil {
 		response.Code = CodeKeyError
-		response.Msg = "no such charging station"
+		response.Msg = "请求的充电桩不存在"
 	} else {
 		response.Code = CodeSucceed
 		scheduler.SwitchBrokenStation(request.Charge_id, !st.GetIsDown())
 		if st.GetIsDown() {
-			response.Msg = "charging station now is broken"
+			response.Msg = "充电桩已故障"
 		} else {
-			response.Msg = "charging station now is fixed"
+			response.Msg = "充电桩已修复"
 		}
 	}
 
@@ -98,7 +98,7 @@ func chargeports_waitingCars(ctx *gin.Context) {
 	st, err := scheduler.StationById(request.Charge_id)
 	if err != nil {
 		response.Code = CodeForbidden
-		response.Msg = "no such charging station"
+		response.Msg = "请求的充电桩不存在"
 	} else {
 		response.Code = CodeSucceed
 		response.Msg = "查询成功"
@@ -142,7 +142,7 @@ func chargeports_getreport(ctx *gin.Context) {
 	}
 
 	response.Code = CodeSucceed
-	response.Msg = "succeeded"
+	response.Msg = "成功"
 	response.Data = scheduler.AllStationReports(request.StartDate, request.EndDate)
 
 	ctx.JSON(http.StatusOK, response)
@@ -159,7 +159,7 @@ func chargeports_getreports(ctx *gin.Context) {
 	}
 
 	response.Code = CodeSucceed
-	response.Msg = "succeeded"
+	response.Msg = "成功"
 	response.Data = scheduler.AllStationReports(0, 1893456000)
 
 	ctx.JSON(http.StatusOK, response)

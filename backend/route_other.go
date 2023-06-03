@@ -26,12 +26,12 @@ func recharge(ctx *gin.Context) {
 	user := scheduler.UserByContext(ctx)
 	if request.Recharge_amount < 0 {
 		response.Code = CodeKeyError
-		response.Msg = "must charge more than 0"
+		response.Msg = "充值金额必须不小于0"
 	} else {
 		user.Balance += request.Recharge_amount
 		user.Update()
 		response.Code = CodeSucceed
-		response.Msg = "recharge succeeded"
+		response.Msg = "充值成功"
 	}
 
 	ctx.JSON(http.StatusOK, response)
@@ -61,7 +61,7 @@ func getbalance(ctx *gin.Context) {
 		log.Println(err, " no such user ", request.User_id)
 	}
 	response.Code = CodeSucceed
-	response.Msg = "succeed"
+	response.Msg = "查询成功"
 	response.Data.Balance = user.Balance
 
 	ctx.JSON(http.StatusOK, response)

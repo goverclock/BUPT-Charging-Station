@@ -43,16 +43,16 @@ func login_user(ctx *gin.Context) {
 	// }
 	if request.Username == "" || request.Password == "" {
 		response.Code = CodeKeyError
-		response.Msg = "need user name or password"
+		response.Msg = "需要输入用户名或密码"
 	} else if err != nil {
 		response.Code = CodeForbidden
-		response.Msg = "no such user"
+		response.Msg = "用户不存在"
 	} else if user.Password != data.Encrypt(request.Password) {
 		response.Code = CodeForbidden
-		response.Msg = "wrong password"
+		response.Msg = "密码错误"
 	} else if user.Password == data.Encrypt(request.Password) {
 		response.Code = CodeSucceed
-		response.Msg = "user login succeeded"
+		response.Msg = "登录成功"
 	}
 
 	// JWT
@@ -95,14 +95,14 @@ func register_user(ctx *gin.Context) {
 	user, err := data.UserByName(request.Username)
 	if request.Username == "" || request.Password == "" {
 		response.Code = CodeKeyError
-		response.Msg = "need user name or password"
+		response.Msg = "需要输入用户名或密码"
 	} else if err == nil {
 		// user with same name already exists, can't register
 		response.Code = CodeForbidden
-		response.Msg = "username is taken"
+		response.Msg = "用户名已被占用"
 	} else {
 		response.Code = CodeSucceed
-		response.Msg = "register succeeds"
+		response.Msg = "注册成功"
 		user.Name = request.Username
 		user.Password = request.Password
 		user.IsAdmin = false
