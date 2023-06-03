@@ -12,8 +12,6 @@ TODO:
 
 // - [ ] some operation needs admin power, check in handler function
 
-- [ ] /charge/getChargingMsg是否保留
-
 - [x] remove all log.Fatal
 
 - [x] 余额不足Request_charge_amount时直接拒绝充电请求
@@ -21,8 +19,6 @@ TODO:
 - [x] StationReport缺少tot_charge_fee...(/chargeports/getreport(s))
 
 - [x] system/xxxsettings接口
-
-- [ ] 更新充电等待时长(管理员)
 
 FRONTEND:
 
@@ -39,3 +35,9 @@ FRONTEND:
 - [x] endCharge之后没有结束时间
 
 - [x] 浮点数显示问题
+
+---
+
+// - [ ] 后端也处理一下浮点数问题
+
+- [x] 加入车辆总容量,前后端逻辑判断
