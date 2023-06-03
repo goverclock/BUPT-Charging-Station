@@ -4,6 +4,8 @@ const user_name=document.querySelector("#username");
 const pwd=document.querySelector("#password");
 const body=document.querySelector("body");
 const para=document.createElement("p");
+const ip=document.querySelector("#ip_address")
+const port=document.querySelector("#port");
 body.appendChild(para);
 let  server_addr="http://localhost:8080";
 
@@ -13,6 +15,7 @@ let usr={
     username:"",
     password:""}
 btn1.addEventListener("click",()=>{
+    server_addr=ip.value+":"+port.value;
     usr.username=user_name.value;
     usr.password=pwd.value;
     const response=send_data(register_url,usr);
@@ -36,6 +39,8 @@ btn1.addEventListener("click",()=>{
 btn2.addEventListener("click",()=>{
     usr.username=user_name.value;
     usr.password=pwd.value;
+    server_addr=ip.value+":"+port.value;
+    console.log(server_addr);
     const response=send_data(login_url,usr);
     response.then(response=>response.json())
     .then(data=>{
@@ -46,6 +51,7 @@ btn2.addEventListener("click",()=>{
           console.log(responseObject.headers.get("Content-Type"));
           console.log(responseObject.headers);
           localStorage.setItem('tokens',data.data.token);
+          localStorage.setItem("address",server_addr);
         });
         if(data.data.user_type===0){
            localStorage.setItem('user_id',data.data.user_id);

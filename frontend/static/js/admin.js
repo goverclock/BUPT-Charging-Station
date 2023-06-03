@@ -2,7 +2,7 @@
 //状态变量
 let value=0;//用于控制显示区只显示一个子窗口
 
-const server_addr="http://localhost:8080";
+const server_addr=localStorage.getItem("address");
 let admin_id=localStorage.getItem('admin_id');//获取本地存储的用户id
 let local_adminname=localStorage.getItem('adminname');
 let tokens=localStorage.getItem('tokens');

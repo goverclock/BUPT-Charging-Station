@@ -4,7 +4,7 @@
 //2 排队号码查询,服务器需将排队号码发送至客户端
 //3 排队车辆查询,服务器需将前车的等待数发送至客户端.
 
-server_addr="http://localhost:8080";
+const server_addr=localStorage.getItem("address");
 let user_id=localStorage.getItem('user_id');//获取本地存储的用户id
 let local_username=localStorage.getItem('username');
 let tokens=localStorage.getItem('tokens');
