@@ -205,6 +205,8 @@ func (st *Station) Join(c *Car) {
 
 // need not to be the first in queue to leave
 func (st *Station) Leave(qid string) *Car {
+	st.mu.Lock()
+	defer st.mu.Unlock()
 	for ci, c := range st.Queue {
 		if c.QId != qid {
 			continue

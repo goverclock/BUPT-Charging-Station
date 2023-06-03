@@ -30,7 +30,7 @@ func main() {
 	server.POST("/charge/changeSubmit", auth_middleware, charge_changeSubmit)
 	server.POST("/charge/cancelCharge", auth_middleware, charge_cancelCharge)
 	server.POST("/charge/startCharge", auth_middleware, charge_startCharge)
-	server.POST("/charge/endCharge", auth_middleware, charge_end_charge)
+	server.POST("/charge/endCharge", auth_middleware, charge_endCharge)
 	server.POST("/charge/details", auth_middleware, charge_details)
 	server.POST("/recharge", auth_middleware, recharge)
 	server.POST("/getbalance", auth_middleware, getbalance)

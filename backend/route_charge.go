@@ -194,7 +194,7 @@ func charge_startCharge(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func charge_end_charge(ctx *gin.Context) {
+func charge_endCharge(ctx *gin.Context) {
 	amazing_lock.Lock()
 	defer amazing_lock.Unlock()
 	var request struct {

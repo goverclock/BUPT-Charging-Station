@@ -596,9 +596,9 @@ func removeCar(u data.User) {
 	}
 	// look for the car in station's queue
 	for _, st := range sched.stations {
-		for ci, c := range st.Queue {
+		for _, c := range st.Queue {
 			if c.OwnedBy == u.Uuid {
-				st.Queue = append(st.Queue[:ci], st.Queue[ci+1:]...)
+				st.Leave(c.QId)
 				return
 			}
 		}
