@@ -46,10 +46,10 @@ function receive_data(part_url,object){
     const res=fetch(url , {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization':`${tokens}`,
           'Access-Control-Allow-Headers':'Authorization',
-	      'Access-Control-Expose-Headers':'Authorization'
+	      'Access-Control-Expose-Headers':'Authorization',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(object)
       });
@@ -78,6 +78,8 @@ function analyse_details(object){//传入的是response中的data部分数据
         request_charge_amount:0.0,
         step:-1,
     }
+    if(object===null){
+    return;}
     for(let i=0;i<object.length;i++){
         if(parseInt(object[i].step)!==4){
             cnt=i;
@@ -337,7 +339,9 @@ const charge_submit_url="/charge/submit";
 let charge_date={
     charge_mode:0,
     charge_amount:0.0,
-    user_id:-1
+    user_id:-1,
+    current_vol:0.0,
+    max_vol:0.0
 }
 const charge_submit = document.querySelector("#charge_submit");
 div_operation.remove();
@@ -354,13 +358,23 @@ charge_submit.addEventListener("click", () => {
     let opt1 = document.createElement("option");
     let opt2 = document.createElement("option");
     let submit = document.createElement("button");
+    const p2=document.createElement("p");
+    const p3=document.createElement("p");
+    const lab1=document.createElement("label");
+    const lab2=document.createElement("label");
+    const cur_input=document.createElement("input");
+    const max_input=document.createElement("input");
     let start_x = document.createElement("button");
     let start_input = document.createElement("input");
     let start_lab = document.createElement("label");
     let p = document.createElement("p");
     let p1 = document.createElement("p");
     let lab = document.createElement("label");
-
+    
+    lab1.textContent="当前车辆电量: ";
+    lab2.textContent="最大车辆电量: ";
+    p2.appendChild(lab1); p2.appendChild(cur_input);
+    p3.appendChild(lab2); p3.appendChild(max_input);
     lab.textContent = "选择充电模式:";
     start_input.min = 1;
     start_input.max = 100;
@@ -377,6 +391,8 @@ charge_submit.addEventListener("click", () => {
     form_charge.appendChild(p);
     form_charge.appendChild(p1);
     form_charge.appendChild(select);
+    form_charge.appendChild(p2);
+    form_charge.appendChild(p3);
 
     select.name = "select_mode";
     select.className = "myselect";
@@ -385,6 +401,7 @@ charge_submit.addEventListener("click", () => {
     start_x.id = "start_submit";
     start_x.className="btn btn-primary";
     start_x.style.left="288px";
+    start_x.style.top="-276px";
 
     submit.className = "btn btn-primary";
     submit.textContent = "确认";
@@ -408,6 +425,11 @@ charge_submit.addEventListener("click", () => {
         }
         charge_date.charge_amount=parseFloat(start_input.value);
         charge_date.user_id=parseInt(user_id);
+        charge_date.current_vol=parseFloat(cur_input.value);
+        charge_date.max_vol=parseFloat(max_input.value);
+        console.log( charge_date.current_vol);
+        console.log(charge_date.max_vol);
+    if(charge_date.max_vol<=(charge_date.current_vol+charge_date.charge_amount)){
         const res=send_data(charge_submit_url,charge_date);
         res.then(res=>res.json())
         .then(all_data=>{
@@ -428,6 +450,14 @@ charge_submit.addEventListener("click", () => {
             }
         })
         user_statue(statue_lab);
+    }
+    else{
+                diag.textContent="请求电量溢出";
+                diag.appendChild(start_x);
+                start_x.style.top="-19px";
+                start_x.style.left="230px";
+                start_x.style.position="relative";
+    }
 
     })
     start_x.addEventListener("click", () => {

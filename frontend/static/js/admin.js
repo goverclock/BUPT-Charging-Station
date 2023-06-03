@@ -839,7 +839,8 @@ addchargeport.addEventListener("click",()=>{
       const res=send_data(addchargeport_url,addchargeport_data);
       res.then(res=>res.json())
       .then(all_data=>{
-        if(all_data==="200"){
+        console.log(all_data);
+        if(all_data.code===200){
             diag.textContent="添加成功";
             diag.appendChild(exit);
             exit.style.top="-19px";

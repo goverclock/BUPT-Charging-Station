@@ -9,7 +9,7 @@ const port=document.querySelector("#port");
 body.appendChild(para);
 let  server_addr="http://localhost:8080";
 
-login_url="/login/user"
+login_url="/login/user";
 register_url="/register/user";
 let usr={
     username:"",
@@ -45,8 +45,6 @@ btn2.addEventListener("click",()=>{
       console.log(data);
       if(data.code===200){
         response.then(responseObject=>{
-          console.log(responseObject.headers.get("Authorization"));
-          console.log(responseObject.headers.get("Content-Type"));
           console.log(responseObject.headers);
           localStorage.setItem('tokens',data.data.token);
           localStorage.setItem("address",server_addr);
@@ -82,19 +80,9 @@ function send_data(part_url,object){
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          
         },
         body: JSON.stringify(object)
       });
       return res;
-}
-
-
-
-//从服务器取数据
-function receive_data(part_url){
-   
-    url=server_addr+part_url;
-    const response=fetch(url);
-
-    return response;
 }
