@@ -20,7 +20,9 @@ TODO:
 
 - [x] StationReport缺少tot_charge_fee...(/chargeports/getreport(s))
 
-- [ ] system/xxxsettings接口
+- [x] system/xxxsettings接口
+
+- [ ] 更新充电等待时长(管理员)
 
 FRONTEND:
 
