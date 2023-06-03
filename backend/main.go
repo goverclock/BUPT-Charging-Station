@@ -1,7 +1,9 @@
 package main
 
 import (
+	"buptcs/data"
 	_ "net/http/pprof"
+	"strconv"
 	"sync"
 
 	"github.com/gin-contrib/cors"
@@ -11,11 +13,6 @@ import (
 var amazing_lock sync.Mutex
 
 func main() {
-	// runtime.SetBlockProfileRate(1)
-	// go func() {
-	// 	log.Println(http.ListenAndServe("localhost:6060", nil))
-	// }()
- 
 	server := gin.Default()
 
 	server.Use(cors.New(cors.Config{
@@ -47,5 +44,5 @@ func main() {
 	server.POST("/system/getsettings", auth_middleware, system_getsettings)
 	server.POST("/system/setsettings", auth_middleware, system_setsettings)
 	
-	server.Run(":8080")
+	server.Run(":" + strconv.Itoa(data.Port))
 }

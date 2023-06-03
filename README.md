@@ -2,7 +2,7 @@
 
 TODO:
 
-- [ ] 充电桩数量作为系统启动参数
+- [x] 充电桩数量作为系统启动参数
 
 - [x] JWT or user_id
 
@@ -34,6 +34,6 @@ FRONTEND:
 
 - [x] 充电桩状态切换应该发到switchBroken而不是switch路径
 
-- [ ] endCharge之后没有结束时间
+- [x] endCharge之后没有结束时间
 
-- [ ] 浮点数显示问题
+- [x] 浮点数显示问题

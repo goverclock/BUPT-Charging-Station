@@ -1,5 +1,10 @@
 package main
 
+import (
+	"buptcs/data"
+	"strconv"
+)
+
 const (
 	CodeSucceed   int = 200
 	CodeKeyError  int = 400
@@ -16,7 +21,8 @@ type Configuration struct {
 var config Configuration
 
 func init() {
-	config.Address = "0.0.0.0:8080"
+	addr := "0.0.0.0"
+	config.Address = addr + ":" + strconv.Itoa(data.Port)
 	config.ReadTimeout = 10
 	config.WriteTimeout = 600
 	config.Static = "public"
