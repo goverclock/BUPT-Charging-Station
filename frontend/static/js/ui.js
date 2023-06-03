@@ -792,27 +792,27 @@ queue_ind_id.addEventListener("click",()=>{
             console.log("charge_msg"+charge_msg.step);
          if(all_data.code===200 && parseInt(charge_msg.step)!==-1 && parseInt(charge_msg.step)!==4){
             p1.textContent="排队号码: "+charge_msg.queue_number;
-            p1.style.color="red";
+            p1.style.color="white";
             p2.textContent="正在等待的前车数量: "+all_data.data["waiting_count"];
-            p2.style.color="red";
+            p2.style.color="white";
             p3.textContent="充电模式: "+charge_msg.charge_mode;
-            p3.style.color="red";
+            p3.style.color="white";
             p4.textContent="本次请求电量: "+charge_msg.request_charge_amount+"度";
-            p4.style.color="red";
+            p4.style.color="white";
             p5.textContent="充电桩编号: "+charge_msg.charge_id;
-            p5.style.color="red";
+            p5.style.color="white";
             switch(parseInt(charge_msg.step)){
                 case 0: p6.textContent="当前充电状态: "+"已提交充电申请";break;
                 case 1: p6.textContent="当前充电状态: "+"正在排队中";break;
                 case 2: p6.textContent="当前充电状态: "+"正在呼号中";break;
                 case 3: p6.textContent="当前充电状态: "+"正在充电中";break;
             }
-            p6.style.color="red";
+            p6.style.color="white";
         }
         else{
             exit_btn.style.bottom="40px";
             p1.textContent="当前还未提交充电方案或充电已结束";
-            p1.style.color="red";
+            p1.style.color="white";
 
         }
     });
