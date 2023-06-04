@@ -8,6 +8,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func chargeports_addchargeport(ctx *gin.Context) {
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	response.Code = CodeForbidden
+	response.Msg = "仅可在系统启动时设置充电桩数量,不支持增加充电桩"
+	ctx.JSON(http.StatusOK, response)
+}
+
+func chargeports_delBatch(ctx *gin.Context) {
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+		} `json:"data"`
+	}
+
+	response.Code = CodeForbidden
+	response.Msg = "仅可在系统启动时设置充电桩数量,不支持删除充电桩"
+	ctx.JSON(http.StatusOK, response)
+}
+
 // on/off
 func chargeports_switch(ctx *gin.Context) {
 	amazing_lock.Lock()
