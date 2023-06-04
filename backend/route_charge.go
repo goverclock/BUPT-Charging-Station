@@ -16,6 +16,8 @@ func charge_submit(ctx *gin.Context) {
 		Charge_mode   int     `json:"charge_mode"`
 		Charge_amount float64 `json:"charge_amount"`
 		User_id       int     `json:"user_id"` // unused
+		Current_vol   float64 `json:"current_vol"`
+		Max_vol       float64 `json:"max_vol"`
 	}
 	ctx.Bind(&request)
 	var response struct {
@@ -35,12 +37,16 @@ func charge_submit(ctx *gin.Context) {
 	cp, sp := scheduler.GetFee()
 	fee := request.Charge_amount * (cp + sp)
 	// check if the user already has a submit
+
 	if scheduler.OngoingCopyByUser(user).Num != 0 {
 		response.Code = CodeForbidden
 		response.Msg = "已经有进行中的请求了"
 	} else if fee > user.Balance { // if balance not enough, refuse submit
 		response.Code = CodeForbidden
 		response.Msg = "余额不足"
+	} else if request.Charge_amount+request.Current_vol > request.Max_vol {
+		response.Code = CodeForbidden
+		response.Msg = "请求充电量溢出车辆电池总容量"
 	} else {
 		// create car for the user
 		car := data.Car{

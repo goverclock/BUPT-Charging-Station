@@ -35,7 +35,7 @@ func chargeports_switch(ctx *gin.Context) {
 		// turn on/off the station
 		scheduler.SwitchStation(request.Charge_id, !st.Running)
 		response.Code = CodeSucceed
-		if st.Running {
+		if st.GetRunning() {
 			response.Msg = "充电桩已关闭"
 		} else {
 			response.Msg = "充电桩已开启"

@@ -31,6 +31,7 @@ func login_user(ctx *gin.Context) {
 	// authenticate
 	user, err := data.UserByName(request.Username)
 	response.Data.User_id = user.Id
+	// response.Data.User_id = 0
 	if user.IsAdmin {
 		response.Data.User_type = 1
 	} else {
