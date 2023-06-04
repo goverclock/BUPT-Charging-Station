@@ -429,7 +429,7 @@ charge_submit.addEventListener("click", () => {
         charge_date.max_vol=parseFloat(max_input.value);
         console.log( charge_date.current_vol);
         console.log(charge_date.max_vol);
-    if(charge_date.max_vol<=(charge_date.current_vol+charge_date.charge_amount)){
+    if(charge_date.max_vol>=(charge_date.current_vol+charge_date.charge_amount)){
         const res=send_data(charge_submit_url,charge_date);
         res.then(res=>res.json())
         .then(all_data=>{
