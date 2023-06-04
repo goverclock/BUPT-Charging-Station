@@ -150,7 +150,9 @@ getreport.addEventListener("click",()=>{
     });
     function analyse_report(object){
         const div_report=document.createElement("div");
-
+        if(object===null){
+            return;
+        }
         for(let i=0;i<object.length;i++){
             const div_msg=document.createElement("div");
             const p1=document.createElement("p");
@@ -233,6 +235,9 @@ getreports.addEventListener("click",()=>{
         div1.appendChild(div_background);
     })
     function getreports_analyse(object){
+        if(object===null){
+            return;
+        }
         for(let i=0;i<object.length;i++){
             exit.style.left="811px";
             const p1=document.createElement("p");
@@ -553,6 +558,13 @@ waitingCars.addEventListener("click",()=>{
         const div_car_msg=document.createElement("div");
         div_car_msg.id="scrollable-div";
         div_car_msg.appendChild(exit);
+        if(object===null){
+            const p1=document.createElement("p");
+            p1.textContent="当前无排队车辆";
+            div_car_msg.appendChild(p1);
+            p1.style.color="white";
+            
+        }
         for(let i=0;i<object.length;i++){
             const p1=document.createElement("p");
             const p2=document.createElement("p");
@@ -827,7 +839,8 @@ addchargeport.addEventListener("click",()=>{
       const res=send_data(addchargeport_url,addchargeport_data);
       res.then(res=>res.json())
       .then(all_data=>{
-        if(all_data==="200"){
+        console.log(all_data);
+        if(all_data.code===200){
             diag.textContent="添加成功";
             diag.appendChild(exit);
             exit.style.top="-19px";
