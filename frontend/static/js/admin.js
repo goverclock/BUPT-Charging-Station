@@ -151,8 +151,10 @@ getreport.addEventListener("click",()=>{
     function analyse_report(object){
         const div_report=document.createElement("div");
         if(object===null){
-            return;
+            div_report.textContent="查询时段无统计报表";
+            div_report.style.color="white";
         }
+        else{
         for(let i=0;i<object.length;i++){
             const div_msg=document.createElement("div");
             const p1=document.createElement("p");
@@ -180,6 +182,7 @@ getreport.addEventListener("click",()=>{
             p1.style.color="white"; p2.style.color="white"; p3.style.color="white";
             div_report.appendChild(div_msg);
         }
+    }
         exit.style.left="810px";
         exit.style.top="0px";
         div_report.id="scrollable-div";
@@ -236,8 +239,11 @@ getreports.addEventListener("click",()=>{
     })
     function getreports_analyse(object){
         if(object===null){
-            return;
+            div_getreports.textContent="无充电桩";
+            div_getreports.style.color="white";
+            div_getreports.appendChild(exit);
         }
+        else{
         for(let i=0;i<object.length;i++){
             exit.style.left="811px";
             const p1=document.createElement("p");
@@ -278,6 +284,7 @@ getreports.addEventListener("click",()=>{
             div_getreports.id="scrollable-div";
             div_operation.appendChild(div_getreports);
         }
+    }
 
     }
 
@@ -565,7 +572,8 @@ waitingCars.addEventListener("click",()=>{
             p1.style.color="white";
             
         }
-        for(let i=0;i<object.length;i++){
+        else{
+          for(let i=0;i<object.length;i++){
             const p1=document.createElement("p");
             const p2=document.createElement("p");
             const lab1=document.createElement("label");
@@ -585,6 +593,7 @@ waitingCars.addEventListener("click",()=>{
             p1.style.color="white"; p2.style.color="white";
             div_car_msg.appendChild(p1); div_car_msg.appendChild(p2);
         }
+    }
         div_car_msg.id="scrollable-div";
         div_operation.appendChild(div_car_msg);
 
