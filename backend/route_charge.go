@@ -33,6 +33,8 @@ func charge_submit(ctx *gin.Context) {
 	if err != nil {
 		log.Println("UserByName")
 	}
+	user.BatteryCapacity = request.Max_vol
+	user.Update()
 
 	cp, sp := scheduler.GetFee()
 	fee := request.Charge_amount * (cp + sp)
