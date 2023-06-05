@@ -99,7 +99,7 @@ func (st *Station) GenerateStationReport(start int64, end int64) StationReport {
 		strp.Tot_service_fee += rp.Service_fee
 		strp.Tot_tot_fee += rp.Tot_fee
 	}
-	strp.Tot_charge_time = secs / 60 // total charge time
+	strp.Tot_charge_time = secs / 3 // total charge time
 
 	return strp
 }
@@ -183,7 +183,7 @@ func (st *Station) generateElectricity() {
 		if up && run {
 			timer := time.NewTimer(3 * time.Second)
 			select {
-			case st.ChargeChan <- st.Speed / 60: // 60 = seconds per minute
+			case st.ChargeChan <- st.Speed / 180: // 180 * 20 = 3600
 			case <-timer.C:
 			}
 			timer.Stop()

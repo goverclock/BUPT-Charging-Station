@@ -141,7 +141,7 @@ func chargeports_waitingCars(ctx *gin.Context) {
 			rp := scheduler.OngoingCopyByUser(user)
 			ent.Username = user.Name
 			ent.User_id = user.Id
-			ent.Waiting_time = (rp.Inlinetime - rp.Subtime) / 60
+			ent.Waiting_time = (rp.Inlinetime - rp.Subtime) / 3
 			ent.Charge_amount = rp.Real_charge_amount
 			ent.Battery_capacity = user.BatteryCapacity
 

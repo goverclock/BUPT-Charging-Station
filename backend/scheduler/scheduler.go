@@ -278,6 +278,7 @@ func EndCharge(u data.User) bool {
 	now := time.Now().Unix()
 	rp.Step = data.StepFinish
 	rp.Charge_end_time = now
+	rp.Terminate_flag = true
 	archiveOngoingReport(rp)
 
 	removeCar(u)
