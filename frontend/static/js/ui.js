@@ -596,9 +596,9 @@ queue_ind.addEventListener("click", () => {
 //modify_queue_ind代码
 const modify_queue_ind_url="/charge/chargeSubmit";
 let modify_date={
-    charge_mode:"",
-    charge_amount:"",
-    user_id:0
+    charge_mode:0,
+    charge_amount:0.0,
+    user_id:-1
 }
 let userid_data={
     user_id:-1
@@ -723,7 +723,7 @@ function modidy_queue(){
         else{
             modify_date.charge_mode=0;
         }
-        modify_date.charge_amount=elc_num.value;
+        modify_date.charge_amount=parseFloat(elc_num.value);
         modify_date.user_id=parseInt(user_id);
         const res=send_data(modify_queue_ind_url,modify_date);
         res.then(res=>res.json())
