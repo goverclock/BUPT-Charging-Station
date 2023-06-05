@@ -594,11 +594,11 @@ queue_ind.addEventListener("click", () => {
    });
 });
 //modify_queue_ind代码
-const modify_queue_ind_url="/charge/changeSubmit";
+const modify_queue_ind_url="/charge/chargeSubmit";
 let modify_date={
     charge_mode:"",
     charge_amount:"",
-    user_id:""
+    user_id:0
 }
 let userid_data={
     user_id:-1
