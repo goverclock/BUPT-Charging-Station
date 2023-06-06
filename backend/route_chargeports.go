@@ -3,8 +3,8 @@ package main
 import (
 	"buptcs/data"
 	"buptcs/scheduler"
+	"buptcs/vtime"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -142,7 +142,7 @@ func chargeports_waitingCars(ctx *gin.Context) {
 			rp := scheduler.OngoingCopyByUser(user)
 			ent.Username = user.Name
 			ent.User_id = user.Id
-			ent.Waiting_time = (time.Now().Unix() - rp.Subtime) / 3
+			ent.Waiting_time = (vtime.Now().Unix() - rp.Subtime) / 60
 			ent.Charge_amount = rp.Real_charge_amount
 			ent.Battery_capacity = user.BatteryCapacity
 

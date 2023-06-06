@@ -1,10 +1,10 @@
 package data
 
 import (
+	"buptcs/vtime"
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 )
 
 const (
@@ -70,7 +70,7 @@ func NewReport(u User) Report {
 	rp.Username = u.Name
 	rp.User_id = u.Id
 	rp.Step = StepSub
-	rp.Subtime = time.Now().Unix()
+	rp.Subtime = vtime.Now().Unix()
 	return rp
 }
 
@@ -94,7 +94,7 @@ func ArchivedReportsByUser(u User) (rps []Report) {
 
 // using unix user_id + timestamp
 func generateReportNum(user_id int) int64 {
-	ts := time.Now().Unix()
+	ts := vtime.Now().Unix()
 	str := strconv.FormatInt(ts, 10)
 	str = strconv.Itoa(user_id) + str
 	ret, err := strconv.ParseInt(str, 10, 64)

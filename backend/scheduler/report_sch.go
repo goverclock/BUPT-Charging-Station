@@ -2,8 +2,8 @@ package scheduler
 
 import (
 	"buptcs/data"
+	"buptcs/vtime"
 	"log"
-	"time"
 )
 
 // assume sched.mu is locked
@@ -72,7 +72,7 @@ func newOngoingReport(u data.User) *data.Report {
 // assume sched.mu is locked
 // only update real_charge_amount, charge_time, charge_fee, service_fee, tot_fee
 func updateOngoingReports() {
-	cur := time.Now().Unix()
+	cur := vtime.Now().Unix()
 	for _, r := range sched.ongoing_reports {
 		// if user isn't charging, nothing should update here
 		if r.Step != data.StepCharge {
@@ -101,6 +101,6 @@ func updateOngoingReports() {
 		default:
 		}
 
-		r.Charge_time = (cur - r.Charge_start_time) / 3 // update charge_time
+		r.Charge_time = (cur - r.Charge_start_time) / 60 // update charge_time
 	}
 }

@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"buptcs/data"
+	"buptcs/vtime"
 	"errors"
 	"log"
 	"strconv"
@@ -134,7 +135,7 @@ func StartChargeCar(c *data.Car) error {
 			// update report
 			rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
 			rp.Step = data.StepCharge
-			rp.Charge_start_time = time.Now().Unix()
+			rp.Charge_start_time = vtime.Now().Unix()
 			return nil
 		}
 	}
@@ -252,7 +253,7 @@ func CancelCharge(u data.User) bool {
 		return false
 	}
 	// cancel the charge(report)
-	now := time.Now().Unix()
+	now := vtime.Now().Unix()
 	rp.Terminate_flag = true
 	rp.Terminate_time = now
 	rp.Step = data.StepFinish
@@ -275,7 +276,7 @@ func EndCharge(u data.User) bool {
 	}
 
 	// end the charge(report)
-	now := time.Now().Unix()
+	now := vtime.Now().Unix()
 	rp.Step = data.StepFinish
 	rp.Charge_end_time = now
 	rp.Terminate_flag = true
@@ -367,7 +368,7 @@ func checkFault() bool {
 			rp.Step = data.StepFinish
 			already_charged_amount := rp.Real_charge_amount
 			if rp.Charge_start_time != 0 {
-				rp.Charge_end_time = time.Now().Unix()
+				rp.Charge_end_time = vtime.Now().Unix()
 			}
 			archiveOngoingReport(rp)
 			// start a new report for cars in temp area
@@ -411,7 +412,7 @@ func schduleFast() {
 
 				// update report
 				rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
-				rp.Inlinetime = time.Now().Unix()
+				rp.Inlinetime = vtime.Now().Unix()
 				rp.Charge_id = min_wait_sti
 
 				sched.stations[min_wait_sti].Join(c)
@@ -449,7 +450,7 @@ func scheduleSlow() {
 
 				// update report
 				rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
-				rp.Inlinetime = time.Now().Unix()
+				rp.Inlinetime = vtime.Now().Unix()
 				rp.Charge_id = min_wait_sti
 
 				sched.stations[min_wait_sti].Join(c)
@@ -500,7 +501,7 @@ func scheduleFaultFast() {
 			c.Stage = data.Queueing
 			// update report
 			rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
-			rp.Inlinetime = time.Now().Unix()
+			rp.Inlinetime = vtime.Now().Unix()
 			rp.Charge_id = min_wait_sti
 			sched.stations[min_wait_sti].Join(c)
 		}
@@ -546,7 +547,7 @@ func scheduleFaultSlow() {
 			c.Stage = data.Queueing
 			// update report
 			rp := ongoingReportByUser(data.UserByUUId(c.OwnedBy))
-			rp.Inlinetime = time.Now().Unix()
+			rp.Inlinetime = vtime.Now().Unix()
 			rp.Charge_id = min_wait_sti
 			sched.stations[min_wait_sti].Join(c)
 		}
@@ -566,7 +567,7 @@ func scheduleCall() {
 		// update report
 		user := data.UserByUUId(car.OwnedBy)
 		rp := ongoingReportByUser(user)
-		rp.Calltime = time.Now().Unix()
+		rp.Calltime = vtime.Now().Unix()
 		rp.Step = data.StepCall
 	}
 

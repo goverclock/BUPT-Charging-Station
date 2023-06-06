@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"buptcs/data"
+	"buptcs/vtime"
 	"fmt"
 	"log"
 	"os"
@@ -83,6 +84,7 @@ func show_info() {
 		time.Sleep(1 * time.Second)
 		sched.mu.Lock()
 
+		fmt.Printf("Time:\t%v\n", vtime.Now())
 		fmt.Printf("FastInd:\t%v\n", "F"+strconv.Itoa(sched.fast_qind+1))
 		fmt.Printf("SlowInd:\t%v\n", "T"+strconv.Itoa(sched.slow_qind+1))
 		fmt.Printf("Waiting:\t")
@@ -130,7 +132,7 @@ func show_info() {
 // yuan per kWh
 func GetFee() (elec float64, service float64) {
 	service = 0.8
-	now := time.Now()
+	now := vtime.Now()
 	// minute := time.Minute
 	hour := now.Hour()
 
