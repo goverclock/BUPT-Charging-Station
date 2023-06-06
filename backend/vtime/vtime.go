@@ -21,6 +21,7 @@ func init() {
 	seco := time.Now().Second()
 	now -= int64((hour*60+minu)*60 + seco)
 	now += 6 * 60 * 60 // begining hour = 6
+	now -= 30 * Xrate	// real 30s for 1st operation
 	vt.ts = now
 
 	go ticker()
