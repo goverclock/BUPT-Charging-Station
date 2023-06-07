@@ -11,7 +11,7 @@ func getuserinfo(ctx *gin.Context) {
 	amazing_lock.Lock()
 	defer amazing_lock.Unlock()
 	var request struct {
-		UserId int `json:"userid"`
+		User_id int `json:"user_id"`
 	}
 	ctx.Bind(&request)
 	var response struct {
@@ -28,8 +28,8 @@ func getuserinfo(ctx *gin.Context) {
 
 	response.Code = CodeSucceed
 	response.Msg = "成功获取用户信息"
-	response.Data.User_id = request.UserId
-	user := scheduler.UserByContext(ctx, request.UserId)
+	response.Data.User_id = request.User_id
+	user := scheduler.UserByContext(ctx, request.User_id)
 	response.Data.Username = user.Name
 	// response.Data.Tell = nil
 	rp := scheduler.OngoingCopyByUser(user)
