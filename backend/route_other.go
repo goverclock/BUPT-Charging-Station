@@ -32,7 +32,8 @@ func getuserinfo(ctx *gin.Context) {
 	user := scheduler.UserByContext(ctx, request.UserId)
 	response.Data.Username = user.Name
 	// response.Data.Tell = nil
-	response.Data.Car_battery_now = 0
+	rp := scheduler.OngoingCopyByUser(user)
+	response.Data.Car_battery_now = rp.Real_charge_amount
 	response.Data.Car_battery = user.BatteryCapacity
 
 	ctx.JSON(http.StatusOK, response)
