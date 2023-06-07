@@ -44,12 +44,12 @@ func UserByName(name string) (user User, err error) {
 }
 
 // get a single user given the id
-// func UserById(id int) (user User, err error) {
-// 	user = User{}
-// 	err = Db.QueryRow("SELECT * FROM users WHERE id = $1", id).
-// 		Scan(&user.Id, &user.Uuid, &user.Name, &user.Password, &user.IsAdmin, &user.Balance, &user.BatteryCapacity)
-// 	return
-// }
+func UserById(id int) (user User, err error) {
+	user = User{}
+	err = Db.QueryRow("SELECT * FROM users WHERE id = $1", id).
+		Scan(&user.Id, &user.Uuid, &user.Name, &user.Password, &user.IsAdmin, &user.Balance, &user.BatteryCapacity)
+	return
+}
 
 func UserByUUId(uuid string) (user User) {
 	user = User{}

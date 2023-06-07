@@ -31,17 +31,12 @@ func login_user(ctx *gin.Context) {
 	// authenticate
 	user, err := data.UserByName(request.Username)
 	response.Data.User_id = user.Id
-	// response.Data.User_id = 0
 	if user.IsAdmin {
 		response.Data.User_type = 1
 	} else {
 		response.Data.User_type = 0
 	}
-	// if user.Id == 1 { // note: in our database, user with id == 1 is considered admin
-	// 	response.Data.User_type = 1
-	// } else {
-	// 	response.Data.User_type = 0
-	// }
+
 	if request.Username == "" || request.Password == "" {
 		response.Code = CodeKeyError
 		response.Msg = "需要输入用户名或密码"

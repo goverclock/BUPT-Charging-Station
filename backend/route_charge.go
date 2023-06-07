@@ -28,11 +28,7 @@ func charge_submit(ctx *gin.Context) {
 	}
 
 	// get user
-	user_name, _ := ctx.Get("user_name") // ctx.Set in JWT
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Println("UserByName")
-	}
+	user := scheduler.UserByContext(ctx, request.User_id)
 	user.BatteryCapacity = request.Max_vol
 	user.Update()
 
@@ -77,7 +73,7 @@ func charge_getChargingMsg(ctx *gin.Context) {
 	amazing_lock.Lock()
 	defer amazing_lock.Unlock()
 	var request struct {
-		Username string `json:"username"`
+		User_id int `json:"user_id"`
 	}
 	ctx.Bind(&request)
 	var response struct {
@@ -89,11 +85,7 @@ func charge_getChargingMsg(ctx *gin.Context) {
 	}
 
 	// get user
-	user_name, _ := ctx.Get("user_name") // ctx.Set in JWT
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Println("UserByName")
-	}
+	user := scheduler.UserByContext(ctx, request.User_id)
 	car, err := scheduler.CarByUser(user)
 	if err != nil {
 		// user hasn't submit the car
@@ -131,7 +123,7 @@ func charge_changeSubmit(ctx *gin.Context) {
 	}
 
 	// get user
-	user := scheduler.UserByContext(ctx)
+	user := scheduler.UserByContext(ctx, request.User_id)
 	if scheduler.ChangeCharge(user, request.Charge_mode, request.Charge_amount) {
 		response.Code = CodeSucceed
 		response.Msg = "修改成功"
@@ -157,7 +149,7 @@ func charge_cancelCharge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user := scheduler.UserByContext(ctx)
+	user := scheduler.UserByContext(ctx, request.User_id)
 	if scheduler.CancelCharge(user) {
 		response.Code = CodeSucceed
 		response.Msg = "已取消"
@@ -183,7 +175,7 @@ func charge_startCharge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user := scheduler.UserByContext(ctx)
+	user := scheduler.UserByContext(ctx, request.User_id)
 	car, err := scheduler.CarByUser(user)
 	if err != nil {
 		response.Code = CodeForbidden
@@ -216,7 +208,7 @@ func charge_endCharge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user := scheduler.UserByContext(ctx)
+	user := scheduler.UserByContext(ctx, request.User_id)
 	if scheduler.EndCharge(user) {
 		response.Code = CodeSucceed
 		response.Msg = "已结束"
@@ -240,7 +232,7 @@ func charge_details(ctx *gin.Context) {
 		Data []data.Report `json:"data"`
 	}
 
-	user := scheduler.UserByContext(ctx)
+	user := scheduler.UserByContext(ctx, request.User_id)
 	rps := scheduler.ReportsByUser(user)
 	response.Code = CodeSucceed
 	response.Msg = "成功获取详单"

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"buptcs/data"
 	"buptcs/scheduler"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +21,7 @@ func recharge(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user := scheduler.UserByContext(ctx)
+	user := scheduler.UserByContext(ctx, request.User_id)
 	if request.Recharge_amount < 0 {
 		response.Code = CodeKeyError
 		response.Msg = "充值金额必须不小于0"
@@ -52,14 +50,7 @@ func getbalance(ctx *gin.Context) {
 		} `json:"data"`
 	}
 
-	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Println("no such user ", user_name)
-	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Println(err, " no such user ", request.User_id)
-	}
+	user := scheduler.UserByContext(ctx, request.User_id)
 	response.Code = CodeSucceed
 	response.Msg = "查询成功"
 	response.Data.Balance = user.Balance

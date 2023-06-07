@@ -18,16 +18,21 @@ func Assert(b bool, s string) {
 	}
 }
 
-func UserByContext(ctx *gin.Context) data.User {
+func UserByContext(ctx *gin.Context, user_id int) (user data.User) {
 	user_name, ok := ctx.Get("user_name")
-	if !ok {
-		log.Fatal("ctx.Get")
+	var err error
+	if ok {	// using JWT
+		user, err = data.UserByName(user_name.(string))
+		if err != nil {
+			log.Fatal("UserByName: ", user_name)
+		}
+	} else {	// using user_id
+		user, err = data.UserById(user_id)
+		if err != nil {
+			log.Fatal("UserById: ", user_id)
+		}
 	}
-	user, err := data.UserByName(user_name.(string))
-	if err != nil {
-		log.Fatal("UserByName: ", user_name)
-	}
-	return user
+	return 
 }
 
 // assume sched.mu is locked

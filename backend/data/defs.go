@@ -3,6 +3,7 @@ package data
 import "flag"
 
 var Port int
+var JWT_enable bool
 
 var FAST_STATION_COUNT int = 2
 var SLOW_STATION_COUNT int = 3
@@ -14,8 +15,10 @@ func init() {
 	port_arg := flag.Int("port", 8080, "server address")
 	fast_count_arg := flag.Int("fast", 2, "fast station count")
 	slow_count_arg := flag.Int("slow", 3, "slow station count")
+	jwt_enable_arg := flag.Bool("jwt", true, "enable jwt or not")
 	flag.Parse()
 	FAST_STATION_COUNT = *fast_count_arg
 	SLOW_STATION_COUNT = *slow_count_arg
 	Port = *port_arg
+	JWT_enable = *jwt_enable_arg
 }
