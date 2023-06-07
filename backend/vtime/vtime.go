@@ -1,12 +1,12 @@
 package vtime
 
 import (
-	"log"
+	"fmt"
 	"sync"
 	"time"
 )
 
-const Xrate = 20
+const Xrate = 60
 
 type vtime struct {
 	ts     int64
@@ -41,11 +41,15 @@ func ShouldFreeze() bool {
 	return vt.freeze
 }
 
-func UnFreeze() {
+func SwitchFreeze() {
 	vt.mu.Lock()
 	defer vt.mu.Unlock()
-	log.Println("UnFreeze!")
-	vt.freeze = false
+	if vt.freeze {
+		fmt.Println("UnFreeze!(manual)")
+	} else {
+		fmt.Println("Freeze!(manual)")
+	}
+	vt.freeze = !vt.freeze
 }
 
 func ticker() {

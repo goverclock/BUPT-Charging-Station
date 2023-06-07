@@ -396,8 +396,8 @@ func schduleFast() {
 				if !st.Available() || st.Mode != 1 { // fast station
 					continue
 				}
-				if min_wait < 0 || st.WaitingTimeForCar(*c) < min_wait {
-					min_wait = st.WaitingTimeForCar(*c)
+				if min_wait < 0 || st.WaitingTimeForCar(*c, sched.ongoing_reports) < min_wait {
+					min_wait = st.WaitingTimeForCar(*c, sched.ongoing_reports)
 					min_wait_sti = sti
 				}
 			}
@@ -434,8 +434,8 @@ func scheduleSlow() {
 				if !st.Available() || st.Mode != 0 { // slow station
 					continue
 				}
-				if min_wait < 0 || st.WaitingTimeForCar(*c) < min_wait {
-					min_wait = st.WaitingTimeForCar(*c)
+				if min_wait < 0 || st.WaitingTimeForCar(*c, sched.ongoing_reports) < min_wait {
+					min_wait = st.WaitingTimeForCar(*c, sched.ongoing_reports)
 					min_wait_sti = sti
 				}
 			}
@@ -487,8 +487,8 @@ func scheduleFaultFast() {
 			if !st.Available() || st.Mode != 1 { // fast station
 				continue
 			}
-			if min_wait < 0 || st.WaitingTimeForCar(*c) < min_wait {
-				min_wait = st.WaitingTimeForCar(*c)
+			if min_wait < 0 || st.WaitingTimeForCar(*c, sched.ongoing_reports) < min_wait {
+				min_wait = st.WaitingTimeForCar(*c, sched.ongoing_reports)
 				min_wait_sti = sti
 			}
 		}
@@ -533,8 +533,8 @@ func scheduleFaultSlow() {
 			if !st.Available() || st.Mode != 0 { // fast station
 				continue
 			}
-			if min_wait < 0 || st.WaitingTimeForCar(*c) < min_wait {
-				min_wait = st.WaitingTimeForCar(*c)
+			if min_wait < 0 || st.WaitingTimeForCar(*c, sched.ongoing_reports) < min_wait {
+				min_wait = st.WaitingTimeForCar(*c, sched.ongoing_reports)
 				min_wait_sti = sti
 			}
 		}

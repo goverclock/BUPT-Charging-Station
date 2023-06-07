@@ -18,7 +18,7 @@ func Assert(b bool, s string) {
 	}
 }
 
-func UserByContext(ctx *gin.Context) data.User{
+func UserByContext(ctx *gin.Context) data.User {
 	user_name, ok := ctx.Get("user_name")
 	if !ok {
 		log.Fatal("ctx.Get")
@@ -123,12 +123,16 @@ func show_info() {
 			fmt.Println()
 		}
 		fmt.Println(sched.ongoing_reports)
-
-		if vtime.ShouldFreeze() {
-			log.Println("**FREEZED**")
-		}
 		fmt.Println()
 		sched.mu.Unlock()
+
+		if vtime.ShouldFreeze() {
+			fmt.Println("**FREEZED**")
+			fmt.Printf("Time:\t%v\n", vtime.Now())
+		}
+		for vtime.ShouldFreeze() {
+			time.Sleep(time.Second)
+		}
 	}
 }
 

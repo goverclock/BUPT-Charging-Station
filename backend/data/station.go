@@ -48,7 +48,7 @@ func NewStation(id int, mode int, speed float64) *Station {
 	st.Id = id
 	st.Mode = mode
 	st.Speed = speed
-	st.ChargeChan = make(chan float64)
+	st.ChargeChan = make(chan float64, 2)
 	st.ControlChan = make(chan int)
 	st.Running = true
 	st.IsDown = false
@@ -182,12 +182,10 @@ func (st *Station) generateElectricity() {
 		// keep trying to send out electricity and
 		// simply blocks if no car is receiving electricity
 		if !vtime.ShouldFreeze() && up && run {
-			timer := time.NewTimer(3 * time.Second)
 			select {
-			case st.ChargeChan <- st.Speed / (3600 / vtime.Xrate): // 180 * 20 = 3600
-			case <-timer.C:
+			case st.ChargeChan <- 0.01 + st.Speed*vtime.Xrate/3600:
+			default:
 			}
-			timer.Stop()
 		}
 	}
 }
@@ -226,10 +224,17 @@ func (st *Station) LeaveAll() []*Car {
 }
 
 // time needed for car before finishing charging
-func (st *Station) WaitingTimeForCar(c Car) float64 {
+func (st *Station) WaitingTimeForCar(c Car, allrps []*Report) float64 {
 	ret := c.ChargeAmount / st.Speed
 	for _, c := range st.Queue {
-		ret += c.ChargeAmount / st.Speed
+		user := UserByUUId(c.OwnedBy)
+		// get report for that user(car)
+		for _, rp := range allrps {
+			if rp.User_id == user.Id {
+				ret += (rp.Request_charge_amount - rp.Real_charge_amount) / st.Speed
+				break
+			}
+		}
 	}
 	return ret
 }

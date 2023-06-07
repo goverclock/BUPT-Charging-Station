@@ -22,7 +22,7 @@ func main() {
 		signal.Notify(sc, syscall.SIGQUIT)
 		for {
 			<-sc
-			vtime.UnFreeze()
+			vtime.SwitchFreeze()
 		}
 	}()
 
