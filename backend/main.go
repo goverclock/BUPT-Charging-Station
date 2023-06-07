@@ -2,9 +2,13 @@ package main
 
 import (
 	"buptcs/data"
+	"buptcs/vtime"
 	_ "net/http/pprof"
+	"os"
+	"os/signal"
 	"strconv"
 	"sync"
+	"syscall"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -13,6 +17,15 @@ import (
 var amazing_lock sync.Mutex
 
 func main() {
+	go func() {
+		sc := make(chan os.Signal, 1)
+		signal.Notify(sc, syscall.SIGQUIT)
+		for {
+			<-sc
+			vtime.UnFreeze()
+		}
+	}()
+
 	server := gin.Default()
 
 	server.Use(cors.New(cors.Config{
@@ -25,8 +38,8 @@ func main() {
 	server.POST("/login/user", login_user)
 	server.POST("/register/user", register_user)
 	server.POST("/charge/submit", auth_middleware, charge_submit)
-	server.POST("/charge/getChargingMsg", auth_middleware, charge_getChargingMsg)	// pending
-	server.POST("/charge/chargeSubmit", auth_middleware, charge_changeSubmit)	// maybe changeSubmit	// pending
+	server.POST("/charge/getChargingMsg", auth_middleware, charge_getChargingMsg) // pending
+	server.POST("/charge/chargeSubmit", auth_middleware, charge_changeSubmit)     // maybe changeSubmit	// pending
 	server.POST("/charge/changeSubmit", auth_middleware, charge_changeSubmit)
 	server.POST("/charge/cancelCharge", auth_middleware, charge_cancelCharge)
 	server.POST("/charge/startCharge", auth_middleware, charge_startCharge)
@@ -43,6 +56,6 @@ func main() {
 	server.POST("/chargeports/waitingCars", auth_middleware, chargeports_waitingCars)
 	server.POST("/system/getsettings", auth_middleware, system_getsettings)
 	server.POST("/system/setsettings", auth_middleware, system_setsettings)
-	
+
 	server.Run(":" + strconv.Itoa(data.Port))
 }

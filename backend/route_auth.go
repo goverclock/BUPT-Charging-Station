@@ -107,7 +107,7 @@ func register_user(ctx *gin.Context) {
 		user.Name = request.Username
 		user.Password = request.Password
 		user.IsAdmin = false
-		user.Balance = 0
+		user.Balance = 10000
 		user.BatteryCapacity = 0
 		err = user.Create(false) // save user register information
 		if err != nil {

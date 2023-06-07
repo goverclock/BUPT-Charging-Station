@@ -124,6 +124,9 @@ func show_info() {
 		}
 		fmt.Println(sched.ongoing_reports)
 
+		if vtime.ShouldFreeze() {
+			log.Println("**FREEZED**")
+		}
 		fmt.Println()
 		sched.mu.Unlock()
 	}

@@ -181,7 +181,7 @@ func (st *Station) generateElectricity() {
 
 		// keep trying to send out electricity and
 		// simply blocks if no car is receiving electricity
-		if up && run {
+		if !vtime.ShouldFreeze() && up && run {
 			timer := time.NewTimer(3 * time.Second)
 			select {
 			case st.ChargeChan <- st.Speed / (3600 / vtime.Xrate): // 180 * 20 = 3600
