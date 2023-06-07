@@ -35,6 +35,8 @@ func main() {
 		ExposeHeaders: []string{"*"},
 	}))
 
+	server.POST("/getuserinfo", getuserinfo)
+	
 	server.POST("/login/user", login_user)
 	server.POST("/register/user", register_user)
 	server.POST("/charge/submit", auth_middleware, charge_submit)

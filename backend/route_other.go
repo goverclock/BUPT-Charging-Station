@@ -6,6 +6,38 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+func getuserinfo(ctx *gin.Context) {
+	amazing_lock.Lock()
+	defer amazing_lock.Unlock()
+	var request struct {
+		UserId int `json:"userid"`
+	}
+	ctx.Bind(&request)
+	var response struct {
+		Code int    `json:"code"`
+		Msg  string `json:"msg"`
+		Data struct {
+			User_id         int     `json:"user_id"`
+			Username        string  `json:"username"`
+			Tell            string  `json:"tell"`
+			Car_battery_now float64 `json:"car_battery_now"`
+			Car_battery     float64 `json:"car_battery"`
+		} `json:"data"`
+	}
+
+	response.Code = CodeSucceed
+	response.Msg = "成功获取用户信息"
+	response.Data.User_id = request.UserId
+	user := scheduler.UserByContext(ctx, request.UserId)
+	response.Data.Username = user.Name
+	// response.Data.Tell = nil
+	response.Data.Car_battery_now = 0
+	response.Data.Car_battery = user.BatteryCapacity
+
+	ctx.JSON(http.StatusOK, response)
+}
+
 func recharge(ctx *gin.Context) {
 	amazing_lock.Lock()
 	defer amazing_lock.Unlock()
